@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>micropanel</title>
+		<script>
+			if (!('registerElement' in document && 'import' in document.createElement('link')))
+				document.write('<script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></scr'+'ipt>')
+		</script>
+		<link rel="import" href="micro-panel.html">
+		<style>
+			body { margin: 0; padding: 0; }
+			body, micro-panel { height: 100vh; }
+		</style>
+	</head>
+	<body>
+		<micro-panel>
+			<iframe src="/"></iframe>
+		</micro-panel>
+	</body>
+</html>
