@@ -1,0 +1,28 @@
+{
+  "name": "micro-panel",
+  "authors": [
+    "Val Packett <val@packett.cool>"
+  ],
+  "description": "An admin panel for websites that support microformats2 and micropub",
+  "main": "",
+  "moduleType": [],
+  "keywords": [
+    "micropub",
+    "microformats",
+    "indieweb"
+  ],
+  "license": "Unlicense",
+  "homepage": "https://github.com/myfreeweb/micro-panel",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.4.0",
+    "paper-header-panel": "PolymerElements/paper-header-panel#^1.1.5",
+    "paper-toolbar": "PolymerElements/paper-toolbar#^1.1.4"
+  }
+}
