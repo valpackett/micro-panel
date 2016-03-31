@@ -15,6 +15,7 @@
 <link rel="import" href="bower_components/neon-animation/neon-animated-pages.html">
 <link rel="import" href="bower_components/neon-animation/animations/fade-in-animation.html">
 <link rel="import" href="bower_components/neon-animation/animations/fade-out-animation.html">
+<script src="bower_components/microformat-shiv/microformat-shiv.min.js"></script>
 
 <dom-module id="micro-panel">
 	<template strip-whitespace>
@@ -55,6 +56,9 @@
 				<paper-tabs id="tabs" scrollable hide-scroll-buttons selected="{{selected}}">
 					<paper-tab>Website</paper-tab>
 					<paper-tab>Drafts</paper-tab>
+					<template is="dom-repeat" items="{{editing}}">
+						<paper-tab>Entry</paper-tab>
+					</template>
 				</paper-tabs>
 			</paper-toolbar>
 
@@ -66,6 +70,11 @@
 				<neon-animatable>
 					TODO
 				</neon-animatable>
+				<template is="dom-repeat" items="{{editing}}">
+					<neon-animatable>
+						[[item.properties.uid]]
+					</neon-animatable>
+				</template>
 			</neon-animated-pages>
 		</paper-header-panel>
 
@@ -107,7 +116,7 @@
 			properties: {
 				selected: { type: Number, value: 0 },
 				src: { type: String, value: "/" },
-				token: { type: String }
+				editing: { type: Array, value: [] }
 			},
 
 			attached: function () {
@@ -117,9 +126,27 @@
 					else
 						this.showAuthDialog()
 				}
-				this.$.frame.addEventListener('load', function (e) {
-					console.log(e)
-				})
+				this.$.frame.addEventListener('load', function (load) {
+					console.log(load)
+					var style = load.target.contentDocument.createElement('style')
+					style.innerHTML += '.h-entry { border: 2px solid blue; }'
+					style.innerHTML += '.h-entry::before { content: "Edit"; background: blue; color: white; padding: 6px; display: block; cursor: pointer; }'
+					load.target.contentDocument.body.appendChild(style)
+					load.target.contentDocument.addEventListener('click', function (e) {
+						if (!e.target.classList.contains('h-entry')) return
+						var entry = Microformats.get({ node: e.target }).items[0]
+						var i = 0
+						if (this.editing.find(function (editingEntry) {
+							i += 1
+							return ((editingEntry.properties || {}).uid || [1])[0] == ((entry.properties || {}).uid || [1])[0]
+						})) {
+							this.selected = 1 + i
+							return
+						}
+						this.push('editing', entry)
+						this.selected = 1 + this.editing.length
+					}.bind(this))
+				}.bind(this))
 			},
 
 			showAuthDialog: function () {
