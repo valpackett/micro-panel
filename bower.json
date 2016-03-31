@@ -35,6 +35,7 @@
     "paper-dialog": "PolymerElements/paper-dialog#^1.0.4",
     "paper-input": "PolymerElements/paper-input#^1.1.10",
     "es6-promise": "^3.2.1",
-    "fetch": "^0.11.0"
+    "fetch": "^0.11.0",
+    "microformat-shiv": "microformats-shiv#^1.4.0"
   }
 }
