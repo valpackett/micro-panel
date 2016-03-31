@@ -5,6 +5,10 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>micropanel</title>
 		<script>
+			if (!('Promise' in window))
+				document.write('<script src="bower_components/es6-promise/es6-promise.min.js"></scr'+'ipt>')
+			if (!('fetch' in window))
+				document.write('<script src="bower_components/fetch/fetch.js"></scr'+'ipt>')
 			if (!('registerElement' in document && 'import' in document.createElement('link')))
 				document.write('<script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></scr'+'ipt>')
 		</script>
