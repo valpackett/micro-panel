@@ -1,10 +1,24 @@
 # micro-panel
 
-TODO
+A client-side admin panel for your [IndieWeb](https://indiewebcamp.com) website!
 
-## Usage
+- your website is the best interface to your website, and micro-panel just shows it in a frame, (TODO) adding edit buttons to entires
+- (TODO) creates/updates/deletes [Microformats 2](http://microformats.org/wiki/microformats2) entries using [Micropub](http://micropub.net/draft/)
+- authenticates using [IndieAuth](https://indiewebcamp.com/IndieAuth)
+- (TODO) saves drafts of posts and allows working on them offline
+- built with [Polymer](https://www.polymer-project.org/1.0/)
 
-TODO
+(Created because I didn't want to make an admin interface specific to [Sweetroll](https://github.com/myfreeweb/sweetroll)… Also check out [indieweb-components](https://github.com/myfreeweb/indieweb-components) for components to put on your website.)
+
+## Installation
+
+Make sure your website engine implements the Micropub spec! In particular, micro-panel will send JSON requests with the access token in an `Authorization` header.
+For update requests, micro-panel uses the `replace` property.
+The endpoint also should support `?q=source` requests, which allow micro-panel to always show all existing properties of an entry in the editing interface.
+
+### From git
+
+Clone the repo (or use GitHub's ZIP download feature), run [bower](http://bower.io/) install, put on your server (same domain as the website!).
 
 ## Contributing
 
