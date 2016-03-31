@@ -28,12 +28,16 @@
 			paper-tabs { flex: 1 1 auto; height: 64px; }
 
 			@media screen and (min-width: 450px) {
-				#open-url-input { min-width: 70vw; }
+				#open-url-input, #auth-url-input { min-width: 70vw; }
 			}
 
 			@media screen and (max-width: 600px) {
 				.content-wrapper { height: calc(100vh - 56px); }
 				paper-tabs { height: 56px; }
+			}
+
+			@media screen and (min-width: 800px) {
+				#open-url-input, #auth-url-input { min-width: 55vw; }
 			}
 		</style>
 
@@ -54,7 +58,7 @@
 				</paper-tabs>
 			</paper-toolbar>
 
-			<neon-animated-pages entry-animation="fade-in-animation" exit-animation="fade-out-animation"
+			<neon-animated-pages id="pages" entry-animation="fade-in-animation" exit-animation="fade-out-animation"
 					selected="[[selected]]" class="content-wrapper content fit">
 				<neon-animatable>
 					<iframe id="frame" src="[[src]]"></iframe>
@@ -64,6 +68,15 @@
 				</neon-animatable>
 			</neon-animated-pages>
 		</paper-header-panel>
+
+		<paper-dialog id="auth-dialog" on-iron-overlay-closed="authDialogClosed"
+				modal entry-animation="fade-in-animation" exit-animation="fade-out-animation">
+			<h2>Sign in</h2>
+			<paper-input id="auth-url-input" label="Your domain" type="url"></paper-input>
+			<div class="buttons">
+				<paper-button on-tap="authStart">Sign in</paper-button>
+			</div>
+		</paper-dialog>
 
 		<paper-dialog id="open-url-dialog" on-iron-overlay-closed="openUrlClosed"
 				modal entry-animation="fade-in-animation" exit-animation="fade-out-animation">
@@ -93,13 +106,72 @@
 
 			properties: {
 				selected: { type: Number, value: 0 },
-				src: { type: String, value: "/" }
+				src: { type: String, value: "/" },
+				token: { type: String }
 			},
 
 			attached: function () {
+				if (!localStorage.getItem('access_token')) {
+					if (location.search.match(/code=/))
+						this.authFinish()
+					else
+						this.showAuthDialog()
+				}
 				this.$.frame.addEventListener('load', function (e) {
 					console.log(e)
 				})
+			},
+
+			showAuthDialog: function () {
+				this.$['auth-url-input'].value = location.origin
+				this.$['auth-dialog'].open()
+			},
+			authStart: function () {
+				fetch(this.$['auth-url-input'].value)
+				.then(function (resp) {
+					var links = resp.headers.get('Link')
+					var micropub_link = links.match(/<([^>]+)>;[^,]*rel="[^,]*micropub[^,]*"/)[1]
+					var auth_link = links.match(/<([^>]+)>;[^,]*rel="[^,]*authorization_endpoint[^,]*"/)[1] || 'https://indieauth.com/auth'
+					var token_link = links.match(/<([^>]+)>;[^,]*rel="[^,]*token_endpoint[^,]*"/)[1]
+					var state = new Uint8Array(32)
+					crypto.getRandomValues(state)
+					state = state.join('')
+					localStorage.setItem('micropub_link', micropub_link)
+					localStorage.setItem('auth_link', auth_link)
+					localStorage.setItem('token_link', token_link)
+					localStorage.setItem('state', state)
+					localStorage.setItem('redirect_uri', location.href)
+					location.href = auth_link +
+						'?me=' + encodeURIComponent(this.$['auth-url-input'].value) +
+						'&client_id=' + encodeURIComponent(this.$['auth-url-input'].value) +
+						'&redirect_uri=' + encodeURIComponent(location.href) +
+						'&state=' + encodeURIComponent(state) +
+						'&scope=post'
+				}.bind(this))
+			},
+			authFinish: function () {
+				var code = location.search.match(/code=([^&]+)/)[1]
+				var me = location.search.match(/me=([^&]+)/)[1]
+				fetch(localStorage.getItem('token_link'), {
+					method: 'post',
+					headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' },
+					body: 'code=' + code + '&me=' + me + '&client_id=' + me +
+						'&redirect_uri=' + encodeURIComponent(localStorage.getItem('redirect_uri')) +
+						'&state=' + encodeURIComponent(localStorage.getItem('state')) + '&scope=post'
+				}).then(function (resp) {
+					return resp.text()
+				}).then(function (body) {
+					var token = body.match(/access_token=([^&]+)/)[1]
+					if (!token) {
+						// TODO: show error to user
+					}
+					localStorage.setItem('access_token', token)
+					history.replaceState({}, '', location.href.replace(/\?[^#]*/, ''))
+				}.bind(this)).catch(function (e) {
+					console.log(e)
+					// TODO: show error to user
+					this.authStart()
+				}.bind(this))
 			},
 
 			showOpenUrl: function () {
