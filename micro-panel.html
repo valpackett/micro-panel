@@ -142,21 +142,54 @@
 					style.innerHTML += '.h-entry { border: 2px solid blue; }'
 					style.innerHTML += '.h-entry::before { content: "Edit"; background: blue; color: white; padding: 6px; display: block; cursor: pointer; }'
 					load.target.contentDocument.body.appendChild(style)
-					load.target.contentDocument.addEventListener('click', function (e) {
-						if (!e.target.classList.contains('h-entry')) return
-						var entry = Microformats.get({ node: e.target, textFormat: 'normalised' }).items[0]
-						var i = 0
-						if (this.editing.find(function (editingEntry) {
-							i += 1
-							return ((editingEntry.properties || {}).uid || [1])[0] == ((entry.properties || {}).uid || [1])[0]
-						})) {
-							this.selected = 1 + i
-							return
-						}
-						this.push('editing', entry)
-						this.selected = 1 + this.editing.length
+					load.target.contentDocument.addEventListener('click', this.editClick.bind(this))
+				}.bind(this))
+			},
+			editClick: function (e) {
+				if (!e.target.classList.contains('h-entry')) return
+				var entry = Microformats.get({ node: e.target, textFormat: 'normalised' }).items[0]
+				var i = 0
+				if (this.editing.find(function (editingEntry) {
+					i += 1
+					return ((editingEntry.properties || {}).uid || [1])[0] == ((entry.properties || {}).uid || [1])[0]
+				})) {
+					this.selected = 1 + i
+					return
+				}
+				var frameUrl = this.$.frame.contentWindow.location.href
+				var url = ((entry.properties || {}).url || [frameUrl])[0]
+				if (frameUrl == url)
+					return this.editStart(entry)
+				this.micropubGet('q=source&url=' + encodeURIComponent(url))
+				.then(function (resp) { return resp.json() })
+				.then(function (fullEntry) { this.editStart(fullEntry) }.bind(this))
+				.catch(function (e) {
+					console.log('Error when asking micropub for entry source', e)
+					fetch(url)
+					.then(function (resp) { return resp.text() })
+					.then(function (body) {
+						var fullEntry = Microformats.get({ html: body, textFormat: 'normalised', filter: ['h-entry'] }).items[0]
+						this.editStart(fullEntry)
+					}.bind(this))
+					.catch(function (e) {
+						console.log('Error when fetching entry', e)
+						this.editStart(entry)
 					}.bind(this))
 				}.bind(this))
+			},
+			editStart: function (entry) {
+				this.push('editing', entry)
+				this.selected = 1 + this.editing.length
+			},
+
+			micropubGet: function (qs) {
+				var link = localStorage.getItem('micropub_link')
+				return fetch(link.indexOf('?') === -1 ? link + '?' + qs : link + '&' + qs, {
+					headers: {
+						Accept: 'application/json',
+						Authorization: 'Bearer ' + localStorage.getItem('access_token')
+					}
+				})
 			},
 
 			showAuthDialog: function () {
