@@ -1,0 +1,66 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/paper-material/paper-material.html">
+<link rel="import" href="bower_components/paper-input/paper-input.html">
+<link rel="import" href="bower_components/paper-input/paper-textarea.html">
+
+<dom-module id="microformat-editor">
+	<template strip-whitespace>
+		<style>
+			paper-material { margin: 1em auto; width: 98%; }
+			.key-name, .one-value { padding: 0.5em; }
+			.one-value { background: rgba(250, 250, 250, 0.1); }
+			.one-value:nth-child(odd) { background: rgba(230, 230, 230, 0.25); }
+
+			@media screen and (min-width: 550px) {
+				paper-material { width: 90%; }
+			}
+		</style>
+
+		<template is="dom-repeat" items="{{getPropKeys(item)}}" as="key">
+			<paper-material elevation="1">
+				<div class="key-name">[[key]]</div>
+				<template is="dom-repeat" items="{{getPropValues(item, key)}}" as="val">
+					<template is="dom-if" if="{{isString(val)}}">
+						<paper-input class="one-value" value="{{val}}" no-label-float></paper-input>
+					</template>
+					<template is="dom-if" if="{{isContentHtml(val)}}">
+						<paper-textarea class="one-value" value="{{val.html}}"></paper-textarea>
+					</template>
+					<template is="dom-if" if="{{isContentValueNotHtml(val)}}">
+						<paper-textarea class="one-value" value="{{val.value}}"></paper-textarea>
+					</template>
+					<template is="dom-if" if="{{isMicroformat(val)}}">
+						<microformat-editor class="one-value" item="{{val}}"></microformat-editor>
+					</template>
+				</template>
+			</paper-material>
+		</template>
+	</template>
+
+	<script>'use strict'
+		Polymer({
+			is: 'microformat-editor',
+			properties: {
+				item: { type: Object, value: { type: [ "h-entry" ], properties: {} } }
+			},
+			getPropKeys: function (item) {
+				return Object.keys(item.properties)
+			},
+			getPropValues: function (item, key) {
+				return item.properties[key]
+			},
+			isString: function (val) {
+				return typeof val === 'string'
+			},
+			isContentHtml: function (val) {
+				return typeof val.html === 'string'
+			},
+			isContentValueNotHtml: function (val) {
+				return typeof val.html !== 'string' && typeof val.type !== 'array' && typeof val.value === 'string'
+			},
+			isMicroformat: function (val) {
+				return (val.type || []).length >= 1
+			}
+		})
+	</script>
+</dom-module>
