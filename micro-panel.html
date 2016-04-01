@@ -5,6 +5,7 @@
 <link rel="import" href="bower_components/paper-input/paper-input.html">
 <link rel="import" href="bower_components/paper-button/paper-button.html">
 <link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
@@ -15,6 +16,7 @@
 <link rel="import" href="bower_components/neon-animation/neon-animated-pages.html">
 <link rel="import" href="bower_components/neon-animation/animations/fade-in-animation.html">
 <link rel="import" href="bower_components/neon-animation/animations/fade-out-animation.html">
+<link rel="import" href="microformat-editor.html">
 <script src="bower_components/microformat-shiv/microformat-shiv.min.js"></script>
 
 <dom-module id="micro-panel">
@@ -27,6 +29,9 @@
 			neon-animatable, neon-animatable > * { width: 100%; height: 100%; border: 0; background: #fff; }
 			paper-icon-button { margin-right: 0 !important; }
 			paper-tabs { flex: 1 1 auto; height: 64px; }
+			.ui-tab-content { overflow-y: scroll; -webkit-overflow-scrolling: touch; }
+			.toolbar-wrapper { @apply(--layout-vertical); }
+			.toolbar-wrapper .ui-tab-content { @apply(--layout-flex); }
 
 			@media screen and (min-width: 450px) {
 				#open-url-input, #auth-url-input { min-width: 70vw; }
@@ -44,13 +49,14 @@
 
 		<paper-header-panel>
 			<paper-toolbar>
-				<paper-menu-button id="menu-button" open-animation-config='[{"name": "fade-in-animation", "timing": {"duration": 200}}]'
+				<paper-menu-button id="menu-button"
+						 open-animation-config='[{"name": "fade-in-animation", "timing": {"duration": 200}}]'
 						close-animation-config='[{"name": "fade-out-animation", "timing": {"duration": 200}}]'>
-					<paper-icon-button icon="menu" class="dropdown-trigger"></paper-icon-button>
+					<paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
 					<paper-menu class="dropdown-content">
-						<paper-icon-item><iron-icon icon="create" item-icon></iron-icon>New post</paper-icon-item>
-						<paper-icon-item on-tap="showOpenUrl"><iron-icon icon="input" item-icon></iron-icon>Open URL</paper-icon-item>
-						<paper-icon-item on-tap="showAbout"><iron-icon icon="info" item-icon></iron-icon>About...</paper-icon-item>
+						<paper-icon-item role="menuitem"><iron-icon icon="create" item-icon></iron-icon>New post</paper-icon-item>
+						<paper-icon-item role="menuitem" on-tap="showOpenUrl"><iron-icon icon="input" item-icon></iron-icon>Open URL</paper-icon-item>
+						<paper-icon-item role="menuitem" on-tap="showAbout"><iron-icon icon="info" item-icon></iron-icon>About...</paper-icon-item>
 					</paper-menu>
 				</paper-menu-button>
 				<paper-tabs id="tabs" scrollable hide-scroll-buttons selected="{{selected}}">
@@ -67,12 +73,16 @@
 				<neon-animatable>
 					<iframe id="frame" src="[[src]]"></iframe>
 				</neon-animatable>
-				<neon-animatable>
+				<neon-animatable class="ui-tab-content">
 					TODO
 				</neon-animatable>
 				<template is="dom-repeat" items="{{editing}}">
 					<neon-animatable>
-						[[item.properties.uid]]
+						<div class="toolbar-wrapper">
+							<microformat-editor class="ui-tab-content" item="{{item}}"></microformat-editor>
+							<paper-toolbar>
+							</paper-toolbar>
+						</div>
 					</neon-animatable>
 				</template>
 			</neon-animated-pages>
@@ -134,7 +144,7 @@
 					load.target.contentDocument.body.appendChild(style)
 					load.target.contentDocument.addEventListener('click', function (e) {
 						if (!e.target.classList.contains('h-entry')) return
-						var entry = Microformats.get({ node: e.target }).items[0]
+						var entry = Microformats.get({ node: e.target, textFormat: 'normalised' }).items[0]
 						var i = 0
 						if (this.editing.find(function (editingEntry) {
 							i += 1
@@ -186,13 +196,16 @@
 						'&redirect_uri=' + encodeURIComponent(localStorage.getItem('redirect_uri')) +
 						'&state=' + encodeURIComponent(localStorage.getItem('state')) + '&scope=post'
 				}).then(function (resp) {
+					console.log(resp)
 					return resp.text()
 				}).then(function (body) {
 					var token = body.match(/access_token=([^&]+)/)[1]
-					if (!token) {
-						// TODO: show error to user
-					}
+					if (!token) throw new Error('No access token in response')
 					localStorage.setItem('access_token', token)
+					localStorage.removeItem('auth_link')
+					localStorage.removeItem('token_link')
+					localStorage.removeItem('state')
+					localStorage.removeItem('redirect_uri')
 					history.replaceState({}, '', location.href.replace(/\?[^#]*/, ''))
 				}.bind(this)).catch(function (e) {
 					console.log(e)
@@ -209,6 +222,7 @@
 			openUrlClosed: function (e) {
 				if (!e.detail.confirmed) return
 				this.src = this.$['open-url-input'].value
+				this.selected = 0
 			},
 
 			showAbout: function () {
