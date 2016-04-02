@@ -65,13 +65,22 @@ Polymer({
 			else
 				this.showAuthDialog()
 		}
-		this.$.frame.addEventListener('e', e => {
+		this.$.frame.addEventListener('load', e => {
 			console.log(e)
 			let style = e.target.contentDocument.createElement('style')
 			style.innerHTML += '.h-entry { border: 2px solid blue; }'
 			style.innerHTML += '.h-entry::before { content: "Edit"; background: blue; color: white; padding: 6px; display: block; cursor: pointer; }'
 			e.target.contentDocument.body.appendChild(style)
 			e.target.contentDocument.addEventListener('click', this.editClick.bind(this))
+		})
+	},
+
+	// Editing {{{
+	openNewEntry(e) {
+		this.editStart({
+			type: ['h-entry'],
+			'x-micro-panel-new': true,
+			properties: { name: [], content: [{html: ''}], 'in-reply-to': [], 'like-of': [], 'repost-of': [] }
 		})
 	},
 
@@ -115,7 +124,7 @@ Polymer({
 
 	deleteEntry(e) {
 		if (!confirm('Are you sure you want to delete the entry?')) return
-		let entry = e.model.item
+		let entry = this.$['editing-repeat'].modelForElement(e.target).item // XXX: https://github.com/Polymer/polymer/issues/1865
 		let url = ((entry.properties || {}).url || [null])[0]
 		if (!url) return alert('Somehow, an entry with no URL! I have no idea how to delete that.')
 		micropubPost({ 'mp-action': 'delete', url: url })
@@ -130,8 +139,7 @@ Polymer({
 	},
 
 	saveEntry(e) {
-		if (!confirm('Are you sure you want to save the entry?')) return
-		let entry = e.model.item
+		let entry = this.$['editing-repeat'].modelForElement(e.target).item
 		let url = ((entry.properties || {}).url || [null])[0]
 		if (!url) return alert('Somehow, an entry with no URL! I have no idea how to save that.')
 		micropubPost({ 'mp-action': 'update', url: url, replace: { properties: entry.properties } })
@@ -145,12 +153,27 @@ Polymer({
 		})
 	},
 
-	editFinish(entry) {
-		this.splice('editing', this.editing.indexOf(entry), 1)
-		this.$.frame.src = this.$.frame.src // reload
-		this.selected = 0
+	createEntry(e) {
+		let entry = this.$['editing-repeat'].modelForElement(e.target).item
+		micropubPost({ type: entry.type, properties: entry.properties })
+		.then(resp => {
+			if (resp.status >= 300) throw new Error("Couldn't create the entry! Response: " + resp.status)
+			this.editFinish(entry, resp.headers.get('Location'))
+		})
+		.catch(e => {
+			console.log('Error when creating entry', e)
+			alert(e)
+		})
 	},
 
+	editFinish(entry, redir) {
+		this.splice('editing', this.editing.indexOf(entry), 1)
+		this.$.frame.src = redir || this.$.frame.src
+		this.selected = 0
+	},
+	// }}}
+
+	// Auth {{{
 	showAuthDialog() {
 		this.$['auth-url-input'].value = location.origin
 		this.$['auth-dialog'].open()
@@ -193,11 +216,13 @@ Polymer({
 			this.authStart()
 		})
 	},
+	// }}}
 
+	// Open URL {{{
 	showOpenUrl() {
 		this.$['menu-button'].close()
-		this.$['open-url-input'].value = this.$.frame.contentWindow.location.href
 		this.$['open-url-dialog'].open()
+		this.$['open-url-input'].value = this.$.frame.contentWindow.location.href
 	},
 
 	openUrlClosed(e) {
@@ -205,6 +230,7 @@ Polymer({
 		this.src = this.$['open-url-input'].value
 		this.selected = 0
 	},
+	// }}}
 
 	showAbout() {
 		this.$['menu-button'].close()
