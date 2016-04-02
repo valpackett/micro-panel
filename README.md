@@ -5,7 +5,9 @@ A client-side admin panel for your [IndieWeb](https://indiewebcamp.com) website!
 - your website is the best interface to your website, and micro-panel just shows it in a frame, making entries editable
 - creates(TODO)/updates/deletes [Microformats 2](http://microformats.org/wiki/microformats2) entries using [Micropub](http://micropub.net/draft/)
 - authenticates using [IndieAuth](https://indiewebcamp.com/IndieAuth)
-- (TODO) saves drafts of posts and allows working on them offline
+- (TODO) saves drafts of posts
+- (TODO) allows working on drafts offline
+- (TODO) undo/redo
 - built with [Polymer](https://www.polymer-project.org/1.0/)
 
 (Created because I didn't want to make an admin interface specific to [Sweetroll](https://github.com/myfreeweb/sweetroll)… Also check out [indieweb-components](https://github.com/myfreeweb/indieweb-components) for components to put on your website.)
