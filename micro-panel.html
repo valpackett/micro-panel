@@ -56,7 +56,7 @@
 						close-animation-config='[{"name": "fade-out-animation", "timing": {"duration": 200}}]'>
 					<paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
 					<paper-menu class="dropdown-content">
-						<paper-icon-item role="menuitem"><iron-icon icon="create" item-icon></iron-icon>New post</paper-icon-item>
+						<paper-icon-item role="menuitem" on-tap="openNewEntry"><iron-icon icon="create" item-icon></iron-icon>New post</paper-icon-item>
 						<paper-icon-item role="menuitem" on-tap="showOpenUrl"><iron-icon icon="input" item-icon></iron-icon>Open URL</paper-icon-item>
 						<paper-icon-item role="menuitem" on-tap="showAbout"><iron-icon icon="info" item-icon></iron-icon>About...</paper-icon-item>
 					</paper-menu>
@@ -78,13 +78,18 @@
 				<neon-animatable class="ui-tab-content">
 					TODO
 				</neon-animatable>
-				<template is="dom-repeat" items="{{editing}}">
+				<template id="editing-repeat" is="dom-repeat" items="{{editing}}">
 					<neon-animatable>
 						<div class="toolbar-wrapper">
 							<microformat-editor class="ui-tab-content" item="{{item}}"></microformat-editor>
 							<paper-toolbar class="editor-bottom-bar">
-								<paper-button on-tap="deleteEntry">Delete</paper-button>
-								<paper-button on-tap="saveEntry">Save</paper-button>
+								<template is="dom-if" if="{{item.x-micro-panel-new}}">
+									<paper-button on-tap="createEntry">Create</paper-button>
+								</template>
+								<template is="dom-if" if="{{!item.x-micro-panel-new}}">
+									<paper-button on-tap="deleteEntry">Delete</paper-button>
+									<paper-button on-tap="saveEntry">Save</paper-button>
+								</template>
 							</paper-toolbar>
 						</div>
 					</neon-animatable>

@@ -3,7 +3,7 @@
 A client-side admin panel for your [IndieWeb](https://indiewebcamp.com) website!
 
 - your website is the best interface to your website, and micro-panel just shows it in a frame, making entries editable
-- creates(TODO)/updates/deletes [Microformats 2](http://microformats.org/wiki/microformats2) entries using [Micropub](http://micropub.net/draft/)
+- creates/updates/deletes [Microformats 2](http://microformats.org/wiki/microformats2) entries using [Micropub](http://micropub.net/draft/)
 - authenticates using [IndieAuth](https://indiewebcamp.com/IndieAuth)
 - (TODO) saves drafts of posts
 - (TODO) allows working on drafts offline
