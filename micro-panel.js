@@ -1,5 +1,31 @@
 'use strict'
 
+function saveAuthParams (links) {
+	let micropub_link = links.match(/<([^>]+)>;[^,]*rel="[^,]*micropub[^,]*"/)[1]
+	let auth_link = links.match(/<([^>]+)>;[^,]*rel="[^,]*authorization_endpoint[^,]*"/)[1] || 'https://indieauth.com/auth'
+	let token_link = links.match(/<([^>]+)>;[^,]*rel="[^,]*token_endpoint[^,]*"/)[1]
+	localStorage.setItem('micropub_link', micropub_link)
+	localStorage.setItem('auth_link', auth_link)
+	localStorage.setItem('token_link', token_link)
+	localStorage.setItem('redirect_uri', location.href)
+}
+
+function saveAndGetState () {
+	let state = new Uint8Array(32)
+	crypto.getRandomValues(state)
+	state = state.join('')
+	localStorage.setItem('state', state)
+	return state
+}
+
+function setAccessToken (token) {
+	localStorage.setItem('access_token', token)
+	localStorage.removeItem('auth_link')
+	localStorage.removeItem('token_link')
+	localStorage.removeItem('state')
+	localStorage.removeItem('redirect_uri')
+	history.replaceState({}, '', location.href.replace(/\?[^#]*/, ''))
+}
 
 function micropubGet (qs) {
 	let link = localStorage.getItem('micropub_link')
@@ -39,13 +65,13 @@ Polymer({
 			else
 				this.showAuthDialog()
 		}
-		this.$.frame.addEventListener('load', load => {
-			console.log(load)
-			let style = load.target.contentDocument.createElement('style')
+		this.$.frame.addEventListener('e', e => {
+			console.log(e)
+			let style = e.target.contentDocument.createElement('style')
 			style.innerHTML += '.h-entry { border: 2px solid blue; }'
 			style.innerHTML += '.h-entry::before { content: "Edit"; background: blue; color: white; padding: 6px; display: block; cursor: pointer; }'
-			load.target.contentDocument.body.appendChild(style)
-			load.target.contentDocument.addEventListener('click', this.editClick.bind(this))
+			e.target.contentDocument.body.appendChild(style)
+			e.target.contentDocument.addEventListener('click', this.editClick.bind(this))
 		})
 	},
 
@@ -95,7 +121,7 @@ Polymer({
 		micropubPost({ 'mp-action': 'delete', url: url })
 		.then(resp => {
 			if (resp.status >= 300) throw new Error("Couldn't delete the entry! Response: " + resp.status)
-			this.stopEditing(entry)
+			this.editFinish(entry)
 		})
 		.catch(e => {
 			console.log('Error when deleting entry', e)
@@ -111,7 +137,7 @@ Polymer({
 		micropubPost({ 'mp-action': 'update', url: url, replace: { properties: entry.properties } })
 		.then(resp => {
 			if (resp.status >= 300) throw new Error("Couldn't save the entry! Response: " + resp.status)
-			this.stopEditing(entry)
+			this.editFinish(entry)
 		})
 		.catch(e => {
 			console.log('Error when saving entry', e)
@@ -119,7 +145,7 @@ Polymer({
 		})
 	},
 
-	stopEditing(entry) {
+	editFinish(entry) {
 		this.splice('editing', this.editing.indexOf(entry), 1)
 		this.$.frame.src = this.$.frame.src // reload
 		this.selected = 0
@@ -134,17 +160,8 @@ Polymer({
 		fetch(this.$['auth-url-input'].value)
 		.then(resp => {
 			let links = resp.headers.get('Link')
-			let micropub_link = links.match(/<([^>]+)>;[^,]*rel="[^,]*micropub[^,]*"/)[1]
-			let auth_link = links.match(/<([^>]+)>;[^,]*rel="[^,]*authorization_endpoint[^,]*"/)[1] || 'https://indieauth.com/auth'
-			let token_link = links.match(/<([^>]+)>;[^,]*rel="[^,]*token_endpoint[^,]*"/)[1]
-			let state = new Uint8Array(32)
-			crypto.getRandomValues(state)
-			state = state.join('')
-			localStorage.setItem('micropub_link', micropub_link)
-			localStorage.setItem('auth_link', auth_link)
-			localStorage.setItem('token_link', token_link)
-			localStorage.setItem('state', state)
-			localStorage.setItem('redirect_uri', location.href)
+			saveAuthParams(links)
+			let state = saveAndGetState()
 			location.href = auth_link +
 				'?me=' + encodeURIComponent(this.$['auth-url-input'].value) +
 				'&client_id=' + encodeURIComponent(this.$['auth-url-input'].value) +
@@ -169,15 +186,10 @@ Polymer({
 		}).then(body => {
 			let token = body.match(/access_token=([^&]+)/)[1]
 			if (!token) throw new Error('No access token in response')
-			localStorage.setItem('access_token', token)
-			localStorage.removeItem('auth_link')
-			localStorage.removeItem('token_link')
-			localStorage.removeItem('state')
-			localStorage.removeItem('redirect_uri')
-			history.replaceState({}, '', location.href.replace(/\?[^#]*/, ''))
+			setAccessToken(token)
 		}).catch(e => {
 			console.log(e)
-			// TODO: show error to user
+			alert('Could not get access token from the token endpoint.')
 			this.authStart()
 		})
 	},
@@ -200,4 +212,3 @@ Polymer({
 	}
 
 })
-
