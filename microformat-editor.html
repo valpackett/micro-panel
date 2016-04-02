@@ -37,30 +37,5 @@
 		</template>
 	</template>
 
-	<script>'use strict'
-		Polymer({
-			is: 'microformat-editor',
-			properties: {
-				item: { type: Object, value: { type: [ "h-entry" ], properties: {} } }
-			},
-			getPropKeys: function (item) {
-				return Object.keys(item.properties)
-			},
-			getPropValues: function (item, key) {
-				return item.properties[key]
-			},
-			isString: function (val) {
-				return typeof val === 'string'
-			},
-			isContentHtml: function (val) {
-				return typeof val.html === 'string'
-			},
-			isContentValueNotHtml: function (val) {
-				return typeof val.html !== 'string' && typeof val.type !== 'array' && typeof val.value === 'string'
-			},
-			isMicroformat: function (val) {
-				return (val.type || []).length >= 1
-			}
-		})
-	</script>
+	<script src="microformat-editor.js"></script>
 </dom-module>
