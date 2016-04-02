@@ -32,6 +32,7 @@
 			.ui-tab-content { overflow-y: scroll; -webkit-overflow-scrolling: touch; }
 			.toolbar-wrapper { @apply(--layout-vertical); }
 			.toolbar-wrapper .ui-tab-content { @apply(--layout-flex); }
+			.editor-bottom-bar { --paper-toolbar-content: { justify-content: flex-end; }; }
 
 			@media screen and (min-width: 450px) {
 				#open-url-input, #auth-url-input { min-width: 70vw; }
@@ -40,6 +41,7 @@
 			@media screen and (max-width: 600px) {
 				.content-wrapper { height: calc(100vh - 56px); }
 				paper-tabs { height: 56px; }
+				.editor-bottom-bar { padding-left: 10vw; padding-right: 10vw; }
 			}
 
 			@media screen and (min-width: 800px) {
@@ -80,7 +82,9 @@
 					<neon-animatable>
 						<div class="toolbar-wrapper">
 							<microformat-editor class="ui-tab-content" item="{{item}}"></microformat-editor>
-							<paper-toolbar>
+							<paper-toolbar class="editor-bottom-bar">
+								<paper-button on-tap="deleteEntry">Delete</paper-button>
+								<paper-button on-tap="saveEntry">Save</paper-button>
 							</paper-toolbar>
 						</div>
 					</neon-animatable>
@@ -91,6 +95,9 @@
 		<paper-dialog id="auth-dialog" on-iron-overlay-closed="authDialogClosed"
 				modal entry-animation="fade-in-animation" exit-animation="fade-out-animation">
 			<h2>Sign in</h2>
+			<p>
+				<small>(manually adding <code>access_token</code> and <code>micropub_link</code> to <code>localStorage</code> in browser devtools also works)</small>
+			</p>
 			<paper-input id="auth-url-input" label="Your domain" type="url"></paper-input>
 			<div class="buttons">
 				<paper-button on-tap="authStart">Sign in</paper-button>
@@ -112,6 +119,9 @@
 			<p>
 				micro-panel is an admin panel for websites that support <a href="http://micropub.net/draft/">micropub</a> and <a href="http://microformats.org/wiki/microformats2">microformats2</a>.
 			</p>
+			<p>
+				Check the <a href="https://github.com/myfreeweb/micro-panel">project's GitHub page</a> for updates, and <a href="https://unrelenting.technology">the author's website</a> just because :)
+			</p>
 			<div class="buttons">
 				<paper-button dialog-dismiss>Close</paper-button>
 			</div>
@@ -130,7 +140,7 @@
 			},
 
 			attached: function () {
-				if (!localStorage.getItem('access_token')) {
+				if (!(localStorage.getItem('access_token') && localStorage.getItem('micropub_link'))) {
 					if (location.search.match(/code=/))
 						this.authFinish()
 					else
@@ -181,6 +191,41 @@
 				this.push('editing', entry)
 				this.selected = 1 + this.editing.length
 			},
+			deleteEntry: function (e) {
+				if (!confirm('Are you sure you want to delete the entry?')) return
+				var entry = e.model.item
+				var url = ((entry.properties || {}).url || [null])[0]
+				if (!url) return alert('Somehow, an entry with no URL! I have no idea how to delete that.')
+				this.micropubPost({ 'mp-action': 'delete', url: url })
+				.then(function (resp) {
+					if (resp.status >= 300) throw new Error("Couldn't delete the entry! Response: " + resp.status)
+					this.stopEditing(entry)
+				}.bind(this))
+				.catch(function (e) {
+					console.log('Error when deleting entry', e)
+					alert(e)
+				})
+			},
+			saveEntry: function (e) {
+				if (!confirm('Are you sure you want to save the entry?')) return
+				var entry = e.model.item
+				var url = ((entry.properties || {}).url || [null])[0]
+				if (!url) return alert('Somehow, an entry with no URL! I have no idea how to save that.')
+				this.micropubPost({ 'mp-action': 'update', url: url, replace: { properties: entry.properties } })
+				.then(function (resp) {
+					if (resp.status >= 300) throw new Error("Couldn't save the entry! Response: " + resp.status)
+					this.stopEditing(entry)
+				}.bind(this))
+				.catch(function (e) {
+					console.log('Error when saving entry', e)
+					alert(e)
+				})
+			},
+			stopEditing: function (entry) {
+				this.splice('editing', this.editing.indexOf(entry), 1)
+				this.$.frame.src = this.$.frame.src // reload
+				this.selected = 0
+			},
 
 			micropubGet: function (qs) {
 				var link = localStorage.getItem('micropub_link')
@@ -189,6 +234,17 @@
 						Accept: 'application/json',
 						Authorization: 'Bearer ' + localStorage.getItem('access_token')
 					}
+				})
+			},
+			micropubPost: function (obj) {
+				return fetch(localStorage.getItem('micropub_link'), {
+					method: 'post',
+					headers: {
+						Accept: 'application/json',
+						'Content-Type': 'application/json',
+						Authorization: 'Bearer ' + localStorage.getItem('access_token')
+					},
+					body: JSON.stringify(obj)
 				})
 			},
 
