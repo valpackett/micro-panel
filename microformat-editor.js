@@ -20,6 +20,13 @@ Polymer({
 		this.set('item.properties.' + e.model.key, this.item.properties[e.model.key].concat(['']))
 	},
 
+	removePropValue(e) {
+		let index = e.model.index
+		let key = e.currentTarget.dataset.key
+		this.item.properties[key].splice(index, 1)
+		this.set('item.properties.' + key, this.item.properties[key].map(x => x))
+	},
+
 	isString(val) {
 		return typeof val === 'string'
 	},
