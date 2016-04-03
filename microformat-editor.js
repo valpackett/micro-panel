@@ -11,8 +11,13 @@ Polymer({
 		return Object.keys(item.properties)
 	},
 
-	getPropValues(item, key) {
-		return item.properties[key]
+	getPropValues(e, key) {
+		return e.base.properties[key]
+	},
+
+	addPropValue(e) {
+		// have to ~replace~ ~the~ ~array~, not push into the existing one. because, idk, computers
+		this.set('item.properties.' + e.model.key, this.item.properties[e.model.key].concat(['']))
 	},
 
 	isString(val) {
