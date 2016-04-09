@@ -57,16 +57,17 @@ Polymer({
 		editing: { type: Array, value: [] },
 	},
 
-	attached() {
-		Array.prototype.forEach.call(document.querySelectorAll('.p0lyfake'), e => e.parentNode.removeChild(e))
+	attached () {
+		Array.prototype.forEach.call(document.querySelectorAll('.p0lyfake'), (e) => e.parentNode.removeChild(e))
 		if (!(localStorage.getItem('access_token') && localStorage.getItem('micropub_link'))) {
-			if (location.search.match(/code=/))
+			if (location.search.match(/code=/)) {
 				this.authFinish()
-			else
+			} else {
 				this.showAuthDialog()
+			}
 		}
 		let frame = this.queryEffectiveChildren('iframe')
-		frame.addEventListener('load', e => {
+		frame.addEventListener('load', (e) => {
 			console.log(e)
 			let style = e.target.contentDocument.createElement('style')
 			style.innerHTML += '.h-entry { border: 2px solid blue; }'
@@ -77,7 +78,7 @@ Polymer({
 	},
 
 	// Editing {{{
-	openNewEntry(e) {
+	openNewEntry (e) {
 		this.editStart({
 			type: ['h-entry'],
 			'x-micro-panel-new': true,
@@ -85,13 +86,13 @@ Polymer({
 		})
 	},
 
-	editClick(e) {
+	editClick (e) {
 		if (!e.target.classList.contains('h-entry')) return
 		let entry = Microformats.get({ node: e.target, textFormat: 'normalised' }).items[0]
 		let i = 0
-		if (this.editing.find(editingEntry => {
+		if (this.editing.find((editingEntry) => {
 			i += 1
-			return ((editingEntry.properties || {}).uid || [1])[0] == ((entry.properties || {}).uid || [1])[0]
+			return ((editingEntry.properties || {}).uid || [1])[0] === ((entry.properties || {}).uid || [1])[0]
 		})) {
 			this.selected = 1 + i
 			return
@@ -99,76 +100,75 @@ Polymer({
 		let frame = this.queryEffectiveChildren('iframe')
 		let frameUrl = frame.contentWindow.location.href
 		let url = ((entry.properties || {}).url || [frameUrl])[0]
-		if (frameUrl == url)
-			return this.editStart(entry)
+		if (frameUrl === url) return this.editStart(entry)
 		micropubGet('q=source&url=' + encodeURIComponent(url))
-		.then(resp => resp.json())
-		.then(fullEntry => this.editStart(fullEntry))
-		.catch(e => {
+		.then((resp) => resp.json())
+		.then((fullEntry) => this.editStart(fullEntry))
+		.catch((e) => {
 			console.log('Error when asking micropub for entry source', e)
 			fetch(url)
-			.then(resp => resp.text())
-			.then(body => {
+			.then((resp) => resp.text())
+			.then((body) => {
 				let fullEntry = Microformats.get({ html: body, textFormat: 'normalised', filter: ['h-entry'] }).items[0]
 				this.editStart(fullEntry)
 			})
-			.catch(e => {
+			.catch((e) => {
 				console.log('Error when fetching entry', e)
 				this.editStart(entry)
 			})
 		})
 	},
 
-	editStart(entry) {
+	editStart (entry) {
 		this.push('editing', entry)
 		this.selected = 1 + this.editing.length
 	},
 
-	deleteEntry(e) {
+	deleteEntry (e) {
 		if (!confirm('Are you sure you want to delete the entry?')) return
 		let entry = this.$['editing-repeat'].modelForElement(e.target).item // XXX: https://github.com/Polymer/polymer/issues/1865
 		let url = ((entry.properties || {}).url || [null])[0]
 		if (!url) return alert('Somehow, an entry with no URL! I have no idea how to delete that.')
 		micropubPost({ 'mp-action': 'delete', url: url })
-		.then(resp => {
+		.then((resp) => {
 			if (resp.status >= 300) throw new Error("Couldn't delete the entry! Response: " + resp.status)
 			this.editFinish(entry)
 		})
-		.catch(e => {
+		.catch((e) => {
 			console.log('Error when deleting entry', e)
 			alert(e)
 		})
 	},
 
-	saveEntry(e) {
+	saveEntry (e) {
 		let entry = this.$['editing-repeat'].modelForElement(e.target).item
 		let url = ((entry.properties || {}).url || [null])[0]
 		if (!url) return alert('Somehow, an entry with no URL! I have no idea how to save that.')
 		micropubPost({ 'mp-action': 'update', url: url, replace: { properties: entry.properties } })
-		.then(resp => {
+		.then((resp) => {
 			if (resp.status >= 300) throw new Error("Couldn't save the entry! Response: " + resp.status)
 			this.editFinish(entry)
 		})
-		.catch(e => {
+		.catch((e) => {
 			console.log('Error when saving entry', e)
 			alert(e)
 		})
 	},
 
-	createEntry(e) {
+	createEntry (e) {
 		let entry = this.$['editing-repeat'].modelForElement(e.target).item
 		micropubPost({ type: entry.type, properties: entry.properties })
-		.then(resp => {
+		.then((resp) => {
 			if (resp.status >= 300) throw new Error("Couldn't create the entry! Response: " + resp.status)
 			this.editFinish(entry, resp.headers.get('Location'))
 		})
-		.catch(e => {
+		.catch((e) => {
 			console.log('Error when creating entry', e)
 			alert(e)
 		})
 	},
 
-	editFinish(entry, redir) {
+	editFinish (entry, redir) {
 		this.splice('editing', this.editing.indexOf(entry), 1)
 		let frame = this.queryEffectiveChildren('iframe')
 		frame.src = redir || frame.src
@@ -177,18 +177,18 @@ Polymer({
 	// }}}
 
 	// Auth {{{
-	showAuthDialog() {
+	showAuthDialog () {
 		this.$['auth-url-input'].value = location.origin
 		this.$['auth-dialog'].open()
 	},
 
-	authStart() {
+	authStart () {
 		fetch(this.$['auth-url-input'].value)
-		.then(resp => {
+		.then((resp) => {
 			let links = resp.headers.get('Link')
 			saveAuthParams(links)
 			let state = saveAndGetState()
-			location.href = auth_link +
+			location.href = localStorage.getItem('auth_link') +
 				'?me=' + encodeURIComponent(this.$['auth-url-input'].value) +
 				'&client_id=' + encodeURIComponent(this.$['auth-url-input'].value) +
 				'&redirect_uri=' + encodeURIComponent(location.href) +
@@ -197,7 +197,7 @@ Polymer({
 		})
 	},
 
-	authFinish() {
+	authFinish () {
 		let code = location.search.match(/code=([^&]+)/)[1]
 		let me = location.search.match(/me=([^&]+)/)[1]
 		fetch(localStorage.getItem('token_link'), {
@@ -206,14 +206,14 @@ Polymer({
 			body: 'code=' + code + '&me=' + me + '&client_id=' + me +
 				'&redirect_uri=' + encodeURIComponent(localStorage.getItem('redirect_uri')) +
 				'&state=' + encodeURIComponent(localStorage.getItem('state')) + '&scope=post',
-		}).then(resp => {
+		}).then((resp) => {
 			console.log(resp)
 			return resp.text()
-		}).then(body => {
+		}).then((body) => {
 			let token = body.match(/access_token=([^&]+)/)[1]
 			if (!token) throw new Error('No access token in response')
 			setAccessToken(token)
-		}).catch(e => {
+		}).catch((e) => {
 			console.log(e)
 			alert('Could not get access token from the token endpoint.')
 			this.authStart()
@@ -222,14 +222,14 @@ Polymer({
 	// }}}
 
 	// Open URL {{{
-	showOpenUrl() {
+	showOpenUrl () {
 		this.$['menu-button'].close()
 		this.$['open-url-dialog'].open()
 		let frame = this.queryEffectiveChildren('iframe')
 		this.$['open-url-input'].value = frame.contentWindow.location.href
 	},
 
-	openUrlClosed(e) {
+	openUrlClosed (e) {
 		if (!e.detail.confirmed) return
 		let frame = this.queryEffectiveChildren('iframe')
 		frame.src = this.$['open-url-input'].value
@@ -237,7 +237,7 @@ Polymer({
 	},
 	// }}}
 
-	showAbout() {
+	showAbout () {
 		this.$['menu-button'].close()
 		this.$['about-dialog'].open()
 	},

@@ -4,15 +4,6 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>micropanel</title>
-		<script>
-			if (!('Promise' in window))
-				document.write('<script src="bower_components/es6-promise/es6-promise.min.js"></scr'+'ipt>')
-			if (!('fetch' in window))
-				document.write('<script src="bower_components/fetch/fetch.js"></scr'+'ipt>')
-			if (!('registerElement' in document && 'import' in document.createElement('link')))
-				document.write('<script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></scr'+'ipt>')
-		</script>
-		<link rel="import" href="micro-panel.html">
 		<style>
 			body { margin: 0; padding: 0; }
 			body, micro-panel { height: 100vh; }
@@ -20,6 +11,15 @@
 			.p0lyfake-toolbar { height: 56px; background: #3f51b5; }
 			@media screen and (min-width: 600px) { .p0lyfake-toolbar { height: 64px; } }
 		</style>
+		<script>
+			if (!('Promise' in window))
+				document.write('<script src="bower_components/es6-promise/es6-promise.min.js"></scr'+'ipt>')
+			if (!('fetch' in window))
+				document.write('<script src="bower_components/fetch/fetch.js"></scr'+'ipt>')
+			if (!('registerElement' in document && 'import' in document.createElement('link')))
+				document.write('<script defer src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></scr'+'ipt>')
+		</script>
+		<link rel="import" href="micro-panel.html">
 	</head>
 	<body>
 		<div class="p0lyfake p0lyfake-toolbar"></div>
