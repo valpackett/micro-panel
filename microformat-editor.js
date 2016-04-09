@@ -1,3 +1,4 @@
+/*eslint-disable no-new-wrappers */
 'use strict'
 
 Polymer({
@@ -35,9 +36,9 @@ Polymer({
 
 	addPropValue (e) {
 		// have to ~replace~ ~the~ ~array~, not push into the existing one. because, idk, computers
-		// and the .map(x => x) clone prevents polymer from binding the new field to both the new element and the previous one
-		// this should just be a `this.push` but polymer binding sucks for now
-		this.set('item.properties.' + e.model.key, this.item.properties[e.model.key].map((x) => x).concat(['']))
+		// and using the String class prevents polymer from binding the new field to both the new element and the previous one
+		// https://github.com/Polymer/polymer/issues/1913
+		this.set('item.properties.' + e.model.key, this.item.properties[e.model.key].concat([new String()]))
 	},
 
 	removePropValue (e) {
@@ -48,15 +49,15 @@ Polymer({
 	},
 
 	isString (val) {
-		return typeof val === 'string'
+		return typeof val === 'string' || val instanceof String
 	},
 
 	isContentHtml (val) {
-		return typeof val.html === 'string'
+		return this.isString(val.html)
 	},
 
 	isContentValueNotHtml (val) {
-		return typeof val.html !== 'string' && !Array.isArray(val.type) && typeof val.value === 'string'
+		return !this.isString(val.html) && !Array.isArray(val.type) && this.isString(val.value)
 	},
 
 	isMicroformat (val) {
