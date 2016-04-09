@@ -100,7 +100,6 @@ Polymer({
 		let frame = this.queryEffectiveChildren('iframe')
 		let frameUrl = frame.contentWindow.location.href
 		let url = ((entry.properties || {}).url || [frameUrl])[0]
-		if (frameUrl === url) return this.editStart(entry)
 		micropubGet('q=source&url=' + encodeURIComponent(url))
 		.then((resp) => resp.json())
 		.then((fullEntry) => this.editStart(fullEntry))
