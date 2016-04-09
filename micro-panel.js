@@ -32,8 +32,8 @@ function micropubGet (qs) {
 	return fetch(link.indexOf('?') === -1 ? link + '?' + qs : link + '&' + qs, {
 		headers: {
 			Accept: 'application/json',
-			Authorization: 'Bearer ' + localStorage.getItem('access_token')
-		}
+			Authorization: 'Bearer ' + localStorage.getItem('access_token'),
+		},
 	})
 }
 
@@ -43,9 +43,9 @@ function micropubPost (obj) {
 		headers: {
 			Accept: 'application/json',
 			'Content-Type': 'application/json',
-			Authorization: 'Bearer ' + localStorage.getItem('access_token')
+			Authorization: 'Bearer ' + localStorage.getItem('access_token'),
 		},
-		body: JSON.stringify(obj)
+		body: JSON.stringify(obj),
 	})
 }
 
@@ -55,7 +55,7 @@ Polymer({
 	properties: {
 		selected: { type: Number, value: 0 },
 		src: { type: String, value: "/" },
-		editing: { type: Array, value: [] }
+		editing: { type: Array, value: [] },
 	},
 
 	attached() {
@@ -80,7 +80,7 @@ Polymer({
 		this.editStart({
 			type: ['h-entry'],
 			'x-micro-panel-new': true,
-			properties: { name: [], content: [{html: ''}], 'in-reply-to': [], 'like-of': [], 'repost-of': [] }
+			properties: { name: [], content: [{html: ''}], 'in-reply-to': [], 'like-of': [], 'repost-of': [] },
 		})
 	},
 
@@ -202,7 +202,7 @@ Polymer({
 			headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' },
 			body: 'code=' + code + '&me=' + me + '&client_id=' + me +
 				'&redirect_uri=' + encodeURIComponent(localStorage.getItem('redirect_uri')) +
-				'&state=' + encodeURIComponent(localStorage.getItem('state')) + '&scope=post'
+				'&state=' + encodeURIComponent(localStorage.getItem('state')) + '&scope=post',
 		}).then(resp => {
 			console.log(resp)
 			return resp.text()
@@ -235,6 +235,6 @@ Polymer({
 	showAbout() {
 		this.$['menu-button'].close()
 		this.$['about-dialog'].open()
-	}
+	},
 
 })

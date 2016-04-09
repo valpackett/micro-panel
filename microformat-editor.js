@@ -4,7 +4,7 @@ Polymer({
 	is: 'microformat-editor',
 
 	properties: {
-		item: { type: Object, value: { type: [ "h-entry" ], properties: {} } }
+		item: { type: Object, value: { type: [ "h-entry" ], properties: {} } },
 	},
 
 	getPropKeys(item) {
@@ -41,6 +41,6 @@ Polymer({
 
 	isMicroformat(val) {
 		return (val.type || []).length >= 1
-	}
+	},
 
 })
