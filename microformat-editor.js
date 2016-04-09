@@ -4,7 +4,7 @@ Polymer({
 	is: 'microformat-editor',
 
 	properties: {
-		item: { type: Object, value: { type: [ "h-entry" ], properties: {} } },
+		item: { type: Object, value: { type: [ 'h-entry' ], properties: {} } },
 	},
 
 	getPropKeys(item) {
@@ -13,6 +13,24 @@ Polymer({
 
 	getPropValues(e, key) {
 		return e.base.properties[key]
+	},
+
+	addProp(e) {
+		let name = this.$['new-prop-name'].value
+		if (name.length < 1) return
+		if (name in this.item.properties) {
+			alert('This property already exists!')
+			return
+		}
+		this.set('item.properties.' + name, [])
+		this.$['new-prop-name'].value = ''
+	},
+
+	removeProp(e) {
+		let props = {}
+		Object.assign(props, this.item.properties)
+		delete props[e.model.key]
+		this.set('item.properties', props)
 	},
 
 	addPropValue(e) {
