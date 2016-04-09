@@ -17,7 +17,9 @@ Polymer({
 
 	addPropValue(e) {
 		// have to ~replace~ ~the~ ~array~, not push into the existing one. because, idk, computers
-		this.set('item.properties.' + e.model.key, this.item.properties[e.model.key].concat(['']))
+		// and the .map(x => x) clone prevents polymer from binding the new field to both the new element and the previous one
+		// this should just be a `this.push` but polymer binding sucks for now
+		this.set('item.properties.' + e.model.key, this.item.properties[e.model.key].map(x => x).concat(['']))
 	},
 
 	removePropValue(e) {
