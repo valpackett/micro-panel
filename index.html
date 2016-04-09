@@ -16,9 +16,15 @@
 		<style>
 			body { margin: 0; padding: 0; }
 			body, micro-panel { height: 100vh; }
+			iframe { width: 100%; border: none; }
+			.p0lyfake-toolbar { height: 56px; background: #3f51b5; }
+			@media screen and (min-width: 600px) { .p0lyfake-toolbar { height: 64px; } }
 		</style>
 	</head>
 	<body>
-		<micro-panel src="/"></micro-panel>
+		<div class="p0lyfake p0lyfake-toolbar"></div>
+		<micro-panel>
+			<iframe src="/"></iframe>
+		</micro-panel>
 	</body>
 </html>

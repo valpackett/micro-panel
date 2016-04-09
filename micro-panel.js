@@ -54,18 +54,19 @@ Polymer({
 
 	properties: {
 		selected: { type: Number, value: 0 },
-		src: { type: String, value: "/" },
 		editing: { type: Array, value: [] },
 	},
 
 	attached() {
+		Array.prototype.forEach.call(document.querySelectorAll('.p0lyfake'), e => e.parentNode.removeChild(e))
 		if (!(localStorage.getItem('access_token') && localStorage.getItem('micropub_link'))) {
 			if (location.search.match(/code=/))
 				this.authFinish()
 			else
 				this.showAuthDialog()
 		}
-		this.$.frame.addEventListener('load', e => {
+		let frame = this.queryEffectiveChildren('iframe')
+		frame.addEventListener('load', e => {
 			console.log(e)
 			let style = e.target.contentDocument.createElement('style')
 			style.innerHTML += '.h-entry { border: 2px solid blue; }'
@@ -95,7 +96,8 @@ Polymer({
 			this.selected = 1 + i
 			return
 		}
-		let frameUrl = this.$.frame.contentWindow.location.href
+		let frame = this.queryEffectiveChildren('iframe')
+		let frameUrl = frame.contentWindow.location.href
 		let url = ((entry.properties || {}).url || [frameUrl])[0]
 		if (frameUrl == url)
 			return this.editStart(entry)
@@ -168,7 +170,8 @@ Polymer({
 
 	editFinish(entry, redir) {
 		this.splice('editing', this.editing.indexOf(entry), 1)
-		this.$.frame.src = redir || this.$.frame.src
+		let frame = this.queryEffectiveChildren('iframe')
+		frame.src = redir || frame.src
 		this.selected = 0
 	},
 	// }}}
@@ -222,12 +225,14 @@ Polymer({
 	showOpenUrl() {
 		this.$['menu-button'].close()
 		this.$['open-url-dialog'].open()
-		this.$['open-url-input'].value = this.$.frame.contentWindow.location.href
+		let frame = this.queryEffectiveChildren('iframe')
+		this.$['open-url-input'].value = frame.contentWindow.location.href
 	},
 
 	openUrlClosed(e) {
 		if (!e.detail.confirmed) return
-		this.src = this.$['open-url-input'].value
+		let frame = this.queryEffectiveChildren('iframe')
+		frame.src = this.$['open-url-input'].value
 		this.selected = 0
 	},
 	// }}}
