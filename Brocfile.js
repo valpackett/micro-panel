@@ -7,7 +7,7 @@ const Babel = require('broccoli-babel-transpiler')
 const Vulcanize = require('broccoli-vulcanize')
 
 // I DO NOT WANT YOUR GOOGLE FONTS HERE
-fs.writeFileSync('bower_components/font-roboto/roboto.html', '', { charset: 'utf-8' })
+fs.writeFileSync('bower_components/font-roboto/roboto.html', ' ', { charset: 'utf-8' })
 
 var root
 root = new Find('.', { include: ['*.{js,html}', 'bower_components/**/*'], exclude: ['Brocfile.js'] })
