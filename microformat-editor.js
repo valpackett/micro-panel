@@ -23,11 +23,13 @@ Polymer({
 			alert('This property already exists!')
 			return
 		}
+		this.set('item.x-micro-panel-deleted-properties', (this.item['x-micro-panel-deleted-properties'] || []).filter((n) => n !== name))
 		this.set('item.properties.' + name, [])
 		this.$['new-prop-name'].value = ''
 	},
 
 	removeProp (e) {
+		this.set('item.x-micro-panel-deleted-properties', (this.item['x-micro-panel-deleted-properties'] || []).concat([e.model.key]))
 		let props = {}
 		Object.assign(props, this.item.properties)
 		delete props[e.model.key]

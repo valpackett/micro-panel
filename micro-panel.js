@@ -144,7 +144,7 @@ Polymer({
 		let entry = this.$['editing-repeat'].modelForElement(e.target).item
 		let url = ((entry.properties || {}).url || [null])[0]
 		if (!url) return alert('Somehow, an entry with no URL! I have no idea how to save that.')
-		micropubPost({ 'mp-action': 'update', url: url, replace: entry.properties })
+		micropubPost({ 'mp-action': 'update', url: url, replace: entry.properties, 'delete': entry['x-micro-panel-deleted-properties'] || [] })
 		.then((resp) => {
 			if (resp.status >= 300) throw new Error("Couldn't save the entry! Response: " + resp.status)
 			this.editFinish(entry)
