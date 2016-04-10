@@ -2,7 +2,7 @@
   "extends": "standard",
   "parserOptions": { "ecmaVersion": 6 },
   "env": { "browser": true, "es6": true },
-  "globals": { "Polymer": true, "Microformats": true },
+  "globals": { "Polymer": true, "Microformats": true, "CodeMirror": true },
   "rules": {
     "indent": ["error", "tab"],
     "comma-dangle": ["error", "only-multiline"]
