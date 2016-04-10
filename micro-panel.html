@@ -13,6 +13,7 @@
 <link rel="import" href="bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="bower_components/paper-item/paper-item.html">
 <link rel="import" href="bower_components/paper-item/paper-icon-item.html">
+<link rel="import" href="bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="bower_components/neon-animation/neon-animated-pages.html">
 <link rel="import" href="bower_components/neon-animation/animations/fade-in-animation.html">
 <link rel="import" href="bower_components/neon-animation/animations/fade-out-animation.html">
@@ -25,6 +26,10 @@
 			:host {
 				--paper-toolbar-content: { padding: 0; };
 				--paper-toolbar-height: 56px;
+				--paper-spinner-layer-1-color: #fcfcfc;
+				--paper-spinner-layer-2-color: #d8d8d8;
+				--paper-spinner-layer-3-color: #fcfcfc;
+				--paper-spinner-layer-4-color: #d8d8d8;
 			}
 			.content-wrapper { overflow: hidden; height: 100%; }
 			neon-animatable, neon-animatable > *, .content-wrapper ::content iframe { width: 100%; height: 100%; border: 0; background: #fff; }
@@ -84,12 +89,13 @@
 						<div class="toolbar-wrapper">
 							<microformat-editor class="ui-tab-content" item="{{item}}"></microformat-editor>
 							<paper-toolbar class="editor-bottom-bar">
+								<paper-spinner active="{{requestInProgress}}"></paper-spinner>
 								<template is="dom-if" if="{{item.x-micro-panel-new}}">
-									<paper-button on-tap="createEntry">Create</paper-button>
+									<paper-button on-tap="createEntry" hidden="{{requestInProgress}}">Create</paper-button>
 								</template>
 								<template is="dom-if" if="{{!item.x-micro-panel-new}}">
-									<paper-button on-tap="deleteEntry">Delete</paper-button>
-									<paper-button on-tap="saveEntry">Save</paper-button>
+									<paper-button on-tap="deleteEntry" hidden="{{requestInProgress}}">Delete</paper-button>
+									<paper-button on-tap="saveEntry" hidden="{{requestInProgress}}">Save</paper-button>
 								</template>
 							</paper-toolbar>
 						</div>
