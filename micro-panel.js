@@ -71,8 +71,8 @@ Polymer({
 		frame.addEventListener('load', (e) => {
 			console.log(e)
 			let style = e.target.contentDocument.createElement('style')
-			style.innerHTML += '.h-entry { border: 2px solid blue; }'
-			style.innerHTML += '.h-entry::before { content: "Edit"; background: blue; color: white; padding: 6px; display: block; cursor: pointer; }'
+			style.innerHTML += '.h-entry { border: 2px solid #26a69a; }'
+			style.innerHTML += '.h-entry::before { content: "Edit"; background: #26a69a; color: white; padding: 6px; display: block; cursor: pointer; }'
 			e.target.contentDocument.body.appendChild(style)
 			e.target.contentDocument.addEventListener('click', this.editClick.bind(this))
 		})
