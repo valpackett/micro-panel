@@ -259,4 +259,8 @@ Polymer({
 		this.$['about-dialog'].open()
 	},
 
+	closeMenu () {
+		this.$['menu-button'].close()
+	}
+
 })
