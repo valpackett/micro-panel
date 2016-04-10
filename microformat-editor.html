@@ -5,6 +5,7 @@
 <link rel="import" href="bower_components/paper-input/paper-input.html">
 <link rel="import" href="bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="code-mirror.html">
 
 <dom-module id="microformat-editor">
 	<template strip-whitespace>
@@ -19,10 +20,14 @@
 			@media screen and (min-width: 550px) {
 				paper-material { width: 90%; }
 			}
+
+			@media screen and (min-width: 750px) {
+				paper-material[one-line-editor] { width: 70%; }
+			}
 		</style>
 
 		<template is="dom-repeat" items="{{getPropKeys(item, item.*)}}" as="key">
-			<paper-material elevation="1">
+			<paper-material elevation="1" one-line-editor$="{{isOnlyStrings(item.*, key)}}">
 				<header class="value-holder">
 					<div class="key-name">[[key]]</div>
 					<paper-icon-button icon="remove" on-tap="removeProp"></paper-icon-button>
@@ -34,10 +39,10 @@
 							<paper-input class="value-editor" value="{{val}}" no-label-float></paper-input>
 						</template>
 						<template is="dom-if" if="{{isContentHtml(val)}}">
-							<paper-textarea class="value-editor" value="{{val.html}}" no-label-float></paper-textarea>
+							<code-mirror class="value-editor" value="{{val.html}}"></code-mirror>
 						</template>
 						<template is="dom-if" if="{{isContentValueNotHtml(val)}}">
-							<paper-textarea class="value-editor" value="{{val.value}}" no-label-float></paper-textarea>
+							<code-mirror class="value-editor" value="{{val.value}}" mode="markdown"></code-mirror>
 						</template>
 						<template is="dom-if" if="{{isMicroformat(val)}}">
 							<microformat-editor class="value-editor" item="{{val}}"></microformat-editor>
@@ -48,7 +53,7 @@
 			</paper-material>
 		</template>
 
-		<paper-material elevation="1">
+		<paper-material elevation="1" one-line-editor>
 			<div class="value-holder">
 				<paper-input class="value-editor" id="new-prop-name" label="New property..." no-label-float></paper-input>
 				<paper-icon-button icon="add" on-tap="addProp"></paper-icon-button>

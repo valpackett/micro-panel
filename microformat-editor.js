@@ -50,6 +50,10 @@ Polymer({
 		this.set('item.properties.' + key, this.item.properties[key].map((x) => x))
 	},
 
+	isOnlyStrings (e, key) {
+		return e.base.properties[key].reduce((acc, p) => acc && this.isString(p), true)
+	},
+
 	isString (val) {
 		return typeof val === 'string' || val instanceof String
 	},
