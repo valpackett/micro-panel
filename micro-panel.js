@@ -55,6 +55,7 @@ Polymer({
 	properties: {
 		selected: { type: Number, value: 0 },
 		editing: { type: Array, value: [] },
+		requestInProgress: { type: Boolean, value: false },
 	},
 
 	attached () {
@@ -128,14 +129,17 @@ Polymer({
 		let entry = this.$['editing-repeat'].modelForElement(e.target).item // XXX: https://github.com/Polymer/polymer/issues/1865
 		let url = ((entry.properties || {}).url || [null])[0]
 		if (!url) return alert('Somehow, an entry with no URL! I have no idea how to delete that.')
+		this.requestInProgress = true
 		micropubPost({ 'mp-action': 'delete', url: url })
 		.then((resp) => {
 			if (resp.status >= 300) throw new Error("Couldn't delete the entry! Response: " + resp.status)
 			this.editFinish(entry)
+			this.requestInProgress = false
 		})
 		.catch((e) => {
 			console.log('Error when deleting entry', e)
 			alert(e)
+			this.requestInProgress = false
 		})
 	},
 
@@ -143,27 +147,33 @@ Polymer({
 		let entry = this.$['editing-repeat'].modelForElement(e.target).item
 		let url = ((entry.properties || {}).url || [null])[0]
 		if (!url) return alert('Somehow, an entry with no URL! I have no idea how to save that.')
+		this.requestInProgress = true
 		micropubPost({ 'mp-action': 'update', url: url, replace: entry.properties, 'delete': entry['x-micro-panel-deleted-properties'] || [] })
 		.then((resp) => {
 			if (resp.status >= 300) throw new Error("Couldn't save the entry! Response: " + resp.status)
 			this.editFinish(entry)
+			this.requestInProgress = false
 		})
 		.catch((e) => {
 			console.log('Error when saving entry', e)
 			alert(e)
+			this.requestInProgress = false
 		})
 	},
 
 	createEntry (e) {
 		let entry = this.$['editing-repeat'].modelForElement(e.target).item
+		this.requestInProgress = true
 		micropubPost({ type: entry.type, properties: entry.properties })
 		.then((resp) => {
 			if (resp.status >= 300) throw new Error("Couldn't create the entry! Response: " + resp.status)
 			this.editFinish(entry, resp.headers.get('Location'))
+			this.requestInProgress = false
 		})
 		.catch((e) => {
 			console.log('Error when creating entry', e)
 			alert(e)
+			this.requestInProgress = false
 		})
 	},
 
@@ -182,6 +192,7 @@ Polymer({
 	},
 
 	authStart () {
+		this.requestInProgress = true
 		fetch(this.$['auth-url-input'].value)
 		.then((resp) => {
 			let links = resp.headers.get('Link')
@@ -193,12 +204,17 @@ Polymer({
 				'&redirect_uri=' + encodeURIComponent(location.href) +
 				'&state=' + encodeURIComponent(state) +
 				'&scope=post'
+		}).catch((e) => {
+			console.log(e)
+			alert('Could not connect.')
+			this.requestInProgress = false
 		})
 	},
 
 	authFinish () {
 		let code = location.search.match(/code=([^&]+)/)[1]
 		let me = location.search.match(/me=([^&]+)/)[1]
+		this.requestInProgress = true
 		fetch(localStorage.getItem('token_link'), {
 			method: 'post',
 			headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' },
@@ -212,10 +228,12 @@ Polymer({
 			let token = body.match(/access_token=([^&]+)/)[1]
 			if (!token) throw new Error('No access token in response')
 			setAccessToken(token)
+			this.requestInProgress = false
 		}).catch((e) => {
 			console.log(e)
 			alert('Could not get access token from the token endpoint.')
 			this.authStart()
+			this.requestInProgress = false
 		})
 	},
 	// }}}
