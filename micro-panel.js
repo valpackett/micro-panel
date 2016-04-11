@@ -1,5 +1,8 @@
 'use strict'
 
+const SCOPE = 'post,update,delete'
+const CLIENT_ID = 'https://github.com/myfreeweb/micro-panel'
+
 function saveAuthParams (links) {
 	let micropub_link = links.match(/<([^>]+)>;[^,]*rel="[^,]*micropub[^,]*"/)[1]
 	let auth_link = links.match(/<([^>]+)>;[^,]*rel="[^,]*authorization_endpoint[^,]*"/)[1] || 'https://indieauth.com/auth'
@@ -200,10 +203,10 @@ Polymer({
 			let state = saveAndGetState()
 			location.href = localStorage.getItem('auth_link') +
 				'?me=' + encodeURIComponent(this.$['auth-url-input'].value) +
-				'&client_id=' + encodeURIComponent(this.$['auth-url-input'].value) +
+				'&client_id=' + encodeURIComponent(CLIENT_ID) +
 				'&redirect_uri=' + encodeURIComponent(location.href) +
 				'&state=' + encodeURIComponent(state) +
-				'&scope=post'
+				'&scope=' + SCOPE
 		}).catch((e) => {
 			console.log(e)
 			alert('Could not connect.')
@@ -218,9 +221,9 @@ Polymer({
 		fetch(localStorage.getItem('token_link'), {
 			method: 'post',
 			headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8' },
-			body: 'code=' + code + '&me=' + me + '&client_id=' + me +
+			body: 'code=' + code + '&me=' + me + '&client_id=' + encodeURIComponent(CLIENT_ID) +
 				'&redirect_uri=' + encodeURIComponent(localStorage.getItem('redirect_uri')) +
-				'&state=' + encodeURIComponent(localStorage.getItem('state')) + '&scope=post',
+				'&state=' + encodeURIComponent(localStorage.getItem('state')) + '&scope=' + SCOPE,
 		}).then((resp) => {
 			console.log(resp)
 			return resp.text()
