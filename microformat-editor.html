@@ -4,6 +4,8 @@
 <link rel="import" href="bower_components/paper-material/paper-material.html">
 <link rel="import" href="bower_components/paper-input/paper-input.html">
 <link rel="import" href="bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="bower_components/paper-item/paper-icon-item.html">
+<link rel="import" href="bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="code-mirror.html">
 
@@ -16,6 +18,7 @@
 			.one-value { background: rgba(250, 250, 250, 0.1); }
 			.one-value:nth-child(odd) { background: rgba(230, 230, 230, 0.25); }
 			.value-editor { @apply(--layout-flex); }
+			paper-menu-button { padding: 0; }
 
 			@media screen and (min-width: 550px) {
 				paper-material { width: 90%; }
@@ -31,7 +34,14 @@
 				<header class="value-holder">
 					<div class="key-name">[[key]]</div>
 					<paper-icon-button icon="remove" on-tap="removeProp"></paper-icon-button>
-					<paper-icon-button icon="add" on-tap="addPropValue"></paper-icon-button>
+					<paper-menu-button>
+						<paper-icon-button icon="add" class="dropdown-trigger"></paper-icon-button>
+						<paper-menu class="dropdown-content">
+							<paper-icon-item role="menuitem" on-tap="addPropValueText"><iron-icon icon="create" item-icon></iron-icon>Text</paper-icon-item>
+							<paper-icon-item role="menuitem" on-tap="addPropValueHTML"><iron-icon icon="code" item-icon></iron-icon>HTML</paper-icon-item>
+							<paper-icon-item role="menuitem" on-tap="addPropValueObject"><iron-icon icon="extension" item-icon></iron-icon>Object</paper-icon-item>
+						</paper-menu>
+					</paper-menu-button>
 				</header>
 				<template is="dom-repeat" items="{{getPropValues(item.*, key)}}" as="val">
 					<div class="one-value value-holder">

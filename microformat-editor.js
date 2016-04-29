@@ -8,6 +8,17 @@ Polymer({
 		item: { type: Object, value: { type: [ 'h-entry' ], properties: {} } },
 	},
 
+	listeners: {
+		tap: 'dismissMenus'
+	},
+
+	dismissMenus (e) {
+		Array.prototype.forEach.call(this.querySelectorAll('paper-menu-button'), (b) => {
+			if (!b.contains(e.target))
+				b.close()
+		})
+	},
+
 	getPropKeys (item) {
 		return Object.keys(item.properties)
 	},
@@ -32,16 +43,30 @@ Polymer({
 		this.set('item.x-micro-panel-deleted-properties', (this.item['x-micro-panel-deleted-properties'] || []).concat([e.model.key]))
 		let props = {}
 		Object.assign(props, this.item.properties)
-		console.log(e.model.key, props, 'del')
 		delete props[e.model.key]
 		this.set('item.properties', props)
 	},
 
-	addPropValue (e) {
+	addPropValue (key, obj) {
 		// have to ~replace~ ~the~ ~array~, not push into the existing one. because, idk, computers
-		// and using the String class prevents polymer from binding the new field to both the new element and the previous one
+		this.set('item.properties.' + key, this.item.properties[key].concat([obj]))
+	},
+
+	addPropValueText (e) {
+		// using the String class prevents polymer from binding the new field to both the new element and the previous one
 		// https://github.com/Polymer/polymer/issues/1913
-		this.set('item.properties.' + e.model.key, this.item.properties[e.model.key].concat([new String()]))
+		this.addPropValue(e.model.key, new String())
+		e.target.fire('iron-select')
+	},
+
+	addPropValueHTML (e) {
+		this.addPropValue(e.model.key, { html: "" })
+		e.target.fire('iron-select')
+	},
+
+	addPropValueObject (e) {
+		this.addPropValue(e.model.key, { type: ["h-entry"], properties: {} })
+		e.target.fire('iron-select')
 	},
 
 	removePropValue (e) {
