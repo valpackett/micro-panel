@@ -32,6 +32,7 @@ Polymer({
 		this.set('item.x-micro-panel-deleted-properties', (this.item['x-micro-panel-deleted-properties'] || []).concat([e.model.key]))
 		let props = {}
 		Object.assign(props, this.item.properties)
+		console.log(e.model.key, props, 'del')
 		delete props[e.model.key]
 		this.set('item.properties', props)
 	},
@@ -51,7 +52,7 @@ Polymer({
 	},
 
 	isOnlyStrings (e, key) {
-		return e.base.properties[key].reduce((acc, p) => acc && this.isString(p), true)
+		return (e.base.properties[key] || []).reduce((acc, p) => acc && this.isString(p), true)
 	},
 
 	isString (val) {
