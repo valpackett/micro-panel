@@ -33,7 +33,7 @@ You can work on micro-panel (in modern browsers such as current Firefox and Chro
 
 However, if you `npm install`, you get two commands:
 
-- `npm run lint` to check JS style (and catch some mistakes) with [ESLint](http://eslint.org/)
+- `npm run lint` to check JS style (and catch some mistakes) with [ESLint](http://eslint.org/) and HTML style with [Polylint](https://github.com/PolymerLabs/polylint)
 - `npm run build` to make a production build with [Broccoli](https://github.com/broccolijs/broccoli)
 
 The production build adds compatibility for non-ES6 browsers and reduces the number of files (so, HTTP requests) to make loading faster on non-HTTP/2 browsers. 
