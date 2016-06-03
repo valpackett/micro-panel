@@ -14,8 +14,9 @@ Polymer({
 
 	dismissMenus (e) {
 		Array.prototype.forEach.call(this.querySelectorAll('paper-menu-button'), (b) => {
-			if (!b.contains(e.target))
+			if (!b.contains(e.target)) {
 				b.close()
+			}
 		})
 	},
 
@@ -60,12 +61,12 @@ Polymer({
 	},
 
 	addPropValueHTML (e) {
-		this.addPropValue(e.model.key, { html: "" })
+		this.addPropValue(e.model.key, { html: '' })
 		e.target.fire('iron-select')
 	},
 
 	addPropValueObject (e) {
-		this.addPropValue(e.model.key, { type: ["h-entry"], properties: {} })
+		this.addPropValue(e.model.key, { type: ['h-entry'], properties: {} })
 		e.target.fire('iron-select')
 	},
 
