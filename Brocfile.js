@@ -16,7 +16,7 @@ root = new Merge([
 	new Vulcanize(root, {
 		input: 'micro-panel.html',
 		output: 'micro-panel.html',
-		excludes: ['bower_components\/codemirror'],
+		excludes: ['bower_components/codemirror'],
 		stripComments: true,
 		inlineScripts: true
 	}),
