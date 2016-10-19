@@ -1,4 +1,4 @@
-/*eslint-disable no-new-wrappers */
+/* eslint-disable no-new-wrappers */
 'use strict'
 
 Polymer({

@@ -4,12 +4,12 @@ const SCOPE = 'post,update,delete'
 const CLIENT_ID = 'https://github.com/myfreeweb/micro-panel'
 
 function saveAuthParams (links) {
-	let micropub_link = links.match(/<([^>]+)>;[^,]*rel="[^,]*micropub[^,]*"/)[1]
-	let auth_link = links.match(/<([^>]+)>;[^,]*rel="[^,]*authorization_endpoint[^,]*"/)[1] || 'https://indieauth.com/auth'
-	let token_link = links.match(/<([^>]+)>;[^,]*rel="[^,]*token_endpoint[^,]*"/)[1]
-	localStorage.setItem('micropub_link', micropub_link)
-	localStorage.setItem('auth_link', auth_link)
-	localStorage.setItem('token_link', token_link)
+	let micropubLink = links.match(/<([^>]+)>;[^,]*rel="[^,]*micropub[^,]*"/)[1]
+	let authLink = links.match(/<([^>]+)>;[^,]*rel="[^,]*authorization_endpoint[^,]*"/)[1] || 'https://indieauth.com/auth'
+	let tokenLink = links.match(/<([^>]+)>;[^,]*rel="[^,]*token_endpoint[^,]*"/)[1]
+	localStorage.setItem('micropub_link', micropubLink)
+	localStorage.setItem('auth_link', authLink)
+	localStorage.setItem('token_link', tokenLink)
 	localStorage.setItem('redirect_uri', location.href)
 }
 
