@@ -28,12 +28,14 @@ Polymer({
 	},
 
 	attached () {
-		this.mirror.refresh()
-		// I have no idea why it doesn't immediately refresh correctly when the first <code-mirror> is attached??
-		setTimeout(() => this.mirror.refresh(), 250)
-		setTimeout(() => this.mirror.refresh(), 500)
-		setTimeout(() => this.mirror.refresh(), 1000)
-		setTimeout(() => this.mirror.refresh(), 1250)
+		Polymer.RenderStatus.afterNextRender(() => {
+			this.mirror.refresh()
+			// I have no idea why it doesn't immediately refresh correctly when the first <code-mirror> is attached??
+			setTimeout(() => this.mirror.refresh(), 250)
+			setTimeout(() => this.mirror.refresh(), 500)
+			setTimeout(() => this.mirror.refresh(), 1000)
+			setTimeout(() => this.mirror.refresh(), 1250)
+		})
 	},
 
 	focus () {
