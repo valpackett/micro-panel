@@ -38,6 +38,8 @@ However, if you `npm install`, you get two commands:
 
 The production build adds compatibility for non-ES6 browsers and reduces the number of files (so, HTTP requests) to make loading faster on non-HTTP/2 browsers. 
 
+NOTE: [pnpm](https://github.com/pnpm/pnpm) seems to have a problem with the broccoli-babel thing (not installing all the babel plugins), use normal npm on this project.
+
 ## Contributing
 
 Please feel free to submit pull requests!

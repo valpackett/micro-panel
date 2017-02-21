@@ -1,7 +1,7 @@
 'use strict'
 
 const fs = require('fs')
-const Find = require('broccoli-stew').find
+const Funnel = require('broccoli-funnel')
 const Merge = require('broccoli-merge-trees')
 const Babel = require('broccoli-babel-transpiler')
 const Vulcanize = require('broccoli-vulcanize')
@@ -9,8 +9,7 @@ const Vulcanize = require('broccoli-vulcanize')
 // I DO NOT WANT YOUR GOOGLE FONTS HERE
 fs.writeFileSync('bower_components/font-roboto/roboto.html', ' ', { charset: 'utf-8' })
 
-var root
-root = new Find('.', { include: ['*.{js,html}', 'bower_components/**/*'], exclude: ['Brocfile.js'] })
+let root = new Funnel('.', { include: ['*.{js,html}', 'bower_components/**/*'], exclude: ['Brocfile.js'] })
 root = new Babel(root, { ignore: ['bower_components/*'], compact: true })
 root = new Merge([
 	new Vulcanize(root, {
@@ -20,10 +19,11 @@ root = new Merge([
 		stripComments: true,
 		inlineScripts: true
 	}),
-	new Find('./bower_components/codemirror/**/*'),
-	new Find('./bower_components/{es6-promise,webcomponentsjs}/*.min.js'),
-	new Find('./bower_components/fetch/*.js'),
-	new Find('index.html'),
+	new Funnel('./bower_components/codemirror', { destDir: 'bower_components/codemirror' }),
+	new Funnel('./bower_components/es6-promise', { include: ['*.min.js'], destDir: 'bower_components/es6-promise' }),
+	new Funnel('./bower_components/webcomponentsjs', { include: ['*.min.js'], destDir: 'bower_components/webcomponentsjs' }),
+	new Funnel('./bower_components/fetch', { include: ['*.js'], destDir: 'bower_components/fetch' }),
+	new Funnel('.', { include: [ 'index.html' ] }),
 ])
 
 module.exports = root

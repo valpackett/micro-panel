@@ -4,8 +4,8 @@
   "description": "An admin panel for websites that support microformats2 and micropub",
   "main": "micro-panel.html",
   "scripts": {
-    "lint": "eslint *.js && echo ESLint OK; polylint --input index.html && echo Polylint OK; true",
-    "build": "rm -rf dist; broccoli build dist"
+    "lint": "eslint --ignore-path .gitignore . && echo ESLint OK; polylint --input index.html && echo Polylint OK; true",
+    "build": "rm -rf dist.new; broccoli build dist.new && mkdir -p dist && rm -rf dist/* && mv dist.new/* dist/ && rmdir dist.new"
   },
   "repository": {
     "type": "git",
@@ -23,15 +23,16 @@
   },
   "homepage": "https://github.com/myfreeweb/micro-panel#readme",
   "devDependencies": {
-    "broccoli": "^0.16.9",
-    "broccoli-babel-transpiler": "^5.5.0",
+    "babel-preset-env": "^1.1.8",
+    "broccoli": "^1.1.1",
+    "broccoli-babel-transpiler": "^5.6.2",
     "broccoli-cli": "^1.0.0",
-    "broccoli-merge-trees": "^1.1.1",
-    "broccoli-stew": "^1.3.1",
-    "broccoli-vulcanize": "^3.0.0",
-    "eslint": "^3.8.1",
+    "broccoli-funnel": "^1.1.0",
+    "broccoli-merge-trees": "^1.2.1",
+    "broccoli-vulcanize": "github:myfreeweb/broccoli-vulcanize",
+    "eslint": "^3.16.0",
     "eslint-config-standard": "^6.2.0",
-    "eslint-plugin-promise": "^3.3.0",
+    "eslint-plugin-promise": "^3.4.2",
     "eslint-plugin-standard": "^2.0.1",
     "polylint": "^2.10.1"
   }
