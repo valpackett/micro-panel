@@ -35,7 +35,7 @@
     "paper-input": "PolymerElements/paper-input#^1.1.10",
     "paper-spinner": "PolymerElements/paper-spinner#^1.1.1",
     "es6-promise": "^4.0.5",
-    "fetch": "^1.0.0",
+    "fetch": "^2.0.2",
     "microformat-shiv": "microformats-shiv#^1.4.0",
     "codemirror": "^5.13.4"
   }

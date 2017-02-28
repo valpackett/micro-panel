@@ -5,9 +5,6 @@ A client-side admin panel for your [IndieWeb](https://indiewebcamp.com) website!
 - your website is the best interface to your website, and micro-panel just shows it in a frame, making entries editable
 - creates/updates/deletes [Microformats 2](http://microformats.org/wiki/microformats2) entries using [Micropub](http://micropub.net/draft/)
 - authenticates using [IndieAuth](https://indiewebcamp.com/IndieAuth)
-- (TODO) saves drafts of posts
-- (TODO) allows working on drafts offline
-- (TODO) undo/redo
 - built with [Polymer](https://www.polymer-project.org/1.0/)
 
 (Created because I didn't want to make an admin interface specific to [Sweetroll](https://github.com/myfreeweb/sweetroll)… Also check out [indieweb-components](https://github.com/myfreeweb/indieweb-components) for components to put on your website.)
@@ -18,13 +15,13 @@ Make sure your website engine implements the Micropub spec! In particular, micro
 For update requests, micro-panel uses the `replace` property.
 The endpoint also should support `?q=source` requests, which allow micro-panel to always show all existing properties of an entry in the editing interface.
 
-### From [a release](https://github.com/myfreeweb/micro-panel/releases) (recommended)
+### From [a release](https://github.com/myfreeweb/micro-panel/releases) (recommended) (TODO)
 
 Unpack the archive, put on your server (same domain as the website!).
 
 ### From git
 
-Clone the repo (or use GitHub's ZIP download feature), run [bower](http://bower.io/) install, put on your server (same domain as the website!).
+Clone the repo (or use GitHub's ZIP download feature), `npm install`, `npm run deps`, put on your server (same domain as the website!).
 
 ## Developing
 
@@ -36,9 +33,7 @@ However, if you `npm install`, you get two commands:
 - `npm run lint` to check JS style (and catch some mistakes) with [ESLint](http://eslint.org/) and HTML style with [Polylint](https://github.com/PolymerLabs/polylint)
 - `npm run build` to make a production build with [Broccoli](https://github.com/broccolijs/broccoli)
 
-The production build adds compatibility for non-ES6 browsers and reduces the number of files (so, HTTP requests) to make loading faster on non-HTTP/2 browsers. 
-
-NOTE: [pnpm](https://github.com/pnpm/pnpm) seems to have a problem with the broccoli-babel thing (not installing all the babel plugins), use normal npm on this project.
+The production build reduces the number of files (so, HTTP requests) to make loading faster. 
 
 ## Contributing
 
