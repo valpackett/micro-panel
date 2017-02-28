@@ -3,14 +3,12 @@
 const fs = require('fs')
 const Funnel = require('broccoli-funnel')
 const Merge = require('broccoli-merge-trees')
-const Babel = require('broccoli-babel-transpiler')
 const Vulcanize = require('broccoli-vulcanize')
 
 // I DO NOT WANT YOUR GOOGLE FONTS HERE
 fs.writeFileSync('bower_components/font-roboto/roboto.html', ' ', { charset: 'utf-8' })
 
 let root = new Funnel('.', { include: ['*.{js,html}', 'bower_components/**/*'], exclude: ['Brocfile.js'] })
-root = new Babel(root, { ignore: ['bower_components/*'], compact: true })
 root = new Merge([
 	new Vulcanize(root, {
 		input: 'micro-panel.html',

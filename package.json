@@ -4,6 +4,7 @@
   "description": "An admin panel for websites that support microformats2 and micropub",
   "main": "micro-panel.html",
   "scripts": {
+    "deps": "bower update",
     "lint": "eslint --ignore-path .gitignore . && echo ESLint OK; polylint --input index.html && echo Polylint OK; true",
     "build": "rm -rf dist.new; broccoli build dist.new && mkdir -p dist && rm -rf dist/* && mv dist.new/* dist/ && rmdir dist.new"
   },
@@ -23,9 +24,8 @@
   },
   "homepage": "https://github.com/myfreeweb/micro-panel#readme",
   "devDependencies": {
-    "babel-preset-env": "^1.1.8",
+    "bower": "^1.8.0",
     "broccoli": "^1.1.1",
-    "broccoli-babel-transpiler": "^5.6.2",
     "broccoli-cli": "^1.0.0",
     "broccoli-funnel": "^1.1.0",
     "broccoli-merge-trees": "^1.2.1",
