@@ -30,49 +30,62 @@ function setAccessToken (token) {
 	history.replaceState({}, '', location.href.replace(/\?[^#]*/, ''))
 }
 
+class MicroPanel extends Polymer.Element {
+	static get is () { return 'micro-panel' }
 
-Polymer({
-	is: 'micro-panel',
+	static get properties () {
+		return {
+			useFrame: { type: Boolean, value: false, reflectToAttribute: true },
+			useAuth: { type: Boolean, value: false, reflectToAttribute: true },
+			selected: { type: Number, value: 0 },
+			requestInProgress: { type: Boolean, value: false },
+			model: { type: Object, value: { entries: [] } },
+		}
+	}
 
-	properties: {
-		useFrame: { type: Boolean, value: false, reflectToAttribute: true },
-		useAuth: { type: Boolean, value: false, reflectToAttribute: true },
-		selected: { type: Number, value: 0 },
-		editing: { type: Array, value: [] },
-		requestInProgress: { type: Boolean, value: false },
-	},
+	connectedCallback () {
+		super.connectedCallback()
+		window.mpstore = new Freezer({ entries: [] })
+		this.model = window.mpstore.get()
+		window.mpstore.on('update', (v, oldv) => {
+			this.model = v
+		})
 
-	attached () {
-		Array.prototype.forEach.call(document.querySelectorAll('.p0lyfake'), e => e.parentNode.removeChild(e))
-		if (this.useAuth && !(localStorage.getItem('access_token') && localStorage.getItem('micropub_link'))) {
-			if (location.search.match(/code=/)) {
-				this.authFinish()
-			} else {
-				this.showAuthDialog()
+		for (const e of document.querySelectorAll('.p0lyfake')) {
+			e.parentNode.removeChild(e)
+		}
+
+		Polymer.RenderStatus.afterNextRender(this, () => {
+			if (this.useAuth && !(localStorage.getItem('access_token') && localStorage.getItem('micropub_link'))) {
+				if (location.search.match(/code=/)) {
+					this.authFinish()
+				} else {
+					this.showAuthDialog()
+				}
+			} else if (!this.useAuth) {
+				fetch(location.href).then(resp => saveAuthParams(resp.headers.get('Link')))
 			}
-		} else if (!this.useAuth) {
-			fetch(location.href).then(resp => saveAuthParams(resp.headers.get('Link')))
-		}
-		function makeStyle (doc) {
-			const style = doc.createElement('style')
-			style.innerHTML += '.h-entry { border: 2px solid #26a69a; }'
-			style.innerHTML += '.h-entry::before { content: "Edit"; background: #26a69a; color: white; padding: 6px; display: block; cursor: pointer; }'
-			return style
-		}
-		if (this.useFrame) {
-			const frame = this.queryEffectiveChildren('iframe')
-			frame.addEventListener('load', e => {
-				console.log(e)
-				const style = makeStyle(e.target.contentDocument)
-				e.target.contentDocument.body.appendChild(style)
-				e.target.contentDocument.addEventListener('click', this.editClick.bind(this))
-			})
-		} else {
-			const style = makeStyle(document)
-			document.body.appendChild(style)
-			this.$['content-container'].addEventListener('click', this.editClick.bind(this))
-		}
-	},
+			function makeStyle (doc) {
+				const style = doc.createElement('style')
+				style.innerHTML += '.h-entry { border: 2px solid #26a69a; }'
+				style.innerHTML += '.h-entry::before { content: "Edit"; background: #26a69a; color: white; padding: 6px; display: block; cursor: pointer; }'
+				return style
+			}
+			if (this.useFrame) {
+				const frame = this.queryEffectiveChildren('iframe')
+				frame.addEventListener('load', e => {
+					console.log(e)
+					const style = makeStyle(e.target.contentDocument)
+					e.target.contentDocument.body.appendChild(style)
+					e.target.contentDocument.addEventListener('click', this.editClick.bind(this))
+				})
+			} else {
+				const style = makeStyle(document)
+				document.body.appendChild(style)
+				this.$['content-container'].addEventListener('click', this.editClick.bind(this))
+			}
+		})
+	}
 
 	micropubGet (qs) {
 		const headers = {
@@ -86,7 +99,7 @@ Polymer({
 			credentials: 'include',
 			headers: headers,
 		})
-	},
+	}
 
 	micropubPost (obj) {
 		const headers = {
@@ -102,7 +115,7 @@ Polymer({
 			headers: headers,
 			body: JSON.stringify(obj),
 		})
-	},
+	}
 
 	// Editing {{{
 	openNewEntry (e) {
@@ -111,7 +124,7 @@ Polymer({
 			'x-micro-panel-new': true,
 			properties: { name: [], content: [{html: ''}], 'in-reply-to': [], 'like-of': [], 'repost-of': [] },
 		})
-	},
+	}
 
 	currentPageUrl () {
 		if (this.useFrame) {
@@ -119,20 +132,20 @@ Polymer({
 			return frame.contentWindow.location.href
 		}
 		return location.href
-	},
+	}
 
 	editClick (e) {
 		if (!e.target.classList.contains('h-entry')) return
 		const entry = Microformats.get({ node: e.target, textFormat: 'normalised' }).items[0]
 		let i = 0
-		if (this.editing.find((editingEntry) => {
+		if (this.model.entries.find((editingEntry) => {
 			i += 1
 			return ((editingEntry.properties || {}).uid || [1])[0] === ((entry.properties || {}).uid || [1])[0]
 		})) {
 			this.selected = 0 + i
 			return
 		}
-		const url = ((entry.properties || {}).url || [currentPageUrl()])[0]
+		const url = ((entry.properties || {}).url || [this.currentPageUrl()])[0]
 		this.micropubGet('q=source&url=' + encodeURIComponent(url))
 		.then((resp) => resp.json())
 		.then((fullEntry) => this.editStart(fullEntry))
@@ -149,12 +162,14 @@ Polymer({
 				this.editStart(entry)
 			})
 		})
-	},
+	}
 
 	editStart (entry) {
-		this.push('editing', entry)
-		this.selected = 0 + this.editing.length
-	},
+		this.model.entries.push(entry)
+		Polymer.RenderStatus.afterNextRender(this, () => {
+			this.selected = 0 + this.model.entries.length
+		})
+	}
 
 	deleteEntry (e) {
 		if (!confirm('Are you sure you want to delete the entry?')) return
@@ -173,14 +188,14 @@ Polymer({
 			alert(e)
 			this.requestInProgress = false
 		})
-	},
+	}
 
 	saveEntry (e) {
 		let entry = this.$['editing-repeat'].modelForElement(e.target).item
 		let url = ((entry.properties || {}).url || [null])[0]
 		if (!url) return alert('Somehow, an entry with no URL! I have no idea how to save that.')
 		this.requestInProgress = true
-		delete entry.properties.url
+		entry.properties.remove('url')
 		this.micropubPost({
 			'mp-action': 'update',
 			url: url,
@@ -198,7 +213,7 @@ Polymer({
 			this.requestInProgress = false
 			entry.properties.url = url
 		})
-	},
+	}
 
 	createEntry (e) {
 		const entry = this.$['editing-repeat'].modelForElement(e.target).item
@@ -214,10 +229,10 @@ Polymer({
 			alert(e)
 			this.requestInProgress = false
 		})
-	},
+	}
 
 	editFinish (entry, redir) {
-		this.splice('editing', this.editing.indexOf(entry), 1)
+		this.model.entries.splice(this.model.entries.indexOf(entry), 1)
 		if (this.useFrame) {
 			const frame = this.queryEffectiveChildren('iframe')
 			frame.src = redir || frame.src
@@ -225,14 +240,14 @@ Polymer({
 			location.reload()
 		}
 		this.selected = 0
-	},
+	}
 	// }}}
 
 	// Auth {{{
 	showAuthDialog () {
 		this.$['auth-url-input'].value = location.origin
 		this.$['auth-dialog'].open()
-	},
+	}
 
 	authStart () {
 		this.requestInProgress = true
@@ -252,7 +267,7 @@ Polymer({
 			alert('Could not connect.')
 			this.requestInProgress = false
 		})
-	},
+	}
 
 	authFinish () {
 		const code = location.search.match(/code=([^&]+)/)[1]
@@ -278,7 +293,7 @@ Polymer({
 			this.authStart()
 			this.requestInProgress = false
 		})
-	},
+	}
 	// }}}
 
 	// Open URL {{{
@@ -287,23 +302,24 @@ Polymer({
 		this.$['open-url-dialog'].open()
 		const frame = this.queryEffectiveChildren('iframe')
 		this.$['open-url-input'].value = frame.contentWindow.location.href
-	},
+	}
 
 	openUrlClosed (e) {
 		if (!e.detail.confirmed) return
 		const frame = this.queryEffectiveChildren('iframe')
 		frame.src = this.$['open-url-input'].value
 		this.selected = 0
-	},
+	}
 	// }}}
 
 	showAbout () {
 		this.$['menu-button'].close()
 		this.$['about-dialog'].open()
-	},
+	}
 
 	closeMenu () {
 		this.$['menu-button'].close()
 	}
+}
 
-})
+customElements.define(MicroPanel.is, MicroPanel)

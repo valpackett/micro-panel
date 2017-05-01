@@ -1,4 +1,6 @@
-<link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/polymer/polymer-element.html">
+<link rel="import" href="bower_components/polymer/lib/elements/dom-bind.html">
+<link rel="import" href="bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="bower_components/paper-styles/color.html">
 <link rel="import" href="bower_components/app-layout/app-header-layout/app-header-layout.html">
 <link rel="import" href="bower_components/app-layout/app-header/app-header.html">
@@ -21,6 +23,7 @@
 <link rel="import" href="bower_components/neon-animation/animations/fade-out-animation.html">
 <link rel="import" href="microformat-editor.html">
 <script src="bower_components/microformat-shiv/microformat-shiv.min.js"></script>
+<script src="bower_components/freezer-js/build/freezer.min.js"></script>
 
 <dom-module id="micro-panel">
 	<template strip-whitespace>
@@ -33,6 +36,8 @@
 				--paper-spinner-layer-3-color: #fcfcfc;
 				--paper-spinner-layer-4-color: #d8d8d8;
 			}
+			a { color: var(--primary-color); }
+			a:hover, a:focus { color: var(--paper-teal-200); }
 			app-header, .editor-bottom-bar { background-color: var(--primary-color); color: #fff; height: var(--toolbar-height); }
 			app-toolbar { height: var(--toolbar-height); }
 			.content-wrapper, .toolbar-wrapper { overflow: hidden; position: absolute; top: 0; right: 0; bottom: 0; left: 0; }
@@ -68,13 +73,13 @@
 						<paper-icon-button icon="more-vert" slot="dropdown-trigger"></paper-icon-button>
 						<paper-listbox slot="dropdown-content">
 							<paper-icon-item role="menuitem" on-tap="openNewEntry"><iron-icon icon="create" slot="item-icon"></iron-icon>New post</paper-icon-item>
-							<paper-icon-item role="menuitem" on-tap="showOpenUrl" hidden="{{!useFrame}}"><iron-icon icon="input" slot="item-icon"></iron-icon>Open URL</paper-icon-item>
+							<paper-icon-item role="menuitem" on-tap="showOpenUrl" hidden$="{{!useFrame}}"><iron-icon icon="input" slot="item-icon"></iron-icon>Open URL</paper-icon-item>
 							<paper-icon-item role="menuitem" on-tap="showAbout"><iron-icon icon="info" slot="item-icon"></iron-icon>About...</paper-icon-item>
 						</paper-listbox>
 					</paper-menu-button>
 					<paper-tabs id="tabs" scrollable hide-scroll-buttons selected="{{selected}}" on-tap="closeMenu">
 						<paper-tab>Website</paper-tab>
-						<template is="dom-repeat" items="{{editing}}">
+						<template is="dom-repeat" items="[[model.entries]]">
 							<paper-tab>Entry</paper-tab>
 						</template>
 					</paper-tabs>
@@ -87,10 +92,10 @@
 					<neon-animatable id="content-container">
 						<slot></slot>
 					</neon-animatable>
-					<template id="editing-repeat" is="dom-repeat" items="{{editing}}">
+					<template id="editing-repeat" is="dom-repeat" items="[[model.entries]]">
 						<neon-animatable>
 							<div class="toolbar-wrapper">
-								<microformat-editor class="ui-tab-content" item="{{item}}"></microformat-editor>
+								<microformat-editor class="ui-tab-content" item="[[item]]"></microformat-editor>
 								<app-toolbar class="editor-bottom-bar">
 									<paper-spinner active="{{requestInProgress}}"></paper-spinner>
 									<template is="dom-if" if="{{item.x-micro-panel-new}}">

@@ -38,6 +38,7 @@
     "paper-input": "PolymerElements/paper-input#2.0-preview",
     "paper-spinner": "PolymerElements/paper-spinner#2.0-preview",
     "fetch": "^2.0.2",
-    "microformat-shiv": "myfreeweb/microformat-shiv#master"
+    "microformat-shiv": "myfreeweb/microformat-shiv#master",
+    "freezer-js": "freezer#^0.11.2"
   }
 }

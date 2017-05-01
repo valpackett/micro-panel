@@ -13,7 +13,7 @@
 		<script>
 			if (!('fetch' in window))
 				document.write('<script src="bower_components/fetch/fetch.js"></scr'+'ipt>')
-			if (!('KeyframeEffect' in window))
+			if (!('KeyframeEffect' in window && 'timeline' in document && 'play' in document.timeline))
 				document.write('<script src="bower_components/web-animations-js/web-animations-next.min.js"></scr'+'ipt>')
 		</script>
 		<script defer src="bower_components/webcomponentsjs/webcomponents-loader.js"></script>
