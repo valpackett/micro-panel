@@ -3,3 +3,4 @@ bower_components/
 tmp/
 dist/
 shrinkwrap.yaml
+yarn.lock

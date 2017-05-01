@@ -1,45 +1,46 @@
 <link rel="import" href="bower_components/polymer/polymer.html">
-<link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="bower_components/paper-material/paper-material.html">
+<link rel="import" href="bower_components/paper-styles/element-styles/paper-material.html">
 <link rel="import" href="bower_components/paper-input/paper-input.html">
 <link rel="import" href="bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="bower_components/paper-item/paper-icon-item.html">
 <link rel="import" href="bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="code-mirror.html">
 
 <dom-module id="microformat-editor">
 	<template strip-whitespace>
+		<custom-style>
+			<style is="custom-style" include="paper-material"></style>
+		</custom-style>
 		<style>
-			paper-material { margin: 1em auto; width: 98%; }
-			.value-holder { padding: 0.25em 0.5em; @apply --layout-horizontal; }
-			.key-name { @apply --layout-flex; line-height: 36px; }
+			.paper-material { margin: 1em auto; width: 98%; }
+			.value-holder { padding: 0.25em 0.5em; display: flex; flex-direction: row; }
+			.key-name { flex: 1; flex-basis: 0.000000001px; line-height: 36px; }
 			.one-value { background: rgba(250, 250, 250, 0.1); }
 			.one-value:nth-child(odd) { background: rgba(230, 230, 230, 0.25); }
-			.value-editor { @apply --layout-flex; }
+			.value-editor { flex: 1; flex-basis: 0.000000001px; }
 			paper-menu-button { padding: 0; }
 
 			@media screen and (min-width: 550px) {
-				paper-material { width: 90%; }
+				.paper-material { width: 90%; }
 			}
 
 			@media screen and (min-width: 750px) {
-				paper-material[one-line-editor] { width: 70%; }
+				.paper-material[one-line-editor] { width: 70%; }
 			}
 		</style>
 
 		<template is="dom-repeat" items="{{getPropKeys(item, item.*)}}" as="key">
-			<paper-material elevation="1" one-line-editor$="{{isOnlyStrings(item.*, key)}}">
+			<div class="paper-material" elevation="1" one-line-editor$="{{isOnlyStrings(item.*, key)}}">
 				<header class="value-holder">
 					<div class="key-name">[[key]]</div>
 					<paper-icon-button icon="remove" on-tap="removeProp"></paper-icon-button>
 					<paper-menu-button>
-						<paper-icon-button icon="add" class="dropdown-trigger"></paper-icon-button>
-						<paper-menu class="dropdown-content">
-							<paper-icon-item role="menuitem" on-tap="addPropValueText"><iron-icon icon="create" item-icon></iron-icon>Text</paper-icon-item>
-							<paper-icon-item role="menuitem" on-tap="addPropValueHTML"><iron-icon icon="code" item-icon></iron-icon>HTML</paper-icon-item>
-							<paper-icon-item role="menuitem" on-tap="addPropValueObject"><iron-icon icon="extension" item-icon></iron-icon>Object</paper-icon-item>
+						<paper-icon-button icon="add" slot="dropdown-trigger"></paper-icon-button>
+						<paper-menu slot="dropdown-content">
+							<paper-icon-item role="menuitem" on-tap="addPropValueText"><iron-icon icon="create" slot="item-icon"></iron-icon>Text</paper-icon-item>
+							<paper-icon-item role="menuitem" on-tap="addPropValueHTML"><iron-icon icon="code" slot="item-icon"></iron-icon>HTML</paper-icon-item>
+							<paper-icon-item role="menuitem" on-tap="addPropValueObject"><iron-icon icon="extension" slot="item-icon"></iron-icon>Object</paper-icon-item>
 						</paper-menu>
 					</paper-menu-button>
 				</header>
@@ -49,10 +50,10 @@
 							<paper-input class="value-editor" value="{{val}}" no-label-float></paper-input>
 						</template>
 						<template is="dom-if" if="{{isContentHtml(val)}}">
-							<code-mirror class="value-editor" value="{{val.html}}"></code-mirror>
+							<paper-textarea class="value-editor" value="{{val.html}}"></paper-textarea>
 						</template>
 						<template is="dom-if" if="{{isContentValueNotHtml(val)}}">
-							<code-mirror class="value-editor" value="{{val.value}}" mode="markdown"></code-mirror>
+							<paper-textarea class="value-editor" value="{{val.value}}"></paper-textarea>
 						</template>
 						<template is="dom-if" if="{{isMicroformat(val)}}">
 							<microformat-editor class="value-editor" item="{{val}}"></microformat-editor>
@@ -60,15 +61,15 @@
 						<paper-icon-button icon="remove" on-tap="removePropValue" data-key$="{{key}}"></paper-icon-button>
 					</div>
 				</template>
-			</paper-material>
+			</div>
 		</template>
 
-		<paper-material elevation="1" one-line-editor>
+		<div class="paper-material" elevation="1" one-line-editor>
 			<div class="value-holder">
 				<paper-input class="value-editor" id="new-prop-name" label="New property..." no-label-float></paper-input>
 				<paper-icon-button icon="add" on-tap="addProp"></paper-icon-button>
 			</div>
-		</paper-material>
+		</div>
 
 	</template>
 

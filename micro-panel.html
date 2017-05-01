@@ -7,12 +7,11 @@
 <link rel="import" href="bower_components/paper-input/paper-input.html">
 <link rel="import" href="bower_components/paper-button/paper-button.html">
 <link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
-<link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="bower_components/paper-menu-button/paper-menu-button.html">
-<link rel="import" href="bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="bower_components/paper-item/paper-item.html">
 <link rel="import" href="bower_components/paper-item/paper-icon-item.html">
 <link rel="import" href="bower_components/paper-spinner/paper-spinner.html">
@@ -36,14 +35,16 @@
 			}
 			app-header, .editor-bottom-bar { background-color: var(--primary-color); color: #fff; height: var(--toolbar-height); }
 			app-toolbar { height: var(--toolbar-height); }
-			.content-wrapper { overflow: hidden; @apply --layout-fit; }
+			.content-wrapper, .toolbar-wrapper { overflow: hidden; position: absolute; top: 0; right: 0; bottom: 0; left: 0; }
 			neon-animatable, neon-animatable > *, .content-wrapper ::content iframe { width: 100%; height: 100%; border: 0; background: #fff; }
 			paper-icon-button { margin-right: 0 !important; }
-			paper-tabs { @apply --layout-flex; height: var(--toolbar-height); }
-			.ui-tab-content { overflow-y: auto; -webkit-overflow-scrolling: touch; }
-			.toolbar-wrapper { @apply --layout-vertical; }
-			.toolbar-wrapper .ui-tab-content { @apply --layout-flex; }
+			paper-tabs { flex: 1; flex-basis: 0.000000001px; height: var(--toolbar-height); }
+			.ui-tab-content { overflow: auto; width: 100%; -webkit-overflow-scrolling: touch; background: white; }
+			.toolbar-wrapper { display: flex; flex-direction: column; }
+			.toolbar-wrapper .ui-tab-content { flex: 1; flex-basis: 0.000000001px; }
 			.editor-bottom-bar { justify-content: flex-end; }
+			#content-container { background: inherit; overflow: auto; } /* avoid making site bg white when used in embedded mode */
+			/* XXX: don't use overflow:auto when frame is used? */
 
 			@media screen and (min-width: 450px) {
 				#open-url-input, #auth-url-input { min-width: 70vw; }
@@ -59,21 +60,20 @@
 		</style>
 
 		<app-header-layout has-scrolling-region>
-			<app-header fixed>
+			<app-header fixed slot="header">
 				<app-toolbar>
 					<paper-menu-button id="menu-button"
 							 open-animation-config='[{"name": "fade-in-animation",  "timing": {"duration": 200} }]'
 							close-animation-config='[{"name": "fade-out-animation", "timing": {"duration": 200} }]'>
-						<paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
-						<paper-menu class="dropdown-content">
-							<paper-icon-item role="menuitem" on-tap="openNewEntry"><iron-icon icon="create" item-icon></iron-icon>New post</paper-icon-item>
-							<paper-icon-item role="menuitem" on-tap="showOpenUrl"><iron-icon icon="input" item-icon></iron-icon>Open URL</paper-icon-item>
-							<paper-icon-item role="menuitem" on-tap="showAbout"><iron-icon icon="info" item-icon></iron-icon>About...</paper-icon-item>
-						</paper-menu>
+						<paper-icon-button icon="more-vert" slot="dropdown-trigger"></paper-icon-button>
+						<paper-listbox slot="dropdown-content">
+							<paper-icon-item role="menuitem" on-tap="openNewEntry"><iron-icon icon="create" slot="item-icon"></iron-icon>New post</paper-icon-item>
+							<paper-icon-item role="menuitem" on-tap="showOpenUrl" hidden="{{!useFrame}}"><iron-icon icon="input" slot="item-icon"></iron-icon>Open URL</paper-icon-item>
+							<paper-icon-item role="menuitem" on-tap="showAbout"><iron-icon icon="info" slot="item-icon"></iron-icon>About...</paper-icon-item>
+						</paper-listbox>
 					</paper-menu-button>
 					<paper-tabs id="tabs" scrollable hide-scroll-buttons selected="{{selected}}" on-tap="closeMenu">
 						<paper-tab>Website</paper-tab>
-						<paper-tab>Drafts</paper-tab>
 						<template is="dom-repeat" items="{{editing}}">
 							<paper-tab>Entry</paper-tab>
 						</template>
@@ -84,11 +84,8 @@
 			<div>
 				<neon-animated-pages id="pages" entry-animation="fade-in-animation" exit-animation="fade-out-animation"
 						selected="[[selected]]" class="content-wrapper content" on-tap="closeMenu">
-					<neon-animatable>
+					<neon-animatable id="content-container">
 						<slot></slot>
-					</neon-animatable>
-					<neon-animatable class="ui-tab-content">
-						TODO
 					</neon-animatable>
 					<template id="editing-repeat" is="dom-repeat" items="{{editing}}">
 						<neon-animatable>

@@ -29,7 +29,8 @@ Polymer({
 	},
 
 	addProp (e) {
-		let name = this.$['new-prop-name'].value
+		const name = this.$['new-prop-name'].value
+		if (!name) return
 		if (name.length < 1) return
 		if (name in this.item.properties) {
 			alert('This property already exists!')
@@ -42,7 +43,7 @@ Polymer({
 
 	removeProp (e) {
 		this.set('item.x-micro-panel-deleted-properties', (this.item['x-micro-panel-deleted-properties'] || []).concat([e.model.key]))
-		let props = {}
+		const props = {}
 		Object.assign(props, this.item.properties)
 		delete props[e.model.key]
 		this.set('item.properties', props)
@@ -57,22 +58,22 @@ Polymer({
 		// using the String class prevents polymer from binding the new field to both the new element and the previous one
 		// https://github.com/Polymer/polymer/issues/1913
 		this.addPropValue(e.model.key, new String())
-		e.target.fire('iron-select')
+		e.target.dispatchEvent(new CustomEvent('iron-select', { bubbles: true }));
 	},
 
 	addPropValueHTML (e) {
 		this.addPropValue(e.model.key, { html: '' })
-		e.target.fire('iron-select')
+		e.target.dispatchEvent(new CustomEvent('iron-select', { bubbles: true }));
 	},
 
 	addPropValueObject (e) {
 		this.addPropValue(e.model.key, { type: ['h-entry'], properties: {} })
-		e.target.fire('iron-select')
+		e.target.dispatchEvent(new CustomEvent('iron-select', { bubbles: true }));
 	},
 
 	removePropValue (e) {
-		let index = e.model.index
-		let key = e.currentTarget.dataset.key
+		const index = e.model.index
+		const key = e.currentTarget.dataset.key
 		this.item.properties[key].splice(index, 1)
 		this.set('item.properties.' + key, this.item.properties[key].map((x) => x))
 	},

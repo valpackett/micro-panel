@@ -11,18 +11,17 @@
 			.p0lyfake-toolbar { height: 56px; background: #00897b; }
 		</style>
 		<script>
-			if (!('Promise' in window))
-				document.write('<script src="bower_components/es6-promise/es6-promise.min.js"></scr'+'ipt>')
 			if (!('fetch' in window))
 				document.write('<script src="bower_components/fetch/fetch.js"></scr'+'ipt>')
-			if (!('registerElement' in document && 'import' in document.createElement('link')))
-				document.write('<script defer src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></scr'+'ipt>')
+			if (!('KeyframeEffect' in window))
+				document.write('<script src="bower_components/web-animations-js/web-animations-next.min.js"></scr'+'ipt>')
 		</script>
+		<script defer src="bower_components/webcomponentsjs/webcomponents-loader.js"></script>
 		<link rel="import" href="micro-panel.html">
 	</head>
 	<body>
 		<div class="p0lyfake p0lyfake-toolbar"></div>
-		<micro-panel>
+		<micro-panel use-frame use-auth>
 			<iframe src="/"></iframe>
 		</micro-panel>
 	</body>
