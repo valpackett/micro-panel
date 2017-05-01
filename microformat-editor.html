@@ -1,9 +1,13 @@
-<link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/polymer/polymer-element.html">
+<link rel="import" href="bower_components/polymer/lib/elements/custom-style.html">
+<link rel="import" href="bower_components/polymer/lib/elements/dom-bind.html">
+<link rel="import" href="bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="bower_components/paper-styles/element-styles/paper-material.html">
 <link rel="import" href="bower_components/paper-input/paper-input.html">
 <link rel="import" href="bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="bower_components/paper-item/paper-icon-item.html">
+<link rel="import" href="bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
 
@@ -30,35 +34,35 @@
 			}
 		</style>
 
-		<template is="dom-repeat" items="{{getPropKeys(item, item.*)}}" as="key">
+		<template is="dom-repeat" items="[[getPropKeys(item, item.*)]]" as="key">
 			<div class="paper-material" elevation="1" one-line-editor$="{{isOnlyStrings(item.*, key)}}">
 				<header class="value-holder">
 					<div class="key-name">[[key]]</div>
 					<paper-icon-button icon="remove" on-tap="removeProp"></paper-icon-button>
 					<paper-menu-button>
 						<paper-icon-button icon="add" slot="dropdown-trigger"></paper-icon-button>
-						<paper-menu slot="dropdown-content">
+						<paper-listbox slot="dropdown-content">
 							<paper-icon-item role="menuitem" on-tap="addPropValueText"><iron-icon icon="create" slot="item-icon"></iron-icon>Text</paper-icon-item>
 							<paper-icon-item role="menuitem" on-tap="addPropValueHTML"><iron-icon icon="code" slot="item-icon"></iron-icon>HTML</paper-icon-item>
 							<paper-icon-item role="menuitem" on-tap="addPropValueObject"><iron-icon icon="extension" slot="item-icon"></iron-icon>Object</paper-icon-item>
-						</paper-menu>
+						</paper-listbox>
 					</paper-menu-button>
 				</header>
-				<template is="dom-repeat" items="{{getPropValues(item.*, key)}}" as="val">
+				<template is="dom-repeat" items="[[getPropValues(item.*, key)]]" as="val">
 					<div class="one-value value-holder">
 						<template is="dom-if" if="{{isString(val)}}">
-							<paper-input class="value-editor" value="{{val}}" no-label-float></paper-input>
+							<paper-input class="value-editor" value="[[val]]" on-value-changed="updatePropFromInput" no-label-float></paper-input>
 						</template>
 						<template is="dom-if" if="{{isContentHtml(val)}}">
-							<paper-textarea class="value-editor" value="{{val.html}}"></paper-textarea>
+							<paper-textarea class="value-editor" value="[[val.html]]" on-value-changed="updatePropFromInput" data-subkey="html"></paper-textarea>
 						</template>
 						<template is="dom-if" if="{{isContentValueNotHtml(val)}}">
-							<paper-textarea class="value-editor" value="{{val.value}}"></paper-textarea>
+							<paper-textarea class="value-editor" value="[[val.value]]" on-value-changed="updatePropFromInput" data-subkey="value"></paper-textarea>
 						</template>
 						<template is="dom-if" if="{{isMicroformat(val)}}">
-							<microformat-editor class="value-editor" item="{{val}}"></microformat-editor>
+							<microformat-editor class="value-editor" item="[[val]]"></microformat-editor>
 						</template>
-						<paper-icon-button icon="remove" on-tap="removePropValue" data-key$="{{key}}"></paper-icon-button>
+						<paper-icon-button icon="remove" on-tap="removePropValue" data-key$="[[key]]"></paper-icon-button>
 					</div>
 				</template>
 			</div>
