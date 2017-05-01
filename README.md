@@ -1,11 +1,12 @@
 # micro-panel
 
-A client-side admin panel for your [IndieWeb](https://indiewebcamp.com) website!
+A client-side admin panel for your [IndieWeb](https://indieweb.org) website!
 
 - your website is the best interface to your website, and micro-panel just shows it in a frame, making entries editable
+  - instead of using a frame it's possible to embed micro-panel into your site's templates and have it show when you're logged in
 - creates/updates/deletes [Microformats 2](http://microformats.org/wiki/microformats2) entries using [Micropub](http://micropub.net/draft/)
-- authenticates using [IndieAuth](https://indiewebcamp.com/IndieAuth)
-- built with [Polymer](https://www.polymer-project.org/1.0/)
+- authenticates using [IndieAuth](https://indieweb.org/IndieAuth)
+- built with [Polymer](https://www.polymer-project.org/)
 
 (Created because I didn't want to make an admin interface specific to [Sweetroll](https://github.com/myfreeweb/sweetroll)… Also check out [indieweb-components](https://github.com/myfreeweb/indieweb-components) for components to put on your website.)
 
@@ -39,7 +40,9 @@ The production build reduces the number of files (so, HTTP requests) to make loa
 
 Please feel free to submit pull requests!
 
-By participating in this project you agree to follow the [Contributor Code of Conduct](http://contributor-covenant.org/version/1/4/).
+By participating in this project you agree to follow the [Contributor Code of Conduct](http://contributor-covenant.org/version/1/4/) and to release your contributions under the Unlicense.
+
+[The list of contributors is available on GitHub](https://github.com/myfreeweb/micro-panel/graphs/contributors).
 
 ## License
 
