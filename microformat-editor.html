@@ -4,6 +4,7 @@
 <link rel="import" href="bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="bower_components/paper-styles/element-styles/paper-material.html">
+<link rel="import" href="bower_components/paper-button/paper-button.html">
 <link rel="import" href="bower_components/paper-input/paper-input.html">
 <link rel="import" href="bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="bower_components/paper-item/paper-icon-item.html">
@@ -24,6 +25,14 @@
 			.one-value:nth-child(odd) { background: rgba(230, 230, 230, 0.25); }
 			.value-editor { flex: 1; flex-basis: 0.000000001px; }
 			paper-menu-button { padding: 0; }
+			.category-adders {
+				padding: 0.5em 0;
+			}
+			.category-adders paper-button {
+				padding: 0.15em 0.1em;
+				border-radius: 10em;
+				background: #efefef;
+			}
 
 			@media screen and (min-width: 550px) {
 				.paper-material { width: 90%; }
@@ -48,6 +57,7 @@
 						</paper-listbox>
 					</paper-menu-button>
 				</header>
+
 				<template is="dom-repeat" items="[[getPropValues(item.*, key)]]" as="val">
 					<div class="one-value value-holder">
 						<template is="dom-if" if="{{isString(val)}}">
@@ -60,9 +70,19 @@
 							<paper-textarea class="value-editor" value="[[val.value]]" on-value-changed="updatePropFromInput" data-subkey="value"></paper-textarea>
 						</template>
 						<template is="dom-if" if="{{isMicroformat(val)}}">
-							<microformat-editor class="value-editor" item="[[val]]"></microformat-editor>
+							<microformat-editor class="value-editor" item="[[val]]" existing-categories="[[existingCategories]]"></microformat-editor>
 						</template>
 						<paper-icon-button icon="remove" on-tap="removePropValue" data-key$="[[key]]"></paper-icon-button>
+					</div>
+				</template>
+
+				<template is="dom-if" if="{{isCategories(key)}}">
+					<div class="category-adders">
+						<template is="dom-repeat" items="[[existingCategories]]" as="cat">
+							<template is="dom-if" if="{{isUnusedCategory(cat, item.*)}}">
+								<paper-button on-tap="addCategory">[[cat]]</paper-button>
+							</template>
+						</template>
 					</div>
 				</template>
 			</div>

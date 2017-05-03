@@ -39,13 +39,13 @@ class MicroPanel extends Polymer.Element {
 			useAuth: { type: Boolean, value: false, reflectToAttribute: true },
 			selected: { type: Number, value: 0 },
 			requestInProgress: { type: Boolean, value: false },
-			model: { type: Object, value: { entries: [] } },
+			model: { type: Object, value: {} },
 		}
 	}
 
 	connectedCallback () {
 		super.connectedCallback()
-		window.mpstore = new Freezer({ entries: [] })
+		window.mpstore = new Freezer({ entries: [], existingCategories: [] })
 		this.model = window.mpstore.get()
 		window.mpstore.on('update', (v, oldv) => {
 			this.model = v
@@ -65,10 +65,16 @@ class MicroPanel extends Polymer.Element {
 			} else if (!this.useAuth) {
 				fetch(location.href).then(resp => saveAuthParams(resp.headers.get('Link')))
 			}
-			function makeStyle (doc) {
+			const makeStyle = (doc) => {
 				const style = doc.createElement('style')
 				style.innerHTML += '.h-entry { border: 2px solid #26a69a; }'
 				style.innerHTML += '.h-entry::before { content: "Edit"; background: #26a69a; color: white; padding: 6px; display: block; cursor: pointer; }'
+				// not really making the style but while we're at it, get tags
+				const tr = this.model.existingCategories.transact()
+				for (const el of doc.querySelectorAll('[data-mf-category]')) {
+					tr.push(el.dataset.mfCategory)
+				}
+				this.model.existingCategories.run()
 				return style
 			}
 			if (this.useFrame) {
