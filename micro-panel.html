@@ -95,7 +95,7 @@
 					<template id="editing-repeat" is="dom-repeat" items="[[model.entries]]">
 						<neon-animatable>
 							<div class="toolbar-wrapper">
-								<microformat-editor class="ui-tab-content" item="[[item]]"></microformat-editor>
+								<microformat-editor class="ui-tab-content" item="[[item]]" existing-categories="[[model.existingCategories]]"></microformat-editor>
 								<app-toolbar class="editor-bottom-bar">
 									<paper-spinner active="{{requestInProgress}}"></paper-spinner>
 									<template is="dom-if" if="{{item.x-micro-panel-new}}">

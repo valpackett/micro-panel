@@ -9,7 +9,8 @@ class MicroformatEditor extends Polymer.Element {
 			item: {
 				type: Object,
 				value: () => ({ type: [ 'h-entry' ], properties: {} }),
-			}
+			},
+			existingCategories: Array,
 		}
 	}
 
@@ -118,6 +119,18 @@ class MicroformatEditor extends Polymer.Element {
 
 	isMicroformat (val) {
 		return (val.type || []).length >= 1
+	}
+
+	isCategories (key) {
+		return key === 'category'
+	}
+
+	isUnusedCategory (cat) {
+		return !(this.item.properties.category || []).includes(cat)
+	}
+
+	addCategory (e) {
+		(this.item.properties.category || []).push(e.target.innerHTML)
 	}
 }
 
