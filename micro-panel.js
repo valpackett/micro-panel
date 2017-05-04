@@ -75,8 +75,9 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 			}
 			const makeStyle = (doc) => {
 				const style = doc.createElement('style')
-				style.innerHTML += '.h-entry { border: 2px solid #26a69a; }'
-				style.innerHTML += '.h-entry::before { content: "Edit"; background: #26a69a; color: white; padding: 6px; display: block; cursor: pointer; }'
+				const excl = ':not(.h-cite):not(.p-author)'
+				style.innerHTML += '[class^="h-"]'+excl+', [class*=" h-"]'+excl+' { border: 2px solid #26a69a; }'
+				style.innerHTML += '[class^="h-"]'+excl+'::before, [class*=" h-"]'+excl+'::before { content: "Edit"; background: #26a69a; color: white; padding: 6px; display: block; cursor: pointer; }'
 				// not really making the style but while we're at it, get tags
 				const tr = this.model.existingCategories.transact()
 				for (const el of doc.querySelectorAll('[data-mf-category]')) {
@@ -150,17 +151,18 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 	}
 
 	editClick (e) {
-		if (!e.target.classList.contains('h-entry')) return
+		if (![].some.call(e.target.classList, x => x.startsWith('h-'))) return
 		const entry = Microformats.get({ node: e.target, textFormat: 'normalised' }).items[0]
+		const props = entry.properties || {}
 		let i = 0
 		if (this.model.entries.find((editingEntry) => {
 			i += 1
-			return ((editingEntry.properties || {}).uid || [1])[0] === ((entry.properties || {}).uid || [1])[0]
+			return ((editingEntry.properties || {}).uid || [1])[0] === (props.uid || [1])[0]
 		})) {
 			this.selected = 0 + i
 			return
 		}
-		const url = ((entry.properties || {}).url || [this.currentPageUrl()])[0]
+		const url = (props['editing-url'] || props.url || [this.currentPageUrl()])[0]
 		this.micropubGet('q=source&url=' + encodeURIComponent(url))
 		.then((resp) => resp.json())
 		.then((fullEntry) => this.editStart(fullEntry))
@@ -169,8 +171,9 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 			fetch(url)
 			.then(resp => resp.text())
 			.then(body => {
-				const fullEntry = Microformats.get({ html: body, textFormat: 'normalised', filter: ['h-entry'] }).items[0]
-				this.editStart(fullEntry)
+				for (const fullEntry of Microformats.get({ html: body, textFormat: 'normalised' })) {
+					this.editStart(fullEntry)
+				}
 			})
 			.catch(e => {
 				console.log('Error when fetching entry', e)
