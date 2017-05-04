@@ -30,7 +30,7 @@ function setAccessToken (token) {
 	history.replaceState({}, '', location.href.replace(/\?[^#]*/, ''))
 }
 
-class MicroPanel extends Polymer.Element {
+class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 	static get is () { return 'micro-panel' }
 
 	static get properties () {
@@ -39,17 +39,20 @@ class MicroPanel extends Polymer.Element {
 			useAuth: { type: Boolean, value: false, reflectToAttribute: true },
 			selected: { type: Number, value: 0 },
 			requestInProgress: { type: Boolean, value: false },
+			fileQueue: { type: Array, value: () => [] },
 			model: { type: Object, value: {} },
 		}
 	}
 
 	connectedCallback () {
 		super.connectedCallback()
-		window.mpstore = new Freezer({ entries: [], existingCategories: [] })
+		window.mpstore = new Freezer({ entries: [], existingCategories: [], mediaEndpoint: null })
 		this.model = window.mpstore.get()
 		window.mpstore.on('update', (v, oldv) => {
 			this.model = v
 		})
+		this.dragFirst = false
+		this.dragSecond = false
 
 		for (const e of document.querySelectorAll('.p0lyfake')) {
 			e.parentNode.removeChild(e)
@@ -65,6 +68,11 @@ class MicroPanel extends Polymer.Element {
 			} else if (!this.useAuth) {
 				fetch(location.href).then(resp => saveAuthParams(resp.headers.get('Link')))
 			}
+			if (localStorage.getItem('micropub_link')) {
+				this.micropubGet('q=config').then(resp => resp.json()).then(conf => {
+					this.model.set('mediaEndpoint', conf['media-endpoint'])
+				})
+			}
 			const makeStyle = (doc) => {
 				const style = doc.createElement('style')
 				style.innerHTML += '.h-entry { border: 2px solid #26a69a; }'
@@ -78,7 +86,8 @@ class MicroPanel extends Polymer.Element {
 				return style
 			}
 			if (this.useFrame) {
-				const frame = this.queryEffectiveChildren('iframe')
+				// XXX: DOES querySelector WORK FOR THIS?
+				const frame = this.querySelector('iframe')
 				frame.addEventListener('load', e => {
 					console.log(e)
 					const style = makeStyle(e.target.contentDocument)
@@ -134,7 +143,7 @@ class MicroPanel extends Polymer.Element {
 
 	currentPageUrl () {
 		if (this.useFrame) {
-			const frame = this.queryEffectiveChildren('iframe')
+			const frame = this.querySelector('iframe')
 			return frame.contentWindow.location.href
 		}
 		return location.href
@@ -240,7 +249,7 @@ class MicroPanel extends Polymer.Element {
 	editFinish (entry, redir) {
 		this.model.entries.splice(this.model.entries.indexOf(entry), 1)
 		if (this.useFrame) {
-			const frame = this.queryEffectiveChildren('iframe')
+			const frame = this.querySelector('iframe')
 			frame.src = redir || frame.src
 		} else {
 			location.reload()
@@ -306,13 +315,13 @@ class MicroPanel extends Polymer.Element {
 	showOpenUrl () {
 		this.$['menu-button'].close()
 		this.$['open-url-dialog'].open()
-		const frame = this.queryEffectiveChildren('iframe')
+		const frame = this.querySelector('iframe')
 		this.$['open-url-input'].value = frame.contentWindow.location.href
 	}
 
 	openUrlClosed (e) {
 		if (!e.detail.confirmed) return
-		const frame = this.queryEffectiveChildren('iframe')
+		const frame = this.querySelector('iframe')
 		frame.src = this.$['open-url-input'].value
 		this.selected = 0
 	}
@@ -325,6 +334,113 @@ class MicroPanel extends Polymer.Element {
 
 	closeMenu () {
 		this.$['menu-button'].close()
+	}
+
+	// dragFirst/dragSecond trick from https://github.com/bensmithett/dragster/blob/gh-pages/src/dragster.coffee
+	fileUploadDropShow (e) {
+		e.stopPropagation()
+		e.preventDefault()
+		if (this.dragFirst) {
+			this.dragSecond = true
+		} else {
+			this.dragFirst = true
+			console.log(e)
+			e.dataTransfer.dropEffect = 'copy'
+			this.$['file-upload-dialog'].classList.add('dragging')
+		}
+	}
+
+	fileUploadDrag (e) {
+		e.stopPropagation()
+		e.preventDefault()
+	}
+
+	fileUploadDropHide (e) {
+		e.stopPropagation()
+		e.preventDefault()
+		if (this.dragSecond) {
+			this.dragSecond = false
+		} else {
+			this.dragFirst = false
+		}
+		if (!this.dragFirst && !this.dragSecond) {
+			this.$['file-upload-dialog'].classList.remove('dragging')
+		}
+	}
+
+	fileUploadDrop (e) {
+		e.stopPropagation()
+		e.preventDefault()
+		this.dragFirst = false
+		this.dragSecond = false
+		this.$['file-upload-dialog'].classList.remove('dragging')
+		for (const file of e.dataTransfer.files) {
+			this.push('fileQueue', file)
+		}
+	}
+
+	fileUploadPick (e) {
+		for (const file of e.target.files) {
+			this.push('fileQueue', file)
+		}
+	}
+
+	fileUploadGo (e) {
+		if (typeof this.$['file-upload-dialog'].callback === 'function') {
+			this.requestInProgress = true
+			this.fileQueue.reduce((prom, file) => {
+				console.log('Starting file upload', file)
+				return prom.then(_ => {
+					return new Promise((resolve, reject) => {
+						const xhr = new XMLHttpRequest()
+						xhr.upload.addEventListener('progress', e => {
+							if (e.lengthComputable) {
+								this.$['upload-progress'].value = e.loaded / e.total * 100
+							} else {
+								this.$['upload-progress'].indeterminate = true
+							}
+						}, false)
+						xhr.addEventListener('load', e => {
+							if (xhr.status >= 200 && xhr.status < 300) {
+								if (xhr.getResponseHeader('Content-Type').includes('application/json')) {
+									resolve(JSON.parse(xhr.responseText))
+								} else {
+									resolve(xhr.getResponseHeader('Location'))
+								}
+							} else {
+								reject(xhr.status)
+							}
+						})
+						xhr.addEventListener('error', reject)
+						xhr.addEventListener('abort', reject)
+						xhr.addEventListener('timeout', reject)
+						xhr.upload.addEventListener('error', reject)
+						xhr.upload.addEventListener('abort', reject)
+						xhr.upload.addEventListener('timeout', reject)
+						xhr.open('post', this.model.mediaEndpoint)
+						const form = new FormData()
+						form.append('file', file)
+						xhr.send(form)
+					})
+				}).then(obj => {
+					this.$['file-upload-dialog'].callback(obj)
+					// NOTE: need to find index here because indices shift on removal
+					this.splice('fileQueue', this.fileQueue.findIndex(x => x === file), 1)
+				})
+			}, Promise.resolve()).then(x => {
+				this.requestInProgress = false
+				this.$['upload-progress'].value = 0
+				this.$['file-upload-dialog'].close()
+			}).catch(e => {
+				console.error(e)
+				this.requestInProgress = false
+				this.$['upload-progress'].value = 0
+			})
+		}
+	}
+
+	fileUploadRemove (e) {
+		this.splice('fileQueue', e.model.index, 1)
 	}
 }
 

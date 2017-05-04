@@ -5,6 +5,7 @@ A client-side admin panel for your [IndieWeb](https://indieweb.org) website!
 - your website is the best interface to your website, and micro-panel just shows it in a frame, making entries editable
   - instead of using a frame it's possible to embed micro-panel into your site's templates and have it show when you're logged in
 - creates/updates/deletes [Microformats 2](http://microformats.org/wiki/microformats2) entries using [Micropub](http://micropub.net/draft/)
+- supports media endpoint file uploads
 - authenticates using [IndieAuth](https://indieweb.org/IndieAuth)
 - built with [Polymer](https://www.polymer-project.org/)
 
