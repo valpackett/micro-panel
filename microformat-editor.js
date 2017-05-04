@@ -11,6 +11,7 @@ class MicroformatEditor extends Polymer.GestureEventListeners(Polymer.Element) {
 				value: () => ({ type: [ 'h-entry' ], properties: {} }),
 			},
 			model: Object,
+			isNested: Boolean,
 		}
 	}
 
@@ -38,6 +39,22 @@ class MicroformatEditor extends Polymer.GestureEventListeners(Polymer.Element) {
 		}
 	}
 
+	updateJSONPropFromInput (e) {
+		const target = e.composedPath()[0]
+		const tr = this.item.properties[e.model.key].transact()
+		tr[e.model.index] = JSON.parse(target.value)
+		this.item.properties[e.model.key].run()
+	}
+
+	updateTypeFromInput (e) {
+		const target = e.composedPath()[0]
+		this.item.set('type', target.value.split(/\s+/))
+	}
+
+	oneLineType (item) {
+		return (item.type || []).join(' ')
+	}
+
 	getPropKeys (item) {
 		return Object.keys(item.properties || {})
 	}
@@ -55,7 +72,12 @@ class MicroformatEditor extends Polymer.GestureEventListeners(Polymer.Element) {
 		}
 		const tr = this.item.transact()
 		tr['x-micro-panel-deleted-properties'] = (tr['x-micro-panel-deleted-properties'] || []).filter(n => n !== name)
-		tr.properties.set(name, [])
+		let dflt = ['']
+		if (name === 'content') { dflt = [{ html: '' }] }
+		if (name === 'item') { dflt = [{ type: ['h-item'], properties: { name: [''], url: [''] } }] }
+		if (name === 'location') { dflt = [{ type: ['h-adr'], properties: { 'country-name': [''], locality: [''] } }] }
+		if (name === 'photo' || name === 'video' || name === 'audio') { dflt = [] }
+		tr.properties.set(name, dflt)
 		this.item.run()
 		this.$['new-prop-name'].value = ''
 	}
@@ -88,7 +110,12 @@ class MicroformatEditor extends Polymer.GestureEventListeners(Polymer.Element) {
 	}
 
 	addPropValueObject (e) {
-		this.addPropValue(e.model.key, { type: ['h-entry'], properties: {} })
+		this.addPropValue(e.model.key, { type: ['h-entry'], properties: {}, 'x-micro-panel-new': true })
+		e.target.dispatchEvent(new CustomEvent('iron-select', { bubbles: true }))
+	}
+
+	addPropValueJSON (e) {
+		this.addPropValue(e.model.key, {})
 		e.target.dispatchEvent(new CustomEvent('iron-select', { bubbles: true }))
 	}
 
@@ -123,12 +150,12 @@ class MicroformatEditor extends Polymer.GestureEventListeners(Polymer.Element) {
 		return this.isString(val.html)
 	}
 
-	isContentValueNotHtml (val) {
-		return !this.isString(val.html) && !Array.isArray(val.type) && this.isString(val.value)
-	}
-
 	isMicroformat (val) {
 		return (val.type || []).length >= 1
+	}
+
+	isWhateverJSONBlob (val) {
+		return typeof val === 'object' && !this.isString(val) && !val.type && !val.html
 	}
 
 	isCategories (key) {
@@ -145,6 +172,14 @@ class MicroformatEditor extends Polymer.GestureEventListeners(Polymer.Element) {
 
 	hasMediaEndpoint (model) {
 		return typeof model.mediaEndpoint === 'string'
+	}
+
+	isNew (item, isNested) {
+		return item['x-micro-panel-new'] || isNested
+	}
+
+	showJSONBlob (val) {
+		return JSON.stringify(val, null, 2)
 	}
 }
 

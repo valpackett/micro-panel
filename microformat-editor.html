@@ -49,6 +49,11 @@
 			}
 		</style>
 
+		<div class="paper-material" one-line-editor>
+			<paper-input class="value-editor" value="[[oneLineType(item)]]"
+				on-value-changed="updateTypeFromInput" disabled="[[!isNew(item, isNested)]]"></paper-input>
+		</div>
+
 		<template is="dom-repeat" items="[[getPropKeys(item, item.*)]]" as="key">
 			<div class="paper-material" elevation="1" one-line-editor$="{{isOnlyStrings(item.*, key)}}">
 				<header class="value-holder">
@@ -64,11 +69,14 @@
 								<iron-icon icon="code" slot="item-icon"></iron-icon>HTML
 							</paper-icon-item>
 							<paper-icon-item role="menuitem" on-tap="addPropValueObject">
-								<iron-icon icon="extension" slot="item-icon"></iron-icon>Object
+								<iron-icon icon="picture-in-picture" slot="item-icon"></iron-icon>Object
+							</paper-icon-item>
+							<paper-icon-item role="menuitem" on-tap="addPropValueJSON">
+								<iron-icon icon="extension" slot="item-icon"></iron-icon>JSON
 							</paper-icon-item>
 							<template is="dom-if" if="{{hasMediaEndpoint(model)}}">
 								<paper-icon-item role="menuitem" on-tap="addPropValueFile">
-									<iron-icon icon="save" slot="item-icon"></iron-icon>Files
+									<iron-icon icon="file-upload" slot="item-icon"></iron-icon>Files
 								</paper-icon-item>
 							</template>
 						</paper-listbox>
@@ -83,11 +91,11 @@
 						<template is="dom-if" if="{{isContentHtml(val)}}">
 							<paper-textarea class="value-editor" value="[[val.html]]" on-value-changed="updatePropFromInput" data-subkey="html"></paper-textarea>
 						</template>
-						<template is="dom-if" if="{{isContentValueNotHtml(val)}}">
-							<paper-textarea class="value-editor" value="[[val.value]]" on-value-changed="updatePropFromInput" data-subkey="value"></paper-textarea>
-						</template>
 						<template is="dom-if" if="{{isMicroformat(val)}}">
-							<microformat-editor class="value-editor" item="[[val]]" model="[[model]]"></microformat-editor>
+							<microformat-editor class="value-editor" item="[[val]]" model="[[model]]" is-nested="true"></microformat-editor>
+						</template>
+						<template is="dom-if" if="{{isWhateverJSONBlob(val)}}">
+							<paper-textarea class="value-editor" value="[[showJSONBlob(val)]]" on-value-changed="updateJSONPropFromInput"></paper-textarea>
 						</template>
 						<paper-icon-button icon="remove" title="Remove this value" on-tap="removePropValue" data-key$="[[key]]"></paper-icon-button>
 					</div>
