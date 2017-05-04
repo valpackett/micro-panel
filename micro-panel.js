@@ -75,9 +75,9 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 			}
 			const makeStyle = (doc) => {
 				const style = doc.createElement('style')
-				const excl = ':not(.h-cite):not(.p-author)'
-				style.innerHTML += '[class^="h-"]'+excl+', [class*=" h-"]'+excl+' { border: 2px solid #26a69a; }'
-				style.innerHTML += '[class^="h-"]'+excl+'::before, [class*=" h-"]'+excl+'::before { content: "Edit"; background: #26a69a; color: white; padding: 6px; display: block; cursor: pointer; }'
+				const excl = ':not(.h-cite):not(.p-author):not(.p-item)'
+				style.innerHTML += '[class^="h-"]' + excl + ', [class*=" h-"]' + excl + ' { border: 2px solid #26a69a; }'
+				style.innerHTML += '[class^="h-"]' + excl + '::before, [class*=" h-"]' + excl + '::before { content: "Edit"; background: #26a69a; color: white; padding: 6px; display: block; cursor: pointer; }'
 				// not really making the style but while we're at it, get tags
 				const tr = this.model.existingCategories.transact()
 				for (const el of doc.querySelectorAll('[data-mf-category]')) {
@@ -155,9 +155,11 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 		const entry = Microformats.get({ node: e.target, textFormat: 'normalised' }).items[0]
 		const props = entry.properties || {}
 		let i = 0
-		if (this.model.entries.find((editingEntry) => {
+		if (this.model.entries.find(editingEntry => {
 			i += 1
-			return ((editingEntry.properties || {}).uid || [1])[0] === (props.uid || [1])[0]
+			const thatUid = ((editingEntry.properties || {}).uid || (editingEntry.properties || {}).url || [])[0]
+			const ourUid = (props.uid || props.url || [])[0]
+			return thatUid && ourUid && thatUid === ourUid
 		})) {
 			this.selected = 0 + i
 			return
@@ -211,7 +213,9 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 	saveEntry (e) {
 		let entry = this.$['editing-repeat'].modelForElement(e.target).item
 		let url = ((entry.properties || {}).url || [null])[0]
-		if (!url) return alert('Somehow, an entry with no URL! I have no idea how to save that.')
+		if (!url) {
+			return alert('Somehow, an entry with no URL! I have no idea how to save that.')
+		}
 		this.requestInProgress = true
 		entry.properties.remove('url')
 		this.micropubPost({
