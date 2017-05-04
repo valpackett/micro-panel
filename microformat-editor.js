@@ -1,7 +1,7 @@
 /* eslint-disable no-new-wrappers */
 'use strict'
 
-class MicroformatEditor extends Polymer.Element {
+class MicroformatEditor extends Polymer.GestureEventListeners(Polymer.Element) {
 	static get is () { return 'microformat-editor' }
 
 	static get properties () {
@@ -10,7 +10,7 @@ class MicroformatEditor extends Polymer.Element {
 				type: Object,
 				value: () => ({ type: [ 'h-entry' ], properties: {} }),
 			},
-			existingCategories: Array,
+			model: Object,
 		}
 	}
 
@@ -92,6 +92,16 @@ class MicroformatEditor extends Polymer.Element {
 		e.target.dispatchEvent(new CustomEvent('iron-select', { bubbles: true }))
 	}
 
+	addPropValueFile (e) {
+		e.target.dispatchEvent(new CustomEvent('iron-select', { bubbles: true }))
+		// XXX: https://github.com/PolymerElements/iron-overlay-behavior/issues/208#issuecomment-293349138
+		const dialog = document.querySelector('micro-panel').$['file-upload-dialog']
+		dialog.callback = result => {
+			this.addPropValue(e.model.key, result)
+		}
+		dialog.open()
+	}
+
 	removePropValue (e) {
 		const index = e.model.index
 		const key = e.currentTarget.dataset.key
@@ -131,6 +141,10 @@ class MicroformatEditor extends Polymer.Element {
 
 	addCategory (e) {
 		(this.item.properties.category || []).push(e.target.innerHTML)
+	}
+
+	hasMediaEndpoint (model) {
+		return typeof model.mediaEndpoint === 'string'
 	}
 }
 

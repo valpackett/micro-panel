@@ -1,6 +1,7 @@
 <link rel="import" href="bower_components/polymer/polymer-element.html">
 <link rel="import" href="bower_components/polymer/lib/elements/dom-bind.html">
 <link rel="import" href="bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="bower_components/polymer/lib/mixins/gesture-event-listeners.html">
 <link rel="import" href="bower_components/paper-styles/color.html">
 <link rel="import" href="bower_components/app-layout/app-header-layout/app-header-layout.html">
 <link rel="import" href="bower_components/app-layout/app-header/app-header.html">
@@ -17,6 +18,7 @@
 <link rel="import" href="bower_components/paper-item/paper-item.html">
 <link rel="import" href="bower_components/paper-item/paper-icon-item.html">
 <link rel="import" href="bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="bower_components/neon-animation/neon-animated-pages.html">
 <link rel="import" href="bower_components/neon-animation/neon-animatable.html">
 <link rel="import" href="bower_components/neon-animation/animations/fade-in-animation.html">
@@ -50,6 +52,18 @@
 			.editor-bottom-bar { justify-content: flex-end; }
 			#content-container { background: inherit; overflow: auto; } /* avoid making site bg white when used in embedded mode */
 			/* XXX: don't use overflow:auto when frame is used? */
+			#file-upload-dialog-drag-overlay {
+				position: absolute; top: 0; right: 0; bottom: 0; left: 0; margin: 0;
+				background: var(--paper-teal-100); color: white; opacity: 0.6;
+				display: none; align-items: center; justify-content: center;
+			}
+			.dragging #file-upload-dialog-drag-overlay { display: flex; }
+			.file-queue { padding: 0; }
+			.file-in-queue { margin-top: 0; display: flex; align-items: center; padding: 0 24px; }
+			.file-in-queue:nth-child(odd) { background: rgba(230, 230, 230, 0.3); }
+			.file-in-queue :first-child { flex: 1; flex-basis: 0.000000001px;  }
+			.note { font-size: 0.9em; color: #aaa; }
+			paper-progress { width: auto; }
 
 			@media screen and (min-width: 450px) {
 				#open-url-input, #auth-url-input { min-width: 70vw; }
@@ -95,7 +109,7 @@
 					<template id="editing-repeat" is="dom-repeat" items="[[model.entries]]">
 						<neon-animatable>
 							<div class="toolbar-wrapper">
-								<microformat-editor class="ui-tab-content" item="[[item]]" existing-categories="[[model.existingCategories]]"></microformat-editor>
+								<microformat-editor class="ui-tab-content" item="[[item]]" model="[[model]]"></microformat-editor>
 								<app-toolbar class="editor-bottom-bar">
 									<paper-spinner active="{{requestInProgress}}"></paper-spinner>
 									<template is="dom-if" if="{{item.x-micro-panel-new}}">
@@ -145,6 +159,33 @@
 			</p>
 			<div class="buttons">
 				<paper-button dialog-dismiss>Close</paper-button>
+			</div>
+		</paper-dialog>
+
+		<paper-dialog id="file-upload-dialog"
+			on-dragenter="fileUploadDropShow" on-dragover="fileUploadDrag" on-dragleave="fileUploadDropHide" on-drop="fileUploadDrop"
+			modal entry-animation="fade-in-animation" exit-animation="fade-out-animation">
+			<h2>Upload files</h2>
+			<input type="file" multiple on-change="fileUploadPick" disabled="{{requestInProgress}}">
+			<div class="file-queue">
+				<template is="dom-repeat" items="{{fileQueue}}">
+					<div class="file-in-queue">
+						<div>[[item.name]]</div>
+						<paper-icon-button icon="remove" title="Remove this file from the queue" on-tap="fileUploadRemove" disabled="{{requestInProgress}}"></paper-icon-button>
+					</div>
+				</template>
+			</div>
+			<paper-progress id="upload-progress" hidden="{{!requestInProgress}}"></paper-progress>
+			<p class="note">
+				Note: you can drag and drop files here.
+				TODO: media capture.
+			</p>
+			<div class="buttons">
+				<paper-button dialog-dismiss disabled="{{requestInProgress}}">Cancel</paper-button>
+				<paper-button on-tap="fileUploadGo" disabled="{{requestInProgress}}">Upload</paper-button>
+			</div>
+			<div id="file-upload-dialog-drag-overlay">
+				<span>Drag files here</span>
 			</div>
 		</paper-dialog>
 

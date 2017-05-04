@@ -37,6 +37,7 @@
     "paper-dialog": "PolymerElements/paper-dialog#2.0-preview",
     "paper-input": "PolymerElements/paper-input#2.0-preview",
     "paper-spinner": "PolymerElements/paper-spinner#2.0-preview",
+    "paper-progress": "PolymerElements/paper-progress#2.0-preview",
     "fetch": "^2.0.2",
     "microformat-shiv": "myfreeweb/microformat-shiv#master",
     "freezer-js": "freezer#^0.11.2"

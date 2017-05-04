@@ -2,6 +2,7 @@
 <link rel="import" href="bower_components/polymer/lib/elements/custom-style.html">
 <link rel="import" href="bower_components/polymer/lib/elements/dom-bind.html">
 <link rel="import" href="bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="bower_components/polymer/lib/mixins/gesture-event-listeners.html">
 <link rel="import" href="bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="bower_components/paper-styles/element-styles/paper-material.html">
 <link rel="import" href="bower_components/paper-button/paper-button.html">
@@ -20,16 +21,21 @@
 		<style>
 			.paper-material { margin: 1em auto; width: 98%; }
 			.value-holder { padding: 0.25em 0.5em; display: flex; flex-direction: row; }
+			header.value-holder { background: var(--paper-teal-200); color: white; }
 			.key-name { flex: 1; flex-basis: 0.000000001px; line-height: 36px; }
 			.one-value { background: rgba(250, 250, 250, 0.1); }
 			.one-value:nth-child(odd) { background: rgba(230, 230, 230, 0.25); }
 			.value-editor { flex: 1; flex-basis: 0.000000001px; }
 			paper-menu-button { padding: 0; }
 			.category-adders {
-				padding: 0.5em 0;
+				padding: 0.5em 0.25em;
+				line-height: 2.3;
+				hyphens: auto;
 			}
 			.category-adders paper-button {
-				padding: 0.15em 0.1em;
+				display: inline;
+				padding: 0.3em 0.65em;
+				margin: 0 0.3em;
 				border-radius: 10em;
 				background: #efefef;
 			}
@@ -47,13 +53,24 @@
 			<div class="paper-material" elevation="1" one-line-editor$="{{isOnlyStrings(item.*, key)}}">
 				<header class="value-holder">
 					<div class="key-name">[[key]]</div>
-					<paper-icon-button icon="remove" on-tap="removeProp"></paper-icon-button>
+					<paper-icon-button icon="remove" title="Remove this property" on-tap="removeProp"></paper-icon-button>
 					<paper-menu-button>
-						<paper-icon-button icon="add" slot="dropdown-trigger"></paper-icon-button>
+						<paper-icon-button icon="add" title="Add new value to this property" slot="dropdown-trigger"></paper-icon-button>
 						<paper-listbox slot="dropdown-content">
-							<paper-icon-item role="menuitem" on-tap="addPropValueText"><iron-icon icon="create" slot="item-icon"></iron-icon>Text</paper-icon-item>
-							<paper-icon-item role="menuitem" on-tap="addPropValueHTML"><iron-icon icon="code" slot="item-icon"></iron-icon>HTML</paper-icon-item>
-							<paper-icon-item role="menuitem" on-tap="addPropValueObject"><iron-icon icon="extension" slot="item-icon"></iron-icon>Object</paper-icon-item>
+							<paper-icon-item role="menuitem" on-tap="addPropValueText">
+								<iron-icon icon="create" slot="item-icon"></iron-icon>Text
+							</paper-icon-item>
+							<paper-icon-item role="menuitem" on-tap="addPropValueHTML">
+								<iron-icon icon="code" slot="item-icon"></iron-icon>HTML
+							</paper-icon-item>
+							<paper-icon-item role="menuitem" on-tap="addPropValueObject">
+								<iron-icon icon="extension" slot="item-icon"></iron-icon>Object
+							</paper-icon-item>
+							<template is="dom-if" if="{{hasMediaEndpoint(model)}}">
+								<paper-icon-item role="menuitem" on-tap="addPropValueFile">
+									<iron-icon icon="save" slot="item-icon"></iron-icon>Files
+								</paper-icon-item>
+							</template>
 						</paper-listbox>
 					</paper-menu-button>
 				</header>
@@ -70,17 +87,17 @@
 							<paper-textarea class="value-editor" value="[[val.value]]" on-value-changed="updatePropFromInput" data-subkey="value"></paper-textarea>
 						</template>
 						<template is="dom-if" if="{{isMicroformat(val)}}">
-							<microformat-editor class="value-editor" item="[[val]]" existing-categories="[[existingCategories]]"></microformat-editor>
+							<microformat-editor class="value-editor" item="[[val]]" model="[[model]]"></microformat-editor>
 						</template>
-						<paper-icon-button icon="remove" on-tap="removePropValue" data-key$="[[key]]"></paper-icon-button>
+						<paper-icon-button icon="remove" title="Remove this value" on-tap="removePropValue" data-key$="[[key]]"></paper-icon-button>
 					</div>
 				</template>
 
 				<template is="dom-if" if="{{isCategories(key)}}">
 					<div class="category-adders">
-						<template is="dom-repeat" items="[[existingCategories]]" as="cat">
+						<template is="dom-repeat" items="[[model.existingCategories]]" as="cat">
 							<template is="dom-if" if="{{isUnusedCategory(cat, item.*)}}">
-								<paper-button on-tap="addCategory">[[cat]]</paper-button>
+								<paper-button on-tap="addCategory" title="Add category '[[cat]]'">[[cat]]</paper-button>
 							</template>
 						</template>
 					</div>
@@ -91,7 +108,7 @@
 		<div class="paper-material" elevation="1" one-line-editor>
 			<div class="value-holder">
 				<paper-input class="value-editor" id="new-prop-name" label="New property..." no-label-float></paper-input>
-				<paper-icon-button icon="add" on-tap="addProp"></paper-icon-button>
+				<paper-icon-button icon="add" title="Create this property" on-tap="addProp"></paper-icon-button>
 			</div>
 		</div>
 
