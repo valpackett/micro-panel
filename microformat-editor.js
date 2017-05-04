@@ -1,6 +1,15 @@
 /* eslint-disable no-new-wrappers */
 'use strict'
 
+function blankObjFor (prop) {
+	if (prop === 'item') {
+		return { type: ['h-item'], properties: { name: [''], url: [''] } }
+	}
+	if (prop === 'location') {
+		return { type: ['h-adr'], properties: { 'country-name': [''], locality: [''] } }
+	}
+}
+
 class MicroformatEditor extends Polymer.GestureEventListeners(Polymer.Element) {
 	static get is () { return 'microformat-editor' }
 
@@ -72,11 +81,13 @@ class MicroformatEditor extends Polymer.GestureEventListeners(Polymer.Element) {
 		}
 		const tr = this.item.transact()
 		tr['x-micro-panel-deleted-properties'] = (tr['x-micro-panel-deleted-properties'] || []).filter(n => n !== name)
-		let dflt = ['']
-		if (name === 'content') { dflt = [{ html: '' }] }
-		if (name === 'item') { dflt = [{ type: ['h-item'], properties: { name: [''], url: [''] } }] }
-		if (name === 'location') { dflt = [{ type: ['h-adr'], properties: { 'country-name': [''], locality: [''] } }] }
-		if (name === 'photo' || name === 'video' || name === 'audio') { dflt = [] }
+		let dflt = blankObjFor(name)
+		if (name === 'content') { dflt = { html: '' } }
+		if (name === 'photo' || name === 'video' || name === 'audio') {
+			dflt = []
+		} else {
+			dflt = [dflt || '']
+		}
 		tr.properties.set(name, dflt)
 		this.item.run()
 		this.$['new-prop-name'].value = ''
@@ -110,7 +121,7 @@ class MicroformatEditor extends Polymer.GestureEventListeners(Polymer.Element) {
 	}
 
 	addPropValueObject (e) {
-		this.addPropValue(e.model.key, { type: ['h-entry'], properties: {}, 'x-micro-panel-new': true })
+		this.addPropValue(e.model.key, blankObjFor(e.model.key) || { type: ['h-entry'], properties: {} })
 		e.target.dispatchEvent(new CustomEvent('iron-select', { bubbles: true }))
 	}
 
@@ -155,7 +166,7 @@ class MicroformatEditor extends Polymer.GestureEventListeners(Polymer.Element) {
 	}
 
 	isWhateverJSONBlob (val) {
-		return typeof val === 'object' && !this.isString(val) && !val.type && !val.html
+		return typeof val === 'object' && !this.isString(val) && !val.type && typeof val.html === 'undefined'
 	}
 
 	isCategories (key) {
