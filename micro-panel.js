@@ -280,7 +280,7 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 			const state = saveAndGetState()
 			location.href = localStorage.getItem('auth_link') +
 				'?me=' + encodeURIComponent(this.$['auth-url-input'].value) +
-				'&client_id=' + encodeURIComponent(CLIENT_ID) +
+				'&client_id=' + encodeURIComponent(location.href) + // e.g. indiecert demands same domain as redirect_uri
 				'&redirect_uri=' + encodeURIComponent(location.href) +
 				'&state=' + encodeURIComponent(state) +
 				'&scope=' + SCOPE
