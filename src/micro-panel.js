@@ -449,6 +449,10 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 	fileUploadRemove (e) {
 		this.splice('fileQueue', e.model.index, 1)
 	}
+
+	isNew (item) {
+		return item['x-micro-panel-new']
+	}
 }
 
 customElements.define(MicroPanel.is, MicroPanel)
