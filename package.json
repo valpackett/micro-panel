@@ -5,8 +5,8 @@
   "main": "micro-panel.html",
   "scripts": {
     "deps": "bower update",
-    "lint": "eslint --ignore-path .gitignore . && echo ESLint OK; polylint --input index.html && echo Polylint OK; true",
-    "build": "rm -rf dist.new; broccoli build dist.new && mkdir -p dist && rm -rf dist/* && mv dist.new/* dist/ && rmdir dist.new"
+    "lint": "eslint --ignore-path .gitignore . && echo ESLint OK",
+    "build": "rm -rf dist.new; broccoli build dist.new && crisper --source dist.new/src/micro-panel.html --html dist.new/src/micro-panel.html --js dist.new/src/micro-panel.js && mkdir -p dist && rm -rf dist/* && mv dist.new/* dist/ && rmdir dist.new"
   },
   "repository": {
     "type": "git",
@@ -30,12 +30,12 @@
     "broccoli-funnel": "^1.2.0",
     "broccoli-merge-trees": "^2.0.0",
     "broccoli-vulcanize": "^4.0.0",
+    "crisper": "^2.0.2",
     "eslint": "^3.19.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-node": "^4.2.2",
     "eslint-plugin-promise": "^3.5.0",
-    "eslint-plugin-standard": "^3.0.1",
-    "polylint": "^2.10.4"
+    "eslint-plugin-standard": "^3.0.1"
   }
 }

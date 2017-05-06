@@ -1,31 +1,31 @@
-<link rel="import" href="bower_components/polymer/polymer-element.html">
-<link rel="import" href="bower_components/polymer/lib/elements/dom-bind.html">
-<link rel="import" href="bower_components/polymer/lib/elements/dom-if.html">
-<link rel="import" href="bower_components/polymer/lib/mixins/gesture-event-listeners.html">
-<link rel="import" href="bower_components/paper-styles/color.html">
-<link rel="import" href="bower_components/app-layout/app-header-layout/app-header-layout.html">
-<link rel="import" href="bower_components/app-layout/app-header/app-header.html">
-<link rel="import" href="bower_components/app-layout/app-toolbar/app-toolbar.html">
-<link rel="import" href="bower_components/paper-tabs/paper-tabs.html">
-<link rel="import" href="bower_components/paper-input/paper-input.html">
-<link rel="import" href="bower_components/paper-button/paper-button.html">
-<link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
-<link rel="import" href="bower_components/iron-icon/iron-icon.html">
-<link rel="import" href="bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="bower_components/paper-menu-button/paper-menu-button.html">
-<link rel="import" href="bower_components/paper-listbox/paper-listbox.html">
-<link rel="import" href="bower_components/paper-item/paper-item.html">
-<link rel="import" href="bower_components/paper-item/paper-icon-item.html">
-<link rel="import" href="bower_components/paper-spinner/paper-spinner.html">
-<link rel="import" href="bower_components/paper-progress/paper-progress.html">
-<link rel="import" href="bower_components/neon-animation/neon-animated-pages.html">
-<link rel="import" href="bower_components/neon-animation/neon-animatable.html">
-<link rel="import" href="bower_components/neon-animation/animations/fade-in-animation.html">
-<link rel="import" href="bower_components/neon-animation/animations/fade-out-animation.html">
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymer/lib/elements/dom-bind.html">
+<link rel="import" href="../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../bower_components/polymer/lib/mixins/gesture-event-listeners.html">
+<link rel="import" href="../bower_components/paper-styles/color.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-item/paper-icon-item.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animated-pages.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animatable.html">
+<link rel="import" href="../bower_components/neon-animation/animations/fade-in-animation.html">
+<link rel="import" href="../bower_components/neon-animation/animations/fade-out-animation.html">
 <link rel="import" href="microformat-editor.html">
-<script src="bower_components/microformat-shiv/microformat-shiv.min.js"></script>
-<script src="bower_components/freezer-js/build/freezer.min.js"></script>
+<script src="../bower_components/microformat-shiv/microformat-shiv.min.js"></script>
+<script src="../bower_components/freezer-js/build/freezer.min.js"></script>
 
 <dom-module id="micro-panel">
 	<template strip-whitespace>
@@ -112,10 +112,10 @@
 								<microformat-editor class="ui-tab-content" item="[[item]]" model="[[model]]"></microformat-editor>
 								<app-toolbar class="editor-bottom-bar">
 									<paper-spinner active="{{requestInProgress}}"></paper-spinner>
-									<template is="dom-if" if="{{item.x-micro-panel-new}}">
+									<template is="dom-if" if="{{isNew(item)}}">
 										<paper-button on-tap="createEntry" hidden="{{requestInProgress}}">Create</paper-button>
 									</template>
-									<template is="dom-if" if="{{!item.x-micro-panel-new}}">
+									<template is="dom-if" if="{{!isNew(item)}}">
 										<paper-button on-tap="deleteEntry" hidden="{{requestInProgress}}">Delete</paper-button>
 										<paper-button on-tap="saveEntry" hidden="{{requestInProgress}}">Save</paper-button>
 									</template>
