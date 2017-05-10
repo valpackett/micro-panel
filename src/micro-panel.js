@@ -424,7 +424,12 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 						xhr.upload.addEventListener('error', reject)
 						xhr.upload.addEventListener('abort', reject)
 						xhr.upload.addEventListener('timeout', reject)
+						if (!this.model.mediaEndpoint.startsWith('http')) {
+							xhr.withCredentials = true
+						}
 						xhr.open('post', this.model.mediaEndpoint)
+						xhr.setRequestHeader('Authorization', 'Bearer ' + (localStorage.getItem('access_token')
+							|| document.cookie.split('; ').find(c => c.split('=')[0] === 'Bearer').split('=')[1]))
 						const form = new FormData()
 						form.append('file', file)
 						xhr.send(form)
