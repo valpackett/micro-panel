@@ -6,7 +6,6 @@
 <link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
 <link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
 <link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
-<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
@@ -19,10 +18,10 @@
 <link rel="import" href="../bower_components/paper-item/paper-icon-item.html">
 <link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
-<link rel="import" href="../bower_components/neon-animation/neon-animated-pages.html">
-<link rel="import" href="../bower_components/neon-animation/neon-animatable.html">
 <link rel="import" href="../bower_components/neon-animation/animations/fade-in-animation.html">
 <link rel="import" href="../bower_components/neon-animation/animations/fade-out-animation.html">
+<link rel="import" href="../bower_components/neon-animation/animations/slide-from-bottom-animation.html">
+<link rel="import" href="../bower_components/neon-animation/animations/slide-down-animation.html">
 <link rel="import" href="microformat-editor.html">
 <script src="../bower_components/microformat-shiv/microformat-shiv.min.js"></script>
 <script src="../bower_components/freezer-js/build/freezer.min.js"></script>
@@ -40,17 +39,15 @@
 			}
 			a { color: var(--primary-color); }
 			a:hover, a:focus { color: var(--paper-teal-200); }
-			app-header, .editor-bottom-bar { background-color: var(--primary-color); color: #fff; height: var(--toolbar-height); }
+			app-header, .editor-bar { background-color: var(--primary-color); color: #fff; height: var(--toolbar-height); margin-top: 0 !important; }
 			app-toolbar { height: var(--toolbar-height); }
-			.content-wrapper, .toolbar-wrapper { overflow: hidden; position: absolute; top: 0; right: 0; bottom: 0; left: 0; }
-			neon-animatable, neon-animatable > *, .content-wrapper ::content iframe { width: 100%; height: 100%; border: 0; background: #fff; }
+			#content-container, #editor-wrapper { overflow: hidden; position: absolute; top: 0; right: 0; bottom: 0; left: 0; }
+			::content iframe { width: 100%; height: 100%; border: 0; background: #fff; }
+			#content-container { width: 100%; height: 100%; background: inherit; overflow: auto; -webkit-overflow-scrolling: touch; } /* avoid making site bg white when used in embedded mode */
 			paper-icon-button { margin-right: 0 !important; }
-			paper-tabs { flex: 1; flex-basis: 0.000000001px; height: var(--toolbar-height); }
-			.ui-tab-content { overflow: auto; width: 100%; -webkit-overflow-scrolling: touch; background: white; }
-			.toolbar-wrapper { display: flex; flex-direction: column; }
-			.toolbar-wrapper .ui-tab-content { flex: 1; flex-basis: 0.000000001px; }
-			.editor-bottom-bar { justify-content: flex-end; }
-			#content-container { background: inherit; overflow: auto; } /* avoid making site bg white when used in embedded mode */
+			.root-editor { overflow: auto; width: auto; -webkit-overflow-scrolling: touch; background: white; margin: 0; }
+			#editor-wrapper { display: flex; flex-direction: column; margin: 0; box-shadow: none; }
+			#editor-wrapper .root-editor { flex: 1; flex-basis: 0.000000001px; }
 			/* XXX: don't use overflow:auto when frame is used? */
 			#file-upload-dialog-drag-overlay {
 				position: absolute; top: 0; right: 0; bottom: 0; left: 0; margin: 0;
@@ -67,10 +64,6 @@
 
 			@media screen and (min-width: 450px) {
 				#open-url-input, #auth-url-input { min-width: 70vw; }
-			}
-
-			@media screen and (max-width: 600px) {
-				.editor-bottom-bar { padding-left: 10vw; padding-right: 10vw; }
 			}
 
 			@media screen and (min-width: 800px) {
@@ -91,41 +84,31 @@
 							<paper-icon-item role="menuitem" on-tap="showAbout"><iron-icon icon="info" slot="item-icon"></iron-icon>About...</paper-icon-item>
 						</paper-listbox>
 					</paper-menu-button>
-					<paper-tabs id="tabs" scrollable hide-scroll-buttons selected="{{selected}}" on-tap="closeMenu">
-						<paper-tab>Website</paper-tab>
-						<template is="dom-repeat" items="[[model.entries]]">
-							<paper-tab>Editor</paper-tab>
-						</template>
-					</paper-tabs>
+					<paper-spinner active="{{requestInProgress}}"></paper-spinner>
 				</app-toolbar>
 			</app-header>
 
-			<div>
-				<neon-animated-pages id="pages" entry-animation="fade-in-animation" exit-animation="fade-out-animation"
-						selected="[[selected]]" class="content-wrapper content" on-tap="closeMenu">
-					<neon-animatable id="content-container">
-						<slot></slot>
-					</neon-animatable>
-					<template id="editing-repeat" is="dom-repeat" items="[[model.entries]]">
-						<neon-animatable>
-							<div class="toolbar-wrapper">
-								<microformat-editor class="ui-tab-content" item="[[item]]" model="[[model]]"></microformat-editor>
-								<app-toolbar class="editor-bottom-bar">
-									<paper-spinner active="{{requestInProgress}}"></paper-spinner>
-									<template is="dom-if" if="{{isNew(item)}}">
-										<paper-button on-tap="createEntry" hidden="{{requestInProgress}}">Create</paper-button>
-									</template>
-									<template is="dom-if" if="{{!isNew(item)}}">
-										<paper-button on-tap="deleteEntry" hidden="{{requestInProgress}}">Delete</paper-button>
-										<paper-button on-tap="saveEntry" hidden="{{requestInProgress}}">Save</paper-button>
-									</template>
-								</app-toolbar>
-							</div>
-						</neon-animatable>
-					</template>
-				</neon-animated-pages>
+			<div id="content-container" class="content" on-tap="closeMenu">
+				<slot></slot>
 			</div>
 		</app-header-layout>
+
+		<paper-dialog class="toolbar-wrapper" id="editor-wrapper" modal
+			entry-animation="slide-from-bottom-animation" exit-animation="slide-down-animation">
+			<app-toolbar class="editor-bar">
+				<paper-icon-button on-tap="cancelEntry" icon="cancel"></paper-icon-button>
+				<div main-title>Entry Editor</div>
+				<paper-spinner active="{{requestInProgress}}"></paper-spinner>
+				<template is="dom-if" if="{{isNew(model.item)}}">
+					<paper-icon-button on-tap="createEntry" hidden="{{requestInProgress}}" icon="save"></paper-icon-button>
+				</template>
+				<template is="dom-if" if="{{!isNew(model.item)}}">
+					<paper-icon-button on-tap="deleteEntry" hidden="{{requestInProgress}}" icon="delete"></paper-icon-button>
+					<paper-icon-button on-tap="saveEntry" hidden="{{requestInProgress}}" icon="save"></paper-icon-button>
+				</template>
+			</app-toolbar>
+			<microformat-editor class="root-editor" model="[[model]]" item="[[model.item]]"></microformat-editor>
+		</paper-dialog>
 
 		<paper-dialog id="auth-dialog" on-iron-overlay-closed="authDialogClosed"
 				modal entry-animation="fade-in-animation" exit-animation="fade-out-animation">

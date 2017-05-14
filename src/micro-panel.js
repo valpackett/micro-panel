@@ -37,19 +37,30 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 		return {
 			useFrame: { type: Boolean, value: false, reflectToAttribute: true },
 			useAuth: { type: Boolean, value: false, reflectToAttribute: true },
-			selected: { type: Number, value: 0 },
 			requestInProgress: { type: Boolean, value: false },
+			itemModified: { type: Boolean, value: false, observer: 'modifiedChanged' },
 			fileQueue: { type: Array, value: () => [] },
 			model: { type: Object, value: {} },
 		}
 	}
 
+	modifiedChanged (val) {
+		window.onbeforeunload = val ? (function () { return true }) : null
+	}
+
 	connectedCallback () {
 		super.connectedCallback()
-		window.mpstore = new Freezer({ entries: [], existingCategories: [], mediaEndpoint: null })
+		window.mpstore = new Freezer({
+			existingCategories: [],
+			mediaEndpoint: null,
+			item: { type: [], properties: {} },
+		})
 		this.model = window.mpstore.get()
 		window.mpstore.on('update', (v, oldv) => {
 			this.model = v
+			if (!this.itemModified) {
+				this.itemModified = v.item !== oldv.item
+			}
 		})
 		this.dragFirst = false
 		this.dragSecond = false
@@ -138,7 +149,7 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 		this.editStart({
 			type: ['h-entry'],
 			'x-micro-panel-new': true,
-			properties: { name: [], content: [{html: ''}], 'in-reply-to': [], 'like-of': [], 'repost-of': [] },
+			properties: { name: [], content: [{html: ''}], category: [], photo: [], 'in-reply-to': [], 'like-of': [], 'repost-of': [] },
 		})
 	}
 
@@ -155,29 +166,29 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 		const entry = Microformats.get({ node: e.target, textFormat: 'normalised' }).items[0]
 		const props = entry.properties || {}
 		let i = 0
-		if (this.model.entries.find(editingEntry => {
-			i += 1
-			const thatUid = ((editingEntry.properties || {}).uid || (editingEntry.properties || {}).url || [])[0]
-			const ourUid = (props.uid || props.url || [])[0]
-			return thatUid && ourUid && thatUid === ourUid
-		})) {
-			this.selected = 0 + i
-			return
-		}
 		const url = (props['editing-url'] || props.url || [this.currentPageUrl()])[0]
+		this.requestInProgress = true
 		this.micropubGet('q=source&url=' + encodeURIComponent(url))
 		.then((resp) => resp.json())
-		.then((fullEntry) => this.editStart(fullEntry))
+			.then((fullEntry) => {
+				this.requestInProgress = false
+				this.editStart(fullEntry)
+			})
 		.catch((e) => {
 			console.log('Error when asking micropub for entry source', e)
 			fetch(url)
 			.then(resp => resp.text())
 			.then(body => {
-				for (const fullEntry of Microformats.get({ html: body, textFormat: 'normalised' })) {
-					this.editStart(fullEntry)
+				this.requestInProgress = false
+				const mfs = Microformats.get({ html: body, textFormat: 'normalised' })
+				if (mfs.length > 0) {
+					this.editStart([0])
+				} else {
+					throw new Error('No microformats found on source page')
 				}
 			})
 			.catch(e => {
+				this.requestInProgress = false
 				console.log('Error when fetching entry', e)
 				this.editStart(entry)
 			})
@@ -185,19 +196,18 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 	}
 
 	editStart (entry) {
-		this.model.entries.push(entry)
-		Polymer.RenderStatus.afterNextRender(this, () => {
-			this.selected = 0 + this.model.entries.length
-		})
+		this.model.set('item', entry)
+		this.$['editor-wrapper'].open()
+		setTimeout(() => { this.itemModified = false }, 400) // HACK: run after update event
 	}
 
 	deleteEntry (e) {
 		if (!confirm('Are you sure you want to delete the entry?')) return
-		const entry = this.$['editing-repeat'].modelForElement(e.target).item // XXX: https://github.com/Polymer/polymer/issues/1865
+		const entry = this.model.item
 		const url = ((entry.properties || {}).url || [null])[0]
 		if (!url) return alert('Somehow, an entry with no URL! I have no idea how to delete that.')
 		this.requestInProgress = true
-		this.micropubPost({ 'mp-action': 'delete', url: url })
+		this.micropubPost({ 'action': 'delete', url: url })
 		.then(resp => {
 			if (resp.status >= 300) throw new Error("Couldn't delete the entry! Response: " + resp.status)
 			this.editFinish(entry)
@@ -211,15 +221,15 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 	}
 
 	saveEntry (e) {
-		let entry = this.$['editing-repeat'].modelForElement(e.target).item
-		let url = ((entry.properties || {}).url || [null])[0]
+		const entry = this.model.item
+		const url = ((entry.properties || {}).url || [null])[0]
 		if (!url) {
 			return alert('Somehow, an entry with no URL! I have no idea how to save that.')
 		}
 		this.requestInProgress = true
 		entry.properties.remove('url')
 		this.micropubPost({
-			'mp-action': 'update',
+			'action': 'update',
 			url: url,
 			replace: entry.properties,
 			'delete': entry['x-micro-panel-deleted-properties'] || []
@@ -238,7 +248,7 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 	}
 
 	createEntry (e) {
-		const entry = this.$['editing-repeat'].modelForElement(e.target).item
+		const entry = this.model.item
 		this.requestInProgress = true
 		this.micropubPost({ type: entry.type, properties: entry.properties })
 		.then(resp => {
@@ -254,14 +264,25 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 	}
 
 	editFinish (entry, redir) {
-		this.model.entries.splice(this.model.entries.indexOf(entry), 1)
 		if (this.useFrame) {
 			const frame = this.querySelector('iframe')
 			frame.src = redir || frame.src
+			this.$['editor-wrapper'].close()
 		} else {
+			window.onbeforeunload = null
 			location.reload()
 		}
-		this.selected = 0
+	}
+
+	cancelEntry (e) {
+		if (this.itemModified && !window.confirm('Are you sure you want to cancel?')) {
+			return
+		}
+		this.$['editor-wrapper'].close()
+		setTimeout(() => {
+			this.model.set('item', { type: [], properties: {} })
+			setTimeout(() => { this.itemModified = false }, 300) // HACK: run after update event
+		}, 400)
 	}
 	// }}}
 
@@ -330,7 +351,6 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 		if (!e.detail.confirmed) return
 		const frame = this.querySelector('iframe')
 		frame.src = this.$['open-url-input'].value
-		this.selected = 0
 	}
 	// }}}
 
@@ -456,7 +476,7 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 	}
 
 	isNew (item) {
-		return item['x-micro-panel-new']
+		return item && item['x-micro-panel-new']
 	}
 }
 
