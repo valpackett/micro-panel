@@ -83,7 +83,7 @@ class MicroformatEditor extends Polymer.GestureEventListeners(Polymer.Element) {
 		tr['x-micro-panel-deleted-properties'] = (tr['x-micro-panel-deleted-properties'] || []).filter(n => n !== name)
 		let dflt = blankObjFor(name)
 		if (name === 'content') { dflt = { html: '' } }
-		if (name === 'photo' || name === 'video' || name === 'audio') {
+		if (name === 'photo' || name === 'video' || name === 'audio' || name === 'category') {
 			dflt = []
 		} else {
 			dflt = [dflt || '']
