@@ -1,0 +1,7 @@
+{
+  "name": "micro-panel",
+  "short_name": "μ-panel",
+  "display": "browser",
+  "orientation": "portrait-primary",
+  "theme_color": "#00897b"
+}
