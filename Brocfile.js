@@ -20,7 +20,7 @@ root = new Merge([
 	new Funnel('./bower_components/web-animations-js', { include: ['*.min.js'], destDir: 'bower_components/web-animations-js' }),
 	new Funnel('./bower_components/fetch', { include: ['*.js'], destDir: 'bower_components/fetch' }),
 	new Funnel('./bower_components/freezer-js/build', { include: ['*.js'], destDir: 'bower_components/freezer-js/build' }),
-	new Funnel('.', { include: [ 'index.html', 'manifest.json' ] }),
+	new Funnel('.', { include: [ 'index.html', 'manifest.json', 'icons' ] }),
 ])
 
 module.exports = root
