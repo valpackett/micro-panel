@@ -3,5 +3,12 @@
   "short_name": "μ-panel",
   "display": "browser",
   "orientation": "portrait-primary",
-  "theme_color": "#00897b"
+  "theme_color": "#00897b",
+  "icons": [
+      {
+          "src": "icons/big-icon.png",
+          "sizes": "512x512",
+          "type": "image/png"
+      }
+  ]
 }
