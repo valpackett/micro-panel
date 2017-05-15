@@ -186,7 +186,7 @@ class MicroformatEditor extends Polymer.GestureEventListeners(Polymer.Element) {
 	}
 
 	isNew (item, isNested) {
-		return item['x-micro-panel-new'] || isNested
+		return item && item['x-micro-panel-new'] || isNested
 	}
 
 	showJSONBlob (val) {

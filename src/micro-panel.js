@@ -37,6 +37,7 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 		return {
 			useFrame: { type: Boolean, value: false, reflectToAttribute: true },
 			useAuth: { type: Boolean, value: false, reflectToAttribute: true },
+			forceMicropubSource: { type: Boolean, value: false, reflectToAttribute: true },
 			requestInProgress: { type: Boolean, value: false },
 			itemModified: { type: Boolean, value: false, observer: 'modifiedChanged' },
 			fileQueue: { type: Array, value: () => [] },
@@ -175,7 +176,12 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 				this.editStart(fullEntry)
 			})
 		.catch((e) => {
-			console.log('Error when asking micropub for entry source', e)
+			console.error(e)
+			if (this.forceMicropubSource) {
+				this.requestInProgress = false
+				alert('Could not fetch the source of the requested entry.')
+				return
+			}
 			fetch(url)
 			.then(resp => resp.text())
 			.then(body => {
@@ -189,8 +195,8 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 			})
 			.catch(e => {
 				this.requestInProgress = false
-				console.log('Error when fetching entry', e)
-				this.editStart(entry)
+				console.error(e)
+				alert('Could not fetch the source of the requested entry.')
 			})
 		})
 	}
