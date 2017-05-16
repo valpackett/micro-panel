@@ -21,6 +21,10 @@ class MicroformatEditor extends Polymer.GestureEventListeners(Polymer.Element) {
 			},
 			model: Object,
 			isNested: Boolean,
+			minimizedProps: {
+				type: Array,
+				value: () => ['comment'],
+			},
 		}
 	}
 
@@ -61,7 +65,7 @@ class MicroformatEditor extends Polymer.GestureEventListeners(Polymer.Element) {
 	}
 
 	oneLineType (item) {
-		return (item.type || []).join(' ')
+		return ((item || {}).type || []).join(' ')
 	}
 
 	getPropKeys (item) {
@@ -191,6 +195,22 @@ class MicroformatEditor extends Polymer.GestureEventListeners(Polymer.Element) {
 
 	showJSONBlob (val) {
 		return JSON.stringify(val, null, 2)
+	}
+
+	toggleExpand (e) {
+		if (this.minimizedProps.includes(e.model.key)) {
+			this.splice('minimizedProps', this.minimizedProps.indexOf(e.model.key), 1)
+		} else {
+			this.push('minimizedProps', e.model.key)
+		}
+	}
+
+	isExpanded (key) {
+		return !this.minimizedProps.includes(key)
+	}
+
+	toggleIcon (key) {
+		return this.minimizedProps.includes(key) ? 'expand-more' : 'expand-less'
 	}
 }
 

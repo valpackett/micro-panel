@@ -57,6 +57,7 @@
 		<template is="dom-repeat" items="[[getPropKeys(item, item.*)]]" as="key">
 			<div class="paper-material" elevation="1" one-line-editor$="{{isOnlyStrings(item.*, key)}}">
 				<header class="value-holder">
+					<paper-icon-button icon="[[toggleIcon(key, minimizedProps.*)]]" title="Toggle minimize/expand" on-tap="toggleExpand"></paper-icon-button>
 					<div class="key-name">[[key]]</div>
 					<paper-icon-button icon="remove" title="Remove this property" on-tap="removeProp"></paper-icon-button>
 					<paper-menu-button>
@@ -83,32 +84,34 @@
 					</paper-menu-button>
 				</header>
 
-				<template is="dom-repeat" items="[[getPropValues(item.*, key)]]" as="val">
-					<div class="one-value value-holder">
-						<template is="dom-if" if="{{isString(val)}}">
-							<paper-input class="value-editor" value="[[val]]" on-value-changed="updatePropFromInput" no-label-float></paper-input>
-						</template>
-						<template is="dom-if" if="{{isContentHtml(val)}}">
-							<paper-textarea class="value-editor" value="[[val.html]]" on-value-changed="updatePropFromInput" data-subkey="html"></paper-textarea>
-						</template>
-						<template is="dom-if" if="{{isMicroformat(val)}}">
-							<microformat-editor class="value-editor" item="[[val]]" model="[[model]]" is-nested="true"></microformat-editor>
-						</template>
-						<template is="dom-if" if="{{isWhateverJSONBlob(val)}}">
-							<paper-textarea class="value-editor" value="[[showJSONBlob(val)]]" on-value-changed="updateJSONPropFromInput"></paper-textarea>
-						</template>
-						<paper-icon-button icon="remove" title="Remove this value" on-tap="removePropValue" data-key$="[[key]]"></paper-icon-button>
-					</div>
-				</template>
-
-				<template is="dom-if" if="{{isCategories(key)}}">
-					<div class="category-adders">
-						<template is="dom-repeat" items="[[model.existingCategories]]" as="cat">
-							<template is="dom-if" if="{{isUnusedCategory(cat, item.*)}}">
-								<paper-button on-tap="addCategory" title="Add category '[[cat]]'">[[cat]]</paper-button>
+				<template is="dom-if" if="[[isExpanded(key, minimizedProps.*)]]">
+					<template is="dom-repeat" items="[[getPropValues(item.*, key)]]" as="val">
+						<div class="one-value value-holder">
+							<template is="dom-if" if="{{isString(val)}}">
+								<paper-input class="value-editor" value="[[val]]" on-value-changed="updatePropFromInput" no-label-float></paper-input>
 							</template>
-						</template>
-					</div>
+							<template is="dom-if" if="{{isContentHtml(val)}}">
+								<paper-textarea class="value-editor" value="[[val.html]]" on-value-changed="updatePropFromInput" data-subkey="html"></paper-textarea>
+							</template>
+							<template is="dom-if" if="{{isMicroformat(val)}}">
+								<microformat-editor class="value-editor" item="[[val]]" model="[[model]]" is-nested="true"></microformat-editor>
+							</template>
+							<template is="dom-if" if="{{isWhateverJSONBlob(val)}}">
+								<paper-textarea class="value-editor" value="[[showJSONBlob(val)]]" on-value-changed="updateJSONPropFromInput"></paper-textarea>
+							</template>
+							<paper-icon-button icon="remove" title="Remove this value" on-tap="removePropValue" data-key$="[[key]]"></paper-icon-button>
+						</div>
+					</template>
+
+					<template is="dom-if" if="{{isCategories(key)}}">
+						<div class="category-adders">
+							<template is="dom-repeat" items="[[model.existingCategories]]" as="cat">
+								<template is="dom-if" if="{{isUnusedCategory(cat, item.*)}}">
+									<paper-button on-tap="addCategory" title="Add category '[[cat]]'">[[cat]]</paper-button>
+								</template>
+							</template>
+						</div>
+					</template>
 				</template>
 			</div>
 		</template>
