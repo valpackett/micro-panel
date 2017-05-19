@@ -12,6 +12,9 @@
 <link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/pen/src/pen-editor.html">
+<link rel="import" href="../bower_components/codeflask/src/codeflask-editor.html">
+<link rel="import" href="prism.html">
 
 <dom-module id="microformat-editor">
 	<template strip-whitespace>
@@ -26,6 +29,8 @@
 			.one-value { background: rgba(250, 250, 250, 0.1); }
 			.one-value:nth-child(odd) { background: rgba(230, 230, 230, 0.25); }
 			.value-editor { flex: 1; flex-basis: 0.000000001px; }
+			codeflask-editor, pen-editor { min-height: 40vh; }
+			.buttons-vert > * { display: block; }
 			paper-menu-button { padding: 0; }
 			.category-adders {
 				padding: 0.5em 0.25em;
@@ -90,16 +95,45 @@
 							<template is="dom-if" if="{{isString(val)}}">
 								<paper-input class="value-editor" value="[[val]]" on-value-changed="updatePropFromInput" no-label-float></paper-input>
 							</template>
-							<template is="dom-if" if="{{isContentHtml(val)}}">
-								<paper-textarea class="value-editor" value="[[val.html]]" on-value-changed="updatePropFromInput" data-subkey="html"></paper-textarea>
-							</template>
 							<template is="dom-if" if="{{isMicroformat(val)}}">
 								<microformat-editor class="value-editor" item="[[val]]" model="[[model]]" is-nested="true"></microformat-editor>
 							</template>
-							<template is="dom-if" if="{{isWhateverJSONBlob(val)}}">
-								<paper-textarea class="value-editor" value="[[showJSONBlob(val)]]" on-value-changed="updateJSONPropFromInput"></paper-textarea>
+							<template is="dom-if" if="{{isNonMfObject(val)}}">
+								<template is="dom-if" if="{{isEditorMarkdown(val)}}">
+									<codeflask-editor class="value-editor" value="[[val.markdown]]" on-value-changed="updatePropFromInput" data-subkey="markdown" language="markdown"></codeflask-editor>
+								</template>
+								<template is="dom-if" if="{{isEditorHtml(val)}}">
+									<codeflask-editor class="value-editor" value="[[val.html]]" on-value-changed="updatePropFromInput" data-subkey="html"></codeflask-editor>
+								</template>
+								<template is="dom-if" if="{{isEditorWysiwyg(val)}}">
+									<pen-editor class="value-editor" value="[[val.html]]" on-value-changed="updatePropFromInput" data-subkey="html"></pen-editor>
+								</template>
+								<template is="dom-if" if="{{isEditorJson(val)}}">
+									<paper-textarea class="value-editor" value="[[showJSONBlob(val)]]" on-value-changed="updateJSONPropFromInput"></paper-textarea>
+								</template>
 							</template>
-							<paper-icon-button icon="remove" title="Remove this value" on-tap="removePropValue" data-key$="[[key]]"></paper-icon-button>
+							<div class="buttons-vert">
+								<paper-icon-button icon="remove" title="Remove this value" on-tap="removePropValue" data-key$="[[key]]"></paper-icon-button>
+								<template is="dom-if" if="{{isNonMfObject(val)}}">
+									<paper-menu-button>
+										<paper-icon-button icon="settings-applications" title="Select editor" slot="dropdown-trigger"></paper-icon-button>
+										<paper-listbox slot="dropdown-content">
+											<paper-icon-item role="menuitem" on-tap="selectEditor" data-key$="[[key]]" data-editor="markdown">
+												<iron-icon icon="create" slot="item-icon"></iron-icon>Markdown
+											</paper-icon-item>
+											<paper-icon-item role="menuitem" on-tap="selectEditor" data-key$="[[key]]" data-editor="html">
+												<iron-icon icon="code" slot="item-icon"></iron-icon>HTML
+											</paper-icon-item>
+											<paper-icon-item role="menuitem" on-tap="selectEditor" data-key$="[[key]]" data-editor="wysiwyg">
+												<iron-icon icon="input" slot="item-icon"></iron-icon>WYSIWYG
+											</paper-icon-item>
+											<paper-icon-item role="menuitem" on-tap="selectEditor" data-key$="[[key]]" data-editor="json">
+												<iron-icon icon="extension" slot="item-icon"></iron-icon>JSON
+											</paper-icon-item>
+										</paper-listbox>
+									</paper-menu-button>
+								</template>
+							</div>
 						</div>
 					</template>
 

@@ -39,6 +39,8 @@
     "paper-progress": "PolymerElements/paper-progress#^2.0.0",
     "fetch": "^2.0.2",
     "microformat-shiv": "myfreeweb/microformat-shiv#master",
+    "pen": "myfreeweb/pen#customelement",
+    "codeflask": "myfreeweb/CodeFlask.js#customelement",
     "freezer-js": "freezer#^0.11.2"
   }
 }
