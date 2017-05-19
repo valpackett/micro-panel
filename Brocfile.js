@@ -16,10 +16,9 @@ root = new Merge([
 		stripComments: true,
 		inlineScripts: true
 	}),
-	new Funnel('./bower_components/webcomponentsjs', { include: ['*.min.js'], destDir: 'bower_components/webcomponentsjs' }),
+	new Funnel('./bower_components/webcomponentsjs', { include: ['*.js'], destDir: 'bower_components/webcomponentsjs' }),
 	new Funnel('./bower_components/web-animations-js', { include: ['*.min.js'], destDir: 'bower_components/web-animations-js' }),
-	new Funnel('./bower_components/fetch', { include: ['*.js'], destDir: 'bower_components/fetch' }),
-	new Funnel('./bower_components/freezer-js/build', { include: ['*.js'], destDir: 'bower_components/freezer-js/build' }),
+	new Funnel('./bower_components/pen/src', { include: ['pen-font.css', 'font/*'], destDir: 'bower_components/pen/src' }),
 	new Funnel('.', { include: [ 'index.html', 'manifest.json' ] }),
 	new Funnel('./icons', { destDir: 'icons' }),
 ])

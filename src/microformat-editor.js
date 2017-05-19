@@ -1,16 +1,36 @@
 /* eslint-disable no-new-wrappers */
-'use strict'
-
-function blankObjFor (prop) {
-	if (prop === 'item') {
-		return { type: ['h-item'], properties: { name: [''], url: [''] } }
-	}
-	if (prop === 'location') {
-		return { type: ['h-adr'], properties: { 'country-name': [''], locality: [''] } }
-	}
-}
 
 class MicroformatEditor extends Polymer.GestureEventListeners(Polymer.Element) {
+	static debounce (f, delay) {
+		let timeout
+		return function () {
+			const args = arguments
+			clearTimeout(timeout)
+			timeout = setTimeout(() => f.apply(this, args), delay)
+		}
+	}
+
+	static blankObjFor (prop) {
+		if (prop === 'item') {
+			return { type: ['h-item'], properties: { name: [''], url: [''] } }
+		}
+		if (prop === 'location') {
+			return { type: ['h-adr'], properties: { 'country-name': [''], locality: [''] } }
+		}
+	}
+
+	static blankPropFor (prop) {
+		let dflt = MicroformatEditor.blankObjFor(prop)
+		if (prop === 'content') { dflt = { html: '', 'x-micro-panel-editor': 'wysiwyg' } }
+		if (prop === 'photo' || prop === 'video' || prop === 'audio' || prop === 'category') {
+			// Expecting file upload or clicking existing tags
+			dflt = []
+		} else {
+			dflt = [dflt || '']
+		}
+		return dflt
+	}
+
 	static get is () { return 'microformat-editor' }
 
 	static get properties () {
@@ -28,6 +48,39 @@ class MicroformatEditor extends Polymer.GestureEventListeners(Polymer.Element) {
 		}
 	}
 
+	constructor () {
+		super()
+		this._updatePropFromInput = MicroformatEditor.debounce((e) => {
+			const target = e.composed ? e.composedPath()[0] : e.path[0]
+			if (target.dataset.subkey) {
+				this.item.properties[e.model.key][e.model.index].set(target.dataset.subkey, target.value)
+			} else {
+				const tr = this.item.properties[e.model.key].transact()
+				tr[e.model.index] = target.value
+				this.item.properties[e.model.key].run()
+			}
+		}, 200)
+		this._updateJSONPropFromInput = MicroformatEditor.debounce((e) => {
+			const target = e.composed ? e.composedPath()[0] : e.path[0]
+			const tr = this.item.properties[e.model.key].transact()
+			tr[e.model.index] = JSON.parse(target.value)
+			this.item.properties[e.model.key].run()
+		}, 200)
+	}
+
+	updatePropFromInput (e) {
+		return this._updatePropFromInput(e)
+	}
+
+	updateJSONPropFromInput (e) {
+		return this._updateJSONPropFromInput (e)
+	}
+
+	updateTypeFromInput (e) {
+		const target = e.composedPath()[0]
+		this.item.set('type', target.value.split(/\s+/))
+	}
+
 	connectedCallback () {
 		super.connectedCallback()
 		this.addEventListener('tap', this.dismissMenus.bind(this))
@@ -39,29 +92,6 @@ class MicroformatEditor extends Polymer.GestureEventListeners(Polymer.Element) {
 				b.close()
 			}
 		}
-	}
-
-	updatePropFromInput (e) {
-		const target = e.composedPath()[0]
-		if (target.dataset.subkey) {
-			this.item.properties[e.model.key][e.model.index].set(target.dataset.subkey, target.value)
-		} else {
-			const tr = this.item.properties[e.model.key].transact()
-			tr[e.model.index] = target.value
-			this.item.properties[e.model.key].run()
-		}
-	}
-
-	updateJSONPropFromInput (e) {
-		const target = e.composedPath()[0]
-		const tr = this.item.properties[e.model.key].transact()
-		tr[e.model.index] = JSON.parse(target.value)
-		this.item.properties[e.model.key].run()
-	}
-
-	updateTypeFromInput (e) {
-		const target = e.composedPath()[0]
-		this.item.set('type', target.value.split(/\s+/))
 	}
 
 	oneLineType (item) {
@@ -85,14 +115,7 @@ class MicroformatEditor extends Polymer.GestureEventListeners(Polymer.Element) {
 		}
 		const tr = this.item.transact()
 		tr['x-micro-panel-deleted-properties'] = (tr['x-micro-panel-deleted-properties'] || []).filter(n => n !== name)
-		let dflt = blankObjFor(name)
-		if (name === 'content') { dflt = { html: '' } }
-		if (name === 'photo' || name === 'video' || name === 'audio' || name === 'category') {
-			dflt = []
-		} else {
-			dflt = [dflt || '']
-		}
-		tr.properties.set(name, dflt)
+		tr.properties.set(name, MicroformatEditor.blankPropFor(name))
 		this.item.run()
 		this.$['new-prop-name'].value = ''
 	}
@@ -125,7 +148,7 @@ class MicroformatEditor extends Polymer.GestureEventListeners(Polymer.Element) {
 	}
 
 	addPropValueObject (e) {
-		this.addPropValue(e.model.key, blankObjFor(e.model.key) || { type: ['h-entry'], properties: {} })
+		this.addPropValue(e.model.key, MicroformatEditor.blankObjFor(e.model.key) || { type: ['h-entry'], properties: {} })
 		e.target.dispatchEvent(new CustomEvent('iron-select', { bubbles: true }))
 	}
 
@@ -161,16 +184,38 @@ class MicroformatEditor extends Polymer.GestureEventListeners(Polymer.Element) {
 		return typeof val === 'string' || val instanceof String
 	}
 
-	isContentHtml (val) {
-		return this.isString(val.html)
-	}
-
 	isMicroformat (val) {
 		return (val.type || []).length >= 1
 	}
 
-	isWhateverJSONBlob (val) {
-		return typeof val === 'object' && !this.isString(val) && !val.type && typeof val.html === 'undefined'
+	isNonMfObject (val) {
+		return typeof val === 'object' && !this.isString(val) && !val.type
+	}
+
+	isEditorHtml (val) {
+		const mpe = val['x-micro-panel-editor']
+		return mpe ? mpe === 'html' : this.isString(val.html)
+	}
+
+	isEditorWysiwyg (val) {
+		const mpe = val['x-micro-panel-editor']
+		return mpe === 'wysiwyg'
+	}
+
+	isEditorMarkdown (val) {
+		const mpe = val['x-micro-panel-editor']
+		return mpe ? mpe === 'markdown' : this.isString(val.markdown)
+	}
+
+	isEditorJson (val) {
+		const mpe = val['x-micro-panel-editor']
+		return mpe ? mpe === 'json' : !(this.isString(val.markdown) || this.isString(val.html))
+	}
+
+	selectEditor (e, name) {
+		const index = e.model.index
+		const key = e.currentTarget.dataset.key
+		this.item.properties[key][index].set('x-micro-panel-editor', e.currentTarget.dataset.editor)
 	}
 
 	isCategories (key) {
