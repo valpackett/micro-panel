@@ -39,18 +39,24 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 			useAuth: { type: Boolean, value: false, reflectToAttribute: true },
 			forceMicropubSource: { type: Boolean, value: false, reflectToAttribute: true },
 			requestInProgress: { type: Boolean, value: false },
-			itemModified: { type: Boolean, value: false, observer: 'modifiedChanged' },
+			itemModified: { type: Boolean, value: false },
 			fileQueue: { type: Array, value: () => [] },
 			model: { type: Object, value: {} },
 		}
 	}
 
-	modifiedChanged (val) {
-		window.onbeforeunload = val ? (function () { return true }) : null
-	}
-
 	connectedCallback () {
 		super.connectedCallback()
+		this.setupData()
+		this.dragFirst = false
+		this.dragSecond = false
+		for (const e of document.querySelectorAll('.p0lyfake')) {
+			e.parentNode.removeChild(e)
+		}
+		this.setupAuth()
+	}
+
+	setupData () {
 		window.mpstore = new Freezer({
 			existingCategories: [],
 			mediaEndpoint: null,
@@ -62,14 +68,30 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 			if (!this.itemModified) {
 				this.itemModified = v.item !== oldv.item
 			}
+			if (this.onNextUpdate) {
+				this.onNextUpdate()
+				delete this.onNextUpdate
+			}
+			this.storeDataLocally()
 		})
-		this.dragFirst = false
-		this.dragSecond = false
-
-		for (const e of document.querySelectorAll('.p0lyfake')) {
-			e.parentNode.removeChild(e)
+		this.storeDataLocally = () => {}
+		const setSetter = () => {
+			this.storeDataLocally = MicroformatEditor.debounce(() => {
+				if (this.model.item.type && this.model.item.type.length > 0) {
+					localforage.setItem('item', this.model.item)
+				}
+			}, 500)
 		}
+		localforage.getItem('item').then(entry => {
+			if (entry.type && entry.type.length > 0 && entry.properties) {
+				this.model.set('item', entry)
+				this.itemModified = true
+				this.$['editor-wrapper'].open()
+			}
+		}).then(setSetter, setSetter)
+	}
 
+	setupAuth () {
 		Polymer.RenderStatus.afterNextRender(this, () => {
 			if (this.useAuth && !(localStorage.getItem('access_token') && localStorage.getItem('micropub_link'))) {
 				if (location.search.match(/code=/)) {
@@ -204,7 +226,7 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 	editStart (entry) {
 		this.model.set('item', entry)
 		this.$['editor-wrapper'].open()
-		setTimeout(() => { this.itemModified = false }, 400) // HACK: run after update event
+		this.onNextUpdate = () => { this.itemModified = false }
 	}
 
 	deleteEntry (e) {
@@ -287,7 +309,10 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 		this.$['editor-wrapper'].close()
 		setTimeout(() => {
 			this.model.set('item', { type: [], properties: {} })
-			setTimeout(() => { this.itemModified = false }, 300) // HACK: run after update event
+			this.onNextUpdate = () => {
+				this.itemModified = false
+				localforage.removeItem('item')
+			}
 		}, 400)
 	}
 	// }}}

@@ -41,6 +41,7 @@
     "microformat-shiv": "myfreeweb/microformat-shiv#master",
     "pen": "myfreeweb/pen#customelement",
     "codeflask": "myfreeweb/CodeFlask.js#customelement",
-    "freezer-js": "freezer#^0.11.2"
+    "freezer-js": "freezer#^0.11.2",
+    "localforage": "^1.5.0"
   }
 }
