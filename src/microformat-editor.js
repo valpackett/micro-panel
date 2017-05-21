@@ -147,6 +147,11 @@ class MicroformatEditor extends Polymer.GestureEventListeners(Polymer.Element) {
 		e.target.dispatchEvent(new CustomEvent('iron-select', { bubbles: true }))
 	}
 
+	addPropValueMarkdown (e) {
+		this.addPropValue(e.model.key, { markdown: '' })
+		e.target.dispatchEvent(new CustomEvent('iron-select', { bubbles: true }))
+	}
+
 	addPropValueObject (e) {
 		this.addPropValue(e.model.key, MicroformatEditor.blankObjFor(e.model.key) || { type: ['h-entry'], properties: {} })
 		e.target.dispatchEvent(new CustomEvent('iron-select', { bubbles: true }))
@@ -215,7 +220,20 @@ class MicroformatEditor extends Polymer.GestureEventListeners(Polymer.Element) {
 	selectEditor (e, name) {
 		const index = e.model.index
 		const key = e.currentTarget.dataset.key
-		this.item.properties[key][index].set('x-micro-panel-editor', e.currentTarget.dataset.editor)
+		const entry = this.item.properties[key][index].transact()
+		const newEditor = e.currentTarget.dataset.editor
+		if (newEditor === 'markdown' && !entry.hasOwnProperty('markdown') && entry.hasOwnProperty('html') &&
+			(entry.html === '' || confirm('You are switching from HTML to Markdown. Do you want to delete HTML content?'))) {
+			delete entry.html
+			entry.markdown = ''
+		}
+		if ((newEditor === 'html' || newEditor === 'wysiwyg') && !entry.hasOwnProperty('html') && entry.hasOwnProperty('markdown') &&
+			(entry.markdown === '' || confirm('You are switching from Markdown to HTML. Do you want to delete Markdown content?'))) {
+			delete entry.markdown
+			entry.html = ''
+		}
+		entry['x-micro-panel-editor'] = newEditor
+		this.item.properties[key][index].run()
 	}
 
 	isCategories (key) {
