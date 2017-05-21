@@ -172,7 +172,10 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 		this.editStart({
 			type: ['h-entry'],
 			'x-micro-panel-new': true,
-			properties: { name: [], content: [{html: ''}], category: [], photo: [], 'in-reply-to': [], 'like-of': [], 'repost-of': [] },
+			properties: {
+				name: [], content: MicroformatEditor.blankPropFor('content'), category: [], photo: [],
+				'in-reply-to': [], 'like-of': [], 'repost-of': []
+			},
 		})
 	}
 
