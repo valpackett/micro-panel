@@ -1,3 +1,7 @@
+<img src="https://unrelentingtech.s3.dualstack.eu-west-1.amazonaws.com/micro-panel-splash.png" alt="" width="512"/>
+
+[![Screenshot](https://unrelentingtech.s3.dualstack.eu-west-1.amazonaws.com/micro-panel-2017-05-21.png)](https://unrelentingtech.s3.dualstack.eu-west-1.amazonaws.com/micro-panel-2017-05-21.png)
+
 # micro-panel
 
 A client-side admin panel for your [IndieWeb](https://indieweb.org) website!
