@@ -34,16 +34,16 @@ Unpack the archive, put on your server (same domain as the website!).
 
 ### From git
 
-Clone the repo (or use GitHub's ZIP download feature), `npm install && npm run deps` (or `yarn && yarn deps`), put on your server (same domain as the website!).
+Clone the repo (or use GitHub's ZIP download feature), `npm i && npm run deps`, put on your server (same domain as the website!).
 
 ## Developing
 
-Clone the repo, run `yarn && yarn deps`, done.
+Clone the repo, run `npm i && npm run deps`, done.
 You can work on micro-panel (in modern browsers such as current Firefox and Chrome) without running the build step!
 But there is one.
 
-- `npm run build` / `yarn build` to make a production build with [Broccoli](https://github.com/broccolijs/broccoli)
-- `npm run lint` / `yarn lint` to check JS style (and catch some mistakes) with [ESLint](http://eslint.org/)
+- `npm run build` to make a production build with [Broccoli](https://github.com/broccolijs/broccoli)
+- `npm run lint` to check JS style (and catch some mistakes) with [ESLint](http://eslint.org/)
 
 The production build reduces the number of files (so, HTTP requests) to make loading faster. 
 
