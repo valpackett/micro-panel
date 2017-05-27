@@ -21,7 +21,7 @@ class MicroformatEditor extends Polymer.GestureEventListeners(Polymer.Element) {
 
 	static blankPropFor (prop) {
 		let dflt = MicroformatEditor.blankObjFor(prop)
-		if (prop === 'content') { dflt = { html: '', 'x-micro-panel-editor': 'wysiwyg' } }
+		if (prop === 'content' || prop === 'note') { dflt = { html: '', 'x-micro-panel-editor': 'wysiwyg' } }
 		if (prop === 'photo' || prop === 'video' || prop === 'audio' || prop === 'category') {
 			// Expecting file upload or clicking existing tags
 			dflt = []

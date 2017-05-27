@@ -300,8 +300,9 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 			frame.src = redir || frame.src
 			this.$['editor-wrapper'].close()
 		} else {
-			window.onbeforeunload = null
-			location.reload()
+			localforage.removeItem('item').then(x => {
+				location.reload()
+			})
 		}
 	}
 
