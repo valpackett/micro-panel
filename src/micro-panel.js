@@ -483,8 +483,14 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 							xhr.withCredentials = true
 						}
 						xhr.open('post', this.model.mediaEndpoint)
-						xhr.setRequestHeader('Authorization', 'Bearer ' + (localStorage.getItem('access_token')
-							|| document.cookie.split('; ').find(c => c.split('=')[0] === 'Bearer').split('=')[1]))
+						const bearerCookie = document.cookie.split('; ').find(c => c.split('=')[0] === 'Bearer')
+						let bearerToken = localStorage.getItem('access_token')
+						if (bearerCookie && !bearerToken) {
+							bearerToken = bearerCookie.split('=')[1]
+						}
+						if (bearerToken) {
+							xhr.setRequestHeader('Authorization', 'Bearer ' + bearerToken)
+						}
 						const form = new FormData()
 						form.append('file', file)
 						xhr.send(form)
