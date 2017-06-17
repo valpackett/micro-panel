@@ -22,8 +22,8 @@
   ],
   "dependencies": {
     "web-animations-js": "^2.2.5",
-    "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0",
-    "polymer": "Polymer/polymer#^2.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.1",
+    "polymer": "Polymer/polymer#^2.0.1",
     "app-layout": "PolymerElements/app-layout#^2.0.0",
     "paper-menu-button": "PolymerElements/paper-menu-button#^2.0.0",
     "paper-listbox": "PolymerElements/paper-listbox#^2.0.0",
@@ -37,11 +37,10 @@
     "paper-input": "PolymerElements/paper-input#^2.0.0",
     "paper-spinner": "PolymerElements/paper-spinner#^2.0.0",
     "paper-progress": "PolymerElements/paper-progress#^2.0.0",
-    "fetch": "^2.0.2",
     "microformat-shiv": "myfreeweb/microformat-shiv#master",
     "pen": "myfreeweb/pen#customelement",
     "codeflask": "myfreeweb/CodeFlask.js#customelement",
-    "freezer-js": "freezer#^0.11.2",
+    "freezer-js": "freezer#^0.12.2",
     "localforage": "^1.5.0"
   }
 }
