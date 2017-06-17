@@ -51,7 +51,8 @@ class MicroformatEditor extends Polymer.GestureEventListeners(Polymer.Element) {
 	constructor () {
 		super()
 		this._updatePropFromInput = MicroformatEditor.debounce((e) => {
-			const target = e.composed ? e.composedPath()[0] : e.path[0]
+			//const target = e.composed ? e.composedPath()[0] : e.path[0]
+			const target = e.path ? e.path[0] : e.composedPath()[0]
 			if (target.dataset.subkey) {
 				this.item.properties[e.model.key][e.model.index].set(target.dataset.subkey, target.value)
 			} else {
@@ -99,7 +100,7 @@ class MicroformatEditor extends Polymer.GestureEventListeners(Polymer.Element) {
 	}
 
 	getPropKeys (item) {
-		return Object.keys(item.properties || {})
+		return Object.keys((item || {}).properties || {})
 	}
 
 	getPropValues (e, key) {
