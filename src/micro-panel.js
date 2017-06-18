@@ -179,6 +179,10 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 		})
 	}
 
+	editCurrentPage (e) {
+		this.fetchSource(this.currentPageUrl()).then(x => this.editStart(x))
+	}
+
 	currentPageUrl () {
 		if (this.useFrame) {
 			const frame = this.querySelector('iframe')
@@ -193,37 +197,41 @@ class MicroPanel extends Polymer.GestureEventListeners(Polymer.Element) {
 		const props = entry.properties || {}
 		let i = 0
 		const url = (props['editing-url'] || props.url || [this.currentPageUrl()])[0]
+		this.fetchSource(url).then(x => this.editStart(x))
+	}
+
+	fetchSource (url) {
 		this.requestInProgress = true
-		this.micropubGet('q=source&url=' + encodeURIComponent(url))
-		.then((resp) => resp.json())
+		return this.micropubGet('q=source&url=' + encodeURIComponent(url))
+			.then((resp) => resp.json())
 			.then((fullEntry) => {
 				this.requestInProgress = false
-				this.editStart(fullEntry)
+				return fullEntry
 			})
-		.catch((e) => {
-			console.error(e)
-			if (this.forceMicropubSource) {
-				this.requestInProgress = false
-				alert('Could not fetch the source of the requested entry.')
-				return
-			}
-			fetch(url)
-			.then(resp => resp.text())
-			.then(body => {
-				this.requestInProgress = false
-				const mfs = Microformats.get({ html: body, textFormat: 'normalised' })
-				if (mfs.length > 0) {
-					this.editStart([0])
-				} else {
-					throw new Error('No microformats found on source page')
-				}
-			})
-			.catch(e => {
-				this.requestInProgress = false
+			.catch((e) => {
 				console.error(e)
-				alert('Could not fetch the source of the requested entry.')
+				if (this.forceMicropubSource) {
+					this.requestInProgress = false
+					alert('Could not fetch the source of the requested entry.')
+					return
+				}
+				fetch(url)
+					.then(resp => resp.text())
+					.then(body => {
+						this.requestInProgress = false
+						const mfs = Microformats.get({ html: body, textFormat: 'normalised' })
+						if (mfs.length > 0) {
+							return mfs[0]
+						} else {
+							throw new Error('No microformats found on source page')
+						}
+					})
+					.catch(e => {
+						this.requestInProgress = false
+						console.error(e)
+						alert('Could not fetch the source of the requested entry.')
+					})
 			})
-		})
 	}
 
 	editStart (entry) {
