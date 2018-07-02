@@ -1,12 +1,9 @@
 {
   "name": "micro-panel",
-  "version": "1.0.0",
-  "description": "An admin panel for websites that support microformats2 and micropub",
-  "main": "micro-panel.html",
+  "version": "2.0.0",
+  "description": "Website editing components for microformats2 and micropub",
   "scripts": {
-    "deps": "bower update",
-    "lint": "eslint --ignore-path .gitignore . && echo ESLint OK",
-    "build": "rm -rf dist.new; broccoli build dist.new && crisper --source dist.new/src/micro-panel.html --html dist.new/src/micro-panel.html --js dist.new/src/micro-panel.js && mkdir -p dist && rm -rf dist/* && mv dist.new/* dist/ && rmdir dist.new"
+    "lint": "eslint --ignore-path .gitignore . && echo ESLint OK"
   },
   "repository": {
     "type": "git",
@@ -15,7 +12,10 @@
   "keywords": [
     "micropub",
     "microformats",
-    "indieweb"
+    "indieweb",
+    "webcomponent",
+    "web-components",
+    "custom-element"
   ],
   "author": "Val Packett <val@packett.cool>",
   "license": "Unlicense",
@@ -24,18 +24,5 @@
   },
   "homepage": "https://github.com/myfreeweb/micro-panel#readme",
   "devDependencies": {
-    "bower": "^1.8.0",
-    "broccoli": "^1.1.2",
-    "broccoli-cli": "^1.0.0",
-    "broccoli-funnel": "^1.2.0",
-    "broccoli-merge-trees": "^2.0.0",
-    "broccoli-vulcanize": "^4.0.0",
-    "crisper": "^2.0.2",
-    "eslint": "^4.0.0",
-    "eslint-config-standard": "^10.2.1",
-    "eslint-plugin-import": "^2.3.0",
-    "eslint-plugin-node": "^5.0.0",
-    "eslint-plugin-promise": "^3.5.0",
-    "eslint-plugin-standard": "^3.0.1"
   }
 }

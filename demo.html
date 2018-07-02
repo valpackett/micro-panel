@@ -3,19 +3,11 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>micro-panel</title>
+		<title>micro-panel demo</title>
 		<style>
 			body { margin: 0; padding: 0; }
-			body, micro-panel { height: 100vh; }
-			iframe { width: 100%; border: none; }
-			.p0lyfake-toolbar { height: 56px; background: #00897b; }
 		</style>
-		<script>
-			if (!('KeyframeEffect' in window && 'timeline' in document && 'play' in document.timeline))
-				document.write('<script src="bower_components/web-animations-js/web-animations-next.min.js"></scr'+'ipt>')
-		</script>
 		<script defer src="bower_components/webcomponentsjs/webcomponents-loader.js"></script>
-		<link rel="import" href="src/micro-panel.html">
 		<link rel="manifest" href="manifest.json">
 		<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
 		<link rel="mask-icon" href="icons/mask-icon.svg" color="#5bbad5">
@@ -24,9 +16,5 @@
 		<meta name="theme-color" content="#00897b">
 	</head>
 	<body>
-		<div class="p0lyfake p0lyfake-toolbar"></div>
-		<micro-panel use-frame use-auth>
-			<iframe src="/"></iframe>
-		</micro-panel>
 	</body>
 </html>
