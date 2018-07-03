@@ -42,6 +42,9 @@ export const sharedStyles = html`
 			background: var(--accent);
 			color: var(--neutral);
 		}
+		button[disabled] {
+			opacity: 0.5;
+		}
 
 		.icon, .icon-button {
 			vertical-align: middle;
@@ -75,14 +78,21 @@ export const sharedStyles = html`
 		.bar label, .bar h1 {
 			flex: 1;
 		}
-		.bar button {
-			margin: 0 0.2rem;
+		.bar > * {
+			margin: 0 0.4rem;
 		}
-		.bar button:first-child {
+		.bar > *:first-child {
 			margin-left: 0;
 		}
-		.bar button:last-child {
+		.bar > * + * {
 			margin-right: 0;
+		}
+		.bar h1 {
+			margin: 0;
+			font-size: 1.1rem;
+		}
+		.bar button {
+			font-size: 1rem;
 		}
 	</style>
 `
@@ -111,7 +121,7 @@ export const icons = {
 }
 
 export function iconCode (icon, title = null) {
-	return html`<svg class="icon" width="24" height="24" viewBox="0 0 24 24" role="img" aria-hidden$=${title ? 'false' : 'true'} title$=${title || ''}>
+	return html`<svg class="icon" width="24" height="24" viewBox="0 0 24 24" role="img" aria-hidden?=${title} title$=${title || ''}>
 		${icon}
 		${title ? html`<title>${title}</title>` : ''}
 	</svg>`

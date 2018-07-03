@@ -5,7 +5,7 @@ import { sharedStyles, icons, iconCode } from './util.js'
 import produce from 'immer'
 
 export default class MicroPanelEditorEntry extends LitElement {
-	static get properties () { return { entry: Object } }
+	static get properties () { return { entry: Object, setEntry: Function } }
 
 	_render ({ entry }) {
 		return html`
@@ -57,17 +57,17 @@ export default class MicroPanelEditorEntry extends LitElement {
 					<header class="bar">
 						<label>${propname}</label>
 						<button on-click=${_ =>
-							this.entry = produce(entry, draft => { delete draft.properties[propname] })
+							this._modify(entry, draft => delete draft.properties[propname])
 						} title="Delete this property" class="icon-button">${iconCode(icons.minus)}</button>
 						<button on-click=${_ =>
-							this.entry = produce(entry, draft => { draft.properties[propname].push('') })
+							this._modify(entry, draft => draft.properties[propname].push(''))
 						} title="Add new value to this property" class="icon-button">${iconCode(icons.plus)}</button>
 					</header>
 					${entry.properties[propname].map((propval, idx) => html`
 						<div class="input-row">
 							${this._rowEditor(entry, propname, propval, idx)}
 							<button on-click=${_ =>
-								this.entry = produce(entry, draft => { draft.properties[propname].splice(idx, 1) })
+								this._modify(entry, draft => draft.properties[propname].splice(idx, 1))
 							} title="Delete this value" class="icon-button">${iconCode(icons.minus)}</button>
 						</div>
 					`)}
@@ -85,7 +85,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 		if (typeof propval === 'string') {
 			return html`
 				<input type="text" value=${propval} on-change=${e =>
-					this.entry = produce(entry, draft => { draft.properties[propname][idx] = e.target.value })
+					this._modify(entry, draft => draft.properties[propname][idx] = e.target.value)
 				}/>
 			`
 		}
@@ -95,13 +95,13 @@ export default class MicroPanelEditorEntry extends LitElement {
 		if ('html' in propval) {
 			return html`
 				<code-flask language="markup" value=${propval.html} on-value-changed=${e =>
-					this.entry = produce(entry, draft => { draft.properties[propname][idx].html = e.target.value })
+					this._modify(entry, draft => draft.properties[propname][idx].html = e.target.value)
 				}></code-flask>
 			`
 		} else if ('markdown' in propval) {
 			return html`
 				<code-flask language="markdown" value=${propval.markdown} on-value-changed=${e =>
-					this.entry = produce(entry, draft => { draft.properties[propname][idx].markdown = e.target.value })
+					this._modify(entry, draft => draft.properties[propname][idx].markdown = e.target.value)
 				}></code-flask>
 			`
 		}
@@ -113,12 +113,16 @@ export default class MicroPanelEditorEntry extends LitElement {
 		}
 		const inp = this.shadowRoot.getElementById('new-prop-inp')
 		const propName = inp.value
-		this.entry = produce(entry, draft => {
-			propName.length > 0 && !(propName in draft.properties) && (draft.properties[propName] = [''])
-		})
+		this._modify(entry, draft =>
+			propName.length > 0 && !(propName in draft.properties) && (draft.properties[propName] = ['']))
 		inp.value = ''
 	}
 
+	_modify (entry, fn) {
+		// NOTE: propagating the entry property assignment up to the top component
+		// NOTE: eat return value here to avoid returning assignment results
+		this.setEntry(produce(entry, draft => { fn(draft) }))
+	}
 }
 
 customElements.define('micro-panel-editor-entry', MicroPanelEditorEntry)
