@@ -24,9 +24,13 @@ function micropubPost(endpoint, obj) {
 }
 
 export default class MicroPanelEditor extends LitElement {
-	static get properties () { return { micropub: String, entry: Object } }
+	static get properties () {
+		return {
+			micropub: String, entry: Object, entryIsModified: Boolean, requestInFlight: Boolean,
+		}
+	}
 
-	_render ({ micropub, entry }) {
+	_render ({ micropub, entry, entryIsModified }) {
 		return html`
 			${sharedStyles}
 			<style>
@@ -49,18 +53,32 @@ export default class MicroPanelEditor extends LitElement {
 			</style>
 
 			<header class="bar header-bar inverted">
-				<button on-click=${_ => this.hidden = true} class="icon-button">${iconCode(icons.close)}</button>
+				<button on-click=${_ => this.close()} class="icon-button">${iconCode(icons.close)}</button>
+				<slot name="title"><h1>micro-panel editor</h1></slot>
+				${this.entryIsNew ? html`
+					<button on-click=${_ => this.createEntry()} disabled?=${!entryIsModified}>Create</button>
+				` : html`
+					<button on-click=${_ => this.updateEntry()} disabled?=${!entryIsModified}>Save</button>
+				`}
 			</header>
 
-			<micro-panel-editor-entry id="root-editor" entry=${entry}></micro-panel-editor-entry>
+			<micro-panel-editor-entry id="root-editor" entry=${entry}
+				setEntry=${entry => {
+					this.entry = entry
+					this.entryIsModified = true
+				}}></micro-panel-editor-entry>
 
 		`
 	}
 
-	async editEntry (url) {
+	close () {
 		if (this.entryIsModified && !confirm('Abandon current modified entry?')) {
 			return
 		}
+		this.hidden = true
+	}
+
+	async editEntry (url) {
 		this.entry = await (await micropubGet(this.micropub, `q=source&url=${encodeURIComponent(url)}`)).json()
 		this.entryIsNew = false
 		this.entryIsModified = false
@@ -68,9 +86,6 @@ export default class MicroPanelEditor extends LitElement {
 	}
 
 	newEntry (properties = { name: ['New post'], content: [''] }) {
-		if (this.entryIsModified && !confirm('Abandon current modified entry?')) {
-			return
-		}
 		this.entry = {
 			type: ['h-entry'],
 			properties,
@@ -78,6 +93,46 @@ export default class MicroPanelEditor extends LitElement {
 		this.entryIsNew = true
 		this.entryIsModified = false
 		this.hidden = false
+	}
+
+	createEntry () {
+		this._post({
+			type: this.entry.type,
+			properties: this.entry.properties,
+		})
+	}
+
+	updateEntry () {
+		const url = ((this.entry.properties || {}).url || [null])[0]
+		if (!url) {
+			return alert('Somehow, an entry with no URL! I have no idea how to save that.')
+		}
+		this._post({
+			'action': 'update',
+			url,
+			replace: this.entry.properties,
+			// TODO 'delete': entry['x-micro-panel-deleted-properties'] || [],;w
+		})
+	}
+
+	async _post (data) {
+		this.requestInFlight = true
+		let resp
+		try {
+			resp = await micropubPost(this.micropub, data)
+		} catch (e) {
+			alert(`Couldn't save the entry! Got error: ${e}`)
+			return
+		} finally {
+			this.requestInFlight = false
+		}
+		if (resp.status >= 300) {
+			alert(`Couldn't save the entry! Got status: ${resp.status}`)
+			return
+		}
+		this.entryIsModified = false
+		this.close()
+		location.href = resp.headers.get('Location')
 	}
 
 }

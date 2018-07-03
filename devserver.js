@@ -20,8 +20,14 @@ polka()
 Look, the post source is **different**! This is a *demo*, so the micropub endpoint is fake :)`
 					}
 				],
+				url: [`https://${req.headers.host}/fake/post`],
 			},
 		}))
+	})
+	.post('/fake-micropub', (req, res) => {
+		res.setHeader('Location', req.headers.referer || `http://${req.headers.host}`)
+		res.statusCode = 201
+		res.end()
 	})
 	.listen(3003)
 	.then(_ => console.log('Running on localhost:3003'))
