@@ -1,5 +1,5 @@
 import { LitElement, html } from '@polymer/lit-element'
-import { mpe, sharedStyles } from './util.js'
+import { mpe, sharedStyles, icons, iconCode } from './util.js'
 
 export default class MicroPanelToolbar extends LitElement {
 	static get properties () { return { } }
@@ -14,7 +14,7 @@ export default class MicroPanelToolbar extends LitElement {
 			</style>
 
 			<header class="bar header-bar inverted">
-				<button on-click=${_ => mpe().newEntry()}>New post</button>
+				<button on-click=${_ => mpe().newEntry()}>${iconCode(icons.leadPencil)} New post</button>
 			</header>
 		`
 	}

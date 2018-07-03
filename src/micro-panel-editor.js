@@ -1,6 +1,6 @@
 import './micro-panel-editor-entry.js'
 import { LitElement, html } from '@polymer/lit-element'
-import { sharedStyles } from './util.js'
+import { sharedStyles, icons, iconCode } from './util.js'
 
 function micropubGet(endpoint, qs) {
 	return fetch(endpoint.indexOf('?') === -1 ? endpoint + '?' + qs : endpoint + '&' + qs, {
@@ -49,7 +49,7 @@ export default class MicroPanelEditor extends LitElement {
 			</style>
 
 			<header class="bar header-bar inverted">
-				<button on-click=${_ => this.hidden = true}>x</button>
+				<button on-click=${_ => this.hidden = true} class="icon-button">${iconCode(icons.close)}</button>
 			</header>
 
 			<micro-panel-editor-entry id="root-editor" entry=${entry}></micro-panel-editor-entry>

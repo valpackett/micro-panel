@@ -1,4 +1,4 @@
-import { html } from '@polymer/lit-element'
+import { html, svg } from '@polymer/lit-element'
 
 export function mpe () {
 	return document.querySelector('micro-panel-editor')
@@ -43,6 +43,17 @@ export const sharedStyles = html`
 			color: var(--neutral);
 		}
 
+		.icon, .icon-button {
+			vertical-align: middle;
+		}
+		.icon-button {
+			padding: 0.2rem;
+			border-radius: 100rem;
+			background: transparent;
+			color: inherit;
+			border: none;
+		}
+
 		.inverted {
 			background: var(--accent);
 			color: var(--neutral);
@@ -75,3 +86,33 @@ export const sharedStyles = html`
 		}
 	</style>
 `
+
+/* https://materialdesignicons.com */
+export const icons = {
+	/* by Google | Apache 2 licensed: */
+	plus: svg`
+		<path fill="currentColor" d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+	`,
+	minus: svg`
+		<path fill="currentColor" d="M19,13H5V11H19V13Z" />
+	`,
+	chevronUp: svg`
+		<path fill="currentColor" d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+	`,
+	chevronDown: svg`
+		<path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+	`,
+	leadPencil: svg`
+		<path fill="currentColor" d="M16.84,2.73C16.45,2.73 16.07,2.88 15.77,3.17L13.65,5.29L18.95,10.6L21.07,8.5C21.67,7.89 21.67,6.94 21.07,6.36L17.9,3.17C17.6,2.88 17.22,2.73 16.84,2.73M12.94,6L4.84,14.11L7.4,14.39L7.58,16.68L9.86,16.85L10.15,19.41L18.25,11.3M4.25,15.04L2.5,21.73L9.2,19.94L8.96,17.78L6.65,17.61L6.47,15.29" />
+	`,
+	close: svg`
+		<path fill="currentColor" d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" />
+	`,
+}
+
+export function iconCode (icon, title = null) {
+	return html`<svg class="icon" width="24" height="24" viewBox="0 0 24 24" role="img" aria-hidden$=${title ? 'false' : 'true'} title$=${title || ''}>
+		${icon}
+		${title ? html`<title>${title}</title>` : ''}
+	</svg>`
+}

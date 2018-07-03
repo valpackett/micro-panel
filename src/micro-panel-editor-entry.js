@@ -1,7 +1,7 @@
 import 'codeflask-element'
 import 'prismjs/components/prism-markdown.min.js'
 import { LitElement, html } from '@polymer/lit-element'
-import { sharedStyles } from './util.js'
+import { sharedStyles, icons, iconCode } from './util.js'
 import produce from 'immer'
 
 export default class MicroPanelEditorEntry extends LitElement {
@@ -58,17 +58,17 @@ export default class MicroPanelEditorEntry extends LitElement {
 						<label>${propname}</label>
 						<button on-click=${_ =>
 							this.entry = produce(entry, draft => { delete draft.properties[propname] })
-						} title="Delete this property">-</button>
+						} title="Delete this property" class="icon-button">${iconCode(icons.minus)}</button>
 						<button on-click=${_ =>
 							this.entry = produce(entry, draft => { draft.properties[propname].push('') })
-						} title="Add new value to this property">+</button>
+						} title="Add new value to this property" class="icon-button">${iconCode(icons.plus)}</button>
 					</header>
 					${entry.properties[propname].map((propval, idx) => html`
 						<div class="input-row">
 							${this._rowEditor(entry, propname, propval, idx)}
 							<button on-click=${_ =>
 								this.entry = produce(entry, draft => { draft.properties[propname].splice(idx, 1) })
-							} title="Delete this value">-</button>
+							} title="Delete this value" class="icon-button">${iconCode(icons.minus)}</button>
 						</div>
 					`)}
 				</fieldset>
@@ -76,7 +76,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 
 		<fieldset class="input-row">
 			<input type="text" placeholder="Add property..." id="new-prop-inp" on-keydown=${e => this.addNewProp(e, entry)}/>
-			<button on-click=${e => this.addNewProp(e, entry)}>+</button>
+			<button on-click=${e => this.addNewProp(e, entry)} class="icon-button">${iconCode(icons.plus)}</button>
 		</fieldset>
 		`
 	}
