@@ -61,7 +61,7 @@ export default class MicroPanelEditor extends LitElement {
 		if (this.entryIsModified && !confirm('Abandon current modified entry?')) {
 			return
 		}
-		this.entry = await micropubGet(this.micropub, `q=source&url=${encodeURIComponent(url)}`).then(resp => resp.json)
+		this.entry = await (await micropubGet(this.micropub, `q=source&url=${encodeURIComponent(url)}`)).json()
 		this.entryIsNew = false
 		this.entryIsModified = false
 		this.hidden = false

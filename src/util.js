@@ -23,7 +23,7 @@ export const sharedStyles = html`
 		input, textarea, button {
 			text-transform: none;
 			border-radius: var(--roundness);
-			padding: 0.4rem 0.8rem;
+			padding: 0.4rem;
 			outline: none;
 			border: 1px solid var(--accent);
 			vertical-align: baseline;
@@ -36,6 +36,7 @@ export const sharedStyles = html`
 			outline: 1px dotted ButtonText;
 		}
 		button {
+			padding: 0.4rem 0.8rem;
 			overflow: visible;
 			-webkit-appearance: button;
 			background: var(--accent);

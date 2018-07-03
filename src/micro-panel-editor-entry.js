@@ -1,3 +1,5 @@
+import 'codeflask-element'
+import 'prismjs/components/prism-markdown.min.js'
 import { LitElement, html } from '@polymer/lit-element'
 import { sharedStyles } from './util.js'
 import produce from 'immer'
@@ -14,7 +16,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 					border: 0;
 					margin: 1rem auto;
 					padding: 0;
-					box-shadow: rgba(20,20,20,0.2) 0 0 5px;
+					box-shadow: rgba(20,20,20,0.24) 0 0 6px;
 					border-radius: var(--roundness);
 					overflow: hidden;
 				}
@@ -26,12 +28,12 @@ export default class MicroPanelEditorEntry extends LitElement {
 				.input-row {
 					padding: 0.5rem;
 					display: flex;
-					align-items: top;
+					align-items: start;
 				}
 				.input-row + .input-row {
 					padding-top: 0;
 				}
-				.input-row input {
+				.input-row input, .input-row textarea, .input-row code-flask {
 					flex: 1;
 				}
 				.input-row button {
@@ -40,13 +42,17 @@ export default class MicroPanelEditorEntry extends LitElement {
 				.input-row button:last-child {
 					margin-right: 0;
 				}
+				textarea, code-flask {
+					resize: vertical;
+					min-height: 200px;
+				}
 
 				@media screen and (min-width: 700px) {
 					fieldset { width: 70%; }
 				}
 			</style>
 
-			${entry && Object.keys(entry.properties).map(propname => html`
+			${entry && entry.properties && Object.keys(entry.properties).map(propname => html`
 				<fieldset>
 					<header class="bar">
 						<label>${propname}</label>
@@ -59,13 +65,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 					</header>
 					${entry.properties[propname].map((propval, idx) => html`
 						<div class="input-row">
-							${(typeof propval === 'string') ?
-								html`
-									<input type="text" value=${propval} on-change=${e =>
-										this.entry = produce(entry, draft => { draft.properties[propname][idx] = e.target.value })
-									}/>
-								` : ''
-							}
+							${this._rowEditor(entry, propname, propval, idx)}
 							<button on-click=${_ =>
 								this.entry = produce(entry, draft => { draft.properties[propname].splice(idx, 1) })
 							} title="Delete this value">-</button>
@@ -75,12 +75,36 @@ export default class MicroPanelEditorEntry extends LitElement {
 			`)}
 
 		<fieldset class="input-row">
-			<input type="text" placeholder="Add property..." id="new-prop-inp" on-keydown=${e => {
-				this.addNewProp(e, entry)
-			}}/>
+			<input type="text" placeholder="Add property..." id="new-prop-inp" on-keydown=${e => this.addNewProp(e, entry)}/>
 			<button on-click=${e => this.addNewProp(e, entry)}>+</button>
 		</fieldset>
 		`
+	}
+
+	_rowEditor (entry, propname, propval, idx) {
+		if (typeof propval === 'string') {
+			return html`
+				<input type="text" value=${propval} on-change=${e =>
+					this.entry = produce(entry, draft => { draft.properties[propname][idx] = e.target.value })
+				}/>
+			`
+		}
+		if (typeof propval !== 'object') {
+			return `Unsupported object type ${typeof propval}`
+		}
+		if ('html' in propval) {
+			return html`
+				<code-flask language="markup" value=${propval.html} on-value-changed=${e =>
+					this.entry = produce(entry, draft => { draft.properties[propname][idx].html = e.target.value })
+				}></code-flask>
+			`
+		} else if ('markdown' in propval) {
+			return html`
+				<code-flask language="markdown" value=${propval.markdown} on-value-changed=${e =>
+					this.entry = produce(entry, draft => { draft.properties[propname][idx].markdown = e.target.value })
+				}></code-flask>
+			`
+		}
 	}
 
 	addNewProp (e, entry) {
