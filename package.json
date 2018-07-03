@@ -3,7 +3,9 @@
   "version": "2.0.0",
   "description": "Website editing components for microformats2 and micropub",
   "scripts": {
-    "lint": "eslint --ignore-path .gitignore . && echo ESLint OK"
+    "build": "rollup -c",
+    "devserve": "node devserver.js",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -24,5 +26,16 @@
   },
   "homepage": "https://github.com/myfreeweb/micro-panel#readme",
   "devDependencies": {
+    "@webcomponents/webcomponentsjs": "^2.0.2",
+    "es-module-devserver": "^0.1.1",
+    "polka": "^0.4.0",
+    "rollup": "^0.62.0",
+    "rollup-plugin-license": "^0.6.0",
+    "rollup-plugin-minify-es": "^1.1.1",
+    "rollup-plugin-node-resolve": "^3.3.0"
+  },
+  "dependencies": {
+    "@polymer/lit-element": "^0.5.2",
+    "immer": "^1.3.1"
   }
 }
