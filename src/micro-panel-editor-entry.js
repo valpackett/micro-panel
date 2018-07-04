@@ -63,7 +63,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 							this._modify(entry, draft => draft.properties[propname].push(''))
 						} title="Add new value to this property" class="icon-button">${iconCode(icons.plus)}</button>
 					</header>
-					${entry.properties[propname].map((propval, idx) => html`
+					${entry.properties[propname] && entry.properties[propname].map((propval, idx) => html`
 						<div class="input-row">
 							${this._rowEditor(entry, propname, propval, idx)}
 							<button on-click=${_ =>

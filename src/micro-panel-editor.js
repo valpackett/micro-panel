@@ -43,6 +43,7 @@ export default class MicroPanelEditor extends LitElement {
 					left: 0;
 					right: 0;
 					background: var(--neutral);
+					z-index: 69420;
 				}
 				#root-editor {
 					flex: 1;
@@ -71,18 +72,31 @@ export default class MicroPanelEditor extends LitElement {
 		`
 	}
 
-	close () {
+	async close () {
 		if (this.entryIsModified && !confirm('Abandon current modified entry?')) {
 			return
 		}
+		if ('animate' in this && 'finished' in Animation.prototype) {
+			await this.animate({transform: ['none', 'translateY(100vh)']}, {duration: 300, easing: 'ease-out'}).finished
+		}
 		this.hidden = true
+		document.body.style.overflow = this.oldBodyOverflow
+	}
+
+	show () {
+		this.oldBodyOverflow = document.body.style.overflow
+		document.body.style.overflow = 'hidden'
+		this.hidden = false
+		if ('animate' in this) {
+			this.animate({transform: ['translateY(100vh)', 'none']}, {duration: 300, easing: 'ease-out'})
+		}
 	}
 
 	async editEntry (url) {
 		this.entry = await (await micropubGet(this.micropub, `q=source&url=${encodeURIComponent(url)}`)).json()
 		this.entryIsNew = false
 		this.entryIsModified = false
-		this.hidden = false
+		this.show()
 	}
 
 	newEntry (properties = { name: ['New post'], content: [''] }) {
@@ -92,7 +106,7 @@ export default class MicroPanelEditor extends LitElement {
 		}
 		this.entryIsNew = true
 		this.entryIsModified = false
-		this.hidden = false
+		this.show()
 	}
 
 	createEntry () {
