@@ -125,7 +125,7 @@ export default class MicroPanelEditor extends LitElement {
 			'action': 'update',
 			url,
 			replace: this.entry.properties,
-			// TODO 'delete': entry['x-micro-panel-deleted-properties'] || [],;w
+			'delete': this.entry['x-micro-panel-deleted-properties'] || [],
 		})
 	}
 

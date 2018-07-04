@@ -76,7 +76,13 @@ export default class MicroPanelEditorEntry extends LitElement {
 					<header class="bar">
 						<label>${propname}</label>
 						<button on-click=${_ =>
-							this._modify(entry, draft => delete draft.properties[propname])
+							this._modify(entry, draft => {
+								delete draft.properties[propname]
+								if (!('x-micro-panel-deleted-properties' in draft)) {
+									draft['x-micro-panel-deleted-properties'] = []
+								}
+								draft['x-micro-panel-deleted-properties'].push(propname)
+							})
 						} title="Delete this property" class="icon-button">${iconCode(icons.minus)}</button>
 						<button on-click=${_ => {
 							this.openJsonEditors = produce(openJsonEditors, x => { x[propname] = !(x[propname] || false) })
@@ -161,8 +167,14 @@ export default class MicroPanelEditorEntry extends LitElement {
 		}
 		const inp = this.shadowRoot.getElementById('new-prop-inp')
 		const propName = inp.value
-		this._modify(entry, draft =>
-			propName.length > 0 && !(propName in draft.properties) && (draft.properties[propName] = ['']))
+		this._modify(entry, draft => {
+			if (propName.length > 0 && !(propName in draft.properties)) {
+				draft.properties[propName] = ['']
+				if ('x-micro-panel-deleted-properties' in draft) {
+					draft['x-micro-panel-deleted-properties'] = draft['x-micro-panel-deleted-properties'].filter(x => x !== propName)
+				}
+			}
+		})
 		inp.value = ''
 	}
 
