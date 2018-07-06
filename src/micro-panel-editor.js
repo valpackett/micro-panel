@@ -121,6 +121,15 @@ export default class MicroPanelEditor extends LitElement {
 
 	async editEntry (url) {
 		this.entry = await (await micropubGet(this.micropub, `q=source&url=${encodeURIComponent(url)}`)).json()
+		if (!this.entry.properties) {
+			this.entry.properties = {}
+		}
+		if (!this.entry.properties.url) {
+			this.entry.properties.url = []
+		}
+		if (this.entry.properties.url.length < 1) {
+			this.entry.properties.url.push(url)
+		}
 		this.entryIsNew = false
 		this.entryIsModified = false
 		this.show()
