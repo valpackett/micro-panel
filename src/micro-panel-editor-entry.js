@@ -165,13 +165,13 @@ export default class MicroPanelEditorEntry extends LitElement {
 		}
 		if ('html' in propval) {
 			return html`
-				<code-flask language="markup" value=${propval.html} on-value-changed=${e =>
+				<code-flask word-wrap language="markup" value=${propval.html} on-value-changed=${e =>
 					this._modify(entry, draft => draft.properties[propname][idx].html = e.target.value)
 				}></code-flask>
 			`
 		} else if ('markdown' in propval) {
 			return html`
-				<code-flask language="markdown" value=${propval.markdown} on-value-changed=${e =>
+				<code-flask word-wrap language="markdown" value=${propval.markdown} on-value-changed=${e =>
 					this._modify(entry, draft => draft.properties[propname][idx].markdown = e.target.value)
 				}></code-flask>
 			`
@@ -182,7 +182,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 
 	_jsonEditor (entry, propname, jsonParseError) {
 		return html`
-			<code-flask language="json" value=${JSON.stringify(entry.properties[propname], null, 2)} on-value-changed=${e =>
+			<code-flask word-wrap language="json" value=${JSON.stringify(entry.properties[propname], null, 2)} on-value-changed=${e =>
 				this._modify(entry, draft => {
 					try {
 						draft.properties[propname] = JSON.parse(e.target.value)
