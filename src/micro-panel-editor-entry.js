@@ -87,6 +87,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 				.cat-suggest {
 					padding: 0.5rem;
 					font-size: 1.1em;
+					line-height: 2;
 				}
 
 				#upload-zone {
