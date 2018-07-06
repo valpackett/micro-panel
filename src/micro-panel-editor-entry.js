@@ -2,23 +2,28 @@ import 'codeflask-element'
 import 'prismjs/components/prism-markdown.min.js'
 import 'prismjs/components/prism-json.min.js'
 import { LitElement, html } from '@polymer/lit-element'
-import { sharedStyles, icons, iconCode } from './util.js'
+import { upload, sharedStyles, icons, iconCode } from './util.js'
 import produce from 'immer'
 
 export default class MicroPanelEditorEntry extends LitElement {
 	static get properties () {
 		return {
-			entry: Object, setEntry: Function, openJsonEditors: Object, jsonParseError: Object
+			entry: Object, setEntry: Function,
+			openUploaders: Object, uploadQueues: Object,
+			openJsonEditors: Object, jsonParseError: Object,
+			media: /* endpoint */ String, mediatoken: String,
 		}
 	}
 
 	constructor () {
 		super()
+		this.openUploaders = {}
+		this.uploadQueues = {}
 		this.openJsonEditors = {}
 		this.jsonParseError = {}
 	}
 
-	_render ({ entry, openJsonEditors, jsonParseError }) {
+	_render ({ entry, openUploaders, uploadQueues, openJsonEditors, jsonParseError, media, mediatoken }) {
 		return html`
 			${sharedStyles}
 			<style>
@@ -66,6 +71,32 @@ export default class MicroPanelEditorEntry extends LitElement {
 					padding: 0.5rem;
 				}
 
+				#upload-zone {
+					position: relative;
+					padding: 0.5rem;
+				}
+				.drag-overlay {
+					display: none;
+				}
+				.dragging .drag-overlay {
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					text-align: center;
+					position: absolute;
+					top: 0;
+					right: 0;
+					bottom: 0;
+					left: 0;
+					background: rgba(60, 60, 60, 0.8);
+					color: #fff;
+				}
+				progress {
+					display: block;
+					width: 100%;
+					margin: 0.1rem 0 0.4rem;
+				}
+
 				@media screen and (min-width: 700px) {
 					fieldset { width: 70%; }
 				}
@@ -88,6 +119,12 @@ export default class MicroPanelEditorEntry extends LitElement {
 							this.openJsonEditors = produce(openJsonEditors, x => { x[propname] = !(x[propname] || false) })
 							this.jsonParseError = produce(jsonParseError, pes => { pes[propname] = null })
 						}} title="Edit this property as JSON" class="icon-button">${iconCode(icons.json)}</button>
+						${media && !openUploaders[propname] ? html`
+							<button on-click=${_ => {
+								this.uploadQueues = produce(uploadQueues, x => { x[propname] = [] })
+								this.openUploaders = produce(openUploaders, x => { x[propname] = true })
+							}} title="Upload media files" class="icon-button">${iconCode(icons.cloudUpload)}</button>
+						` : ''}
 						<button on-click=${_ =>
 							this._modify(entry, draft => draft.properties[propname].push(''))
 						} title="Add new value to this property" class="icon-button">${iconCode(icons.plus)}</button>
@@ -101,6 +138,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 							} title="Delete this value" class="icon-button">${iconCode(icons.minus)}</button>
 						</div>
 					`))}
+					${openUploaders[propname] ? this._mediaUploader(entry, propname, media, mediatoken, uploadQueues) : ''}
 				</fieldset>
 			`)}
 
@@ -158,6 +196,104 @@ export default class MicroPanelEditorEntry extends LitElement {
 				<p><strong>JSON parsing error!</strong> The changes are not saved when this error is present. Please fix the syntax in the editor above. The error is:</p>
 				<p><code>${jsonParseError[propname]}</code></p>
 			</div>` : ''}
+		`
+	}
+
+	_mediaUploader (entry, propname, media, mediatoken, uploadQueues) {
+		return html`
+			<div id="upload-zone"
+				on-dragenter=${e => {
+					e.stopPropagation()
+					e.preventDefault()
+					console.log(this)
+					if (this.dragFirst) {
+						this.dragSecond = true
+					} else {
+						this.dragFirst = true
+						e.dataTransfer.dropEffect = 'copy'
+						this.shadowRoot.getElementById('upload-zone').classList.add('dragging')
+					}
+				}}
+				on-dragover=${e => {
+					e.stopPropagation()
+					e.preventDefault()
+				}}
+				on-dragleave=${e => {
+					e.stopPropagation()
+					e.preventDefault()
+					if (this.dragSecond) {
+						this.dragSecond = false
+					} else {
+						this.dragFirst = false
+					}
+					if (!this.dragFirst && !this.dragSecond) {
+						this.shadowRoot.getElementById('upload-zone').classList.remove('dragging')
+					}
+				}}
+				on-drop=${e => {
+					e.stopPropagation()
+					e.preventDefault()
+					this.dragFirst = false
+					this.dragSecond = false
+					this.shadowRoot.getElementById('upload-zone').classList.remove('dragging')
+					this.uploadQueues = produce(uploadQueues, x => {
+						for (const file of e.dataTransfer.files) {
+							x[propname].push({ file })
+							console.log(file)
+						}
+					})
+				}}>
+				Drag'n'drop or select <input type="file" multiple on-change=${e => {
+					this.uploadQueues = produce(uploadQueues, x => {
+						for (const file of e.target.files) {
+							x[propname].push({ file })
+							console.log(file)
+						}
+					})
+				}}>
+				to upload.
+				${uploadQueues[propname].length > 0 ? html`
+					<div class="upload-queue">
+						${uploadQueues[propname].map(({ file, progress }, idx) => html`
+							<div class="upload-queue-file bar">
+								<div class="stretchy">
+									<div>${file.name}</div>
+									${progress ? html`<progress max="100" value=${progress}>${progress}%</progress>` : ''}
+								</div>
+								<button on-click=${_ =>
+									this.uploadQueues = produce(uploadQueues, x => { x[propname].splice(idx, 1) })
+								} title="Delete this file from the queue" class="icon-button">${iconCode(icons.minus)}</button>
+							</div>
+						`)}
+					</div>
+					<button on-click=${async e => {
+						for (const [idx, wrapper] of uploadQueues[propname].entries()) {
+							try {
+								const result = await upload(media, mediatoken, wrapper.file, e =>
+									this.uploadQueues = produce(this.uploadQueues, x => {
+										const idxx = x[propname].findIndex(y => y.file === wrapper.file)
+										if (e.lengthComputable) {
+											x[propname][idxx].progress = e.loaded / e.total * 100
+										} else {
+											x[propname][idxx].progress = 'ind'
+										}
+									}))
+								this._modify(this.entry, draft => {
+									draft.properties[propname].push(result)
+								})
+								this.uploadQueues = produce(this.uploadQueues, x => {
+									x[propname].splice(x[propname].findIndex(y => y.file === wrapper.file), 1)
+								})
+							} catch (e) {
+								alert(e)
+							}
+						}
+					}}>Upload!</button>
+				` : ''}
+				<div class="drag-overlay">
+					Drop files here!
+				</div>
+			</div>
 		`
 	}
 

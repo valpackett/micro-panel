@@ -27,6 +27,7 @@
   "homepage": "https://github.com/myfreeweb/micro-panel#readme",
   "devDependencies": {
     "@webcomponents/webcomponentsjs": "^2.0.2",
+    "busboy": "^0.2.14",
     "es-module-devserver": "^0.1.2",
     "polka": "^0.4.0",
     "rollup": "^0.62.0",
