@@ -97,6 +97,13 @@ export const sharedStyles = html`
 			opacity: 0.5;
 		}
 
+		a {
+			color: var(--accent);
+		}
+		a:hover {
+			color: var(--accent-hover);
+		}
+
 		.icon, .icon-button {
 			vertical-align: middle;
 		}

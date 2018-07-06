@@ -36,6 +36,56 @@ Look, the post source is **different**! This is a *demo*, so the micropub endpoi
 						],
 					},
 				],
+				video: [
+					{
+						"height": 640,
+						"width": 800,
+						"source": [
+							{
+								"src": "https://unrelentingtech.s3.dualstack.eu-west-1.amazonaws.com/786ac297_x.mp4",
+								"type": "video/mp4"
+							},
+							{
+								"src": "https://unrelentingtech.s3.dualstack.eu-west-1.amazonaws.com/786ac297_x.webm",
+								"type": "video/webm"
+							},
+							{
+								"src": "https://unrelentingtech.s3.dualstack.eu-west-1.amazonaws.com/786ac297_x.poster.jpg",
+								"type": "image/jpeg"
+							}
+						],
+						"meta": {
+							"major_brand": "isom",
+							"encoder": "Lavf57.46.100",
+							"minor_version": "512",
+							"compatible_brands": "isomiso2avc1mp41"
+						}
+					}
+				],
+				photo: [
+					{
+						"height": 380,
+						"palette": {
+							"Vibrant": { "color": "#e47060", "population": 4 },
+							"LightVibrant": { "color": "#f4ac9c", "population": 4 },
+							"Muted": { "color": "#9fcc97", "population": 7 },
+							"DarkVibrant": { "color": "#711e13", "population": 0 },
+							"LightMuted": { "color": "#b0c6ad", "population": 21 }
+						},
+						"width": 1276,
+						"source": [
+							{
+								"src": "https://unrelentingtech.s3.dualstack.eu-west-1.amazonaws.com/b18de0b9_wayland-screenshot-2018-07-05_16-33-27-fs8.png",
+								"type": "image/png"
+							},
+							{
+								"src": "https://unrelentingtech.s3.dualstack.eu-west-1.amazonaws.com/b18de0b9_wayland-screenshot-2018-07-05_16-33-27-fs8.webp",
+								"type": "image/webp"
+							}
+						],
+						"id": "snap"
+					}
+				],
 			},
 		}))
 	})

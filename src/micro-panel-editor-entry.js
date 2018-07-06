@@ -54,7 +54,8 @@ export default class MicroPanelEditorEntry extends LitElement {
 				.input-row + .input-row {
 					padding-top: 0;
 				}
-				.input-row input, .input-row textarea, .input-row code-flask, .input-row micro-panel-editor-entry, .input-row .error-value {
+				.input-row input, .input-row textarea, .input-row code-flask,
+				.input-row micro-panel-editor-entry, .input-row .media-editor, .input-row .error-value {
 					flex: 1;
 				}
 				.input-row button {
@@ -62,6 +63,9 @@ export default class MicroPanelEditorEntry extends LitElement {
 				}
 				.input-row button:last-child {
 					margin-right: 0;
+				}
+				.input-row-labeled {
+					align-items: baseline;
 				}
 				textarea, code-flask {
 					resize: vertical;
@@ -100,6 +104,25 @@ export default class MicroPanelEditorEntry extends LitElement {
 					display: block;
 					width: 100%;
 					margin: 0.1rem 0 0.4rem;
+				}
+
+				img, video {
+					max-width: 100%;
+				}
+				.palette-row {
+					flex-wrap: wrap;
+					line-height: 1.9;
+				}
+				.palette-color {
+					border-right: 1px solid #999;
+					padding-right: 0.5rem;
+					margin-right: 0.5rem;
+				}
+				.palette-color:first-of-type {
+					margin-left: 0.5rem;
+				}
+				.palette-color:last-of-type {
+					border-right: 0;
 				}
 
 				@media screen and (min-width: 700px) {
@@ -193,6 +216,61 @@ export default class MicroPanelEditorEntry extends LitElement {
 				<code-flask word-wrap language="markdown" value=${propval.markdown} on-value-changed=${e =>
 					this._modify(entry, draft => draft.properties[propname][idx].markdown = e.target.value)
 				}></code-flask>
+			`
+		}
+		if ('source' in propval) {
+			return html`
+				<div class="media-editor">
+					${(propval.width || propval.height) ? html`
+						<div class="input-row">[${propval.width}x${propval.height}]</div>` : ''}
+					<div class="input-row">
+					${propval.source.map(src => html`
+						<figure>
+							${src.type && src.type.startsWith('image') ? html`
+								<img src=${src.src} alt=""/>
+							` : ''}
+							${src.type && src.type.startsWith('audio') ? html`
+								<audio src=${src.src} controls></audio>
+							` : ''}
+							${src.type && src.type.startsWith('video') ? html`
+								<video src=${src.src} controls></video>
+							` : ''}
+							<figcaption>
+								<a href=${src.src}>${src.type}</a>
+							</figcaption>
+						</figure>
+					`)}
+					</div>
+					${propval.palette ? html`
+						<div class="input-row input-row-labeled palette-row">
+							Palette
+							${Object.keys(propval.palette).map(clr => html`
+								<label class="palette-color">
+									<input type="color" value=${propval.palette[clr].color} on-change=${e =>
+										this._modify(entry, draft => draft.properties[propname][idx].palette[clr].color = e.target.value)
+									}/>
+									${clr} (${propval.palette[clr].population})
+								</label>
+							`)}
+						</div>` : ''}
+					<label class="input-row input-row-labeled">
+						Alt text&nbsp;
+						<input type="text" value=${propval.alt} on-change=${e =>
+							this._modify(entry, draft => draft.properties[propname][idx].alt = e.target.value)
+						}/>
+					</label>
+					<div class="input-row input-row-labeled">
+						<label for$=${`id-${propval}`}>
+							ID&nbsp;
+						</label>
+						<input type="text" id$=${`id-${propval}`} value=${propval.id} on-change=${e =>
+							this._modify(entry, draft => draft.properties[propname][idx].id = e.target.value)
+						}/>&nbsp;
+						<code on-click=${e => window.getSelection().selectAllChildren(e.target)}>
+							&lt;${propname}-here id="${propval.id}"&gt;&lt;/${propname}-here&gt;
+						</code>
+					</label>
+				</div>
 			`
 		}
 		return html`<div class="error-value">Unsupported object with keys: ${Object.keys(propval).join(', ')}</div>`
