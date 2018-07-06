@@ -108,6 +108,15 @@ If the endpoint is on the same domain, you don't have to care about any of this 
 Also: if the endpoint returns a JSON body, it will be inserted verbatim.
 Sweetroll uses this for rich photo upload.
 
+#### Default Content Type
+
+By default, newly created entries will be populated with `content: [{html: ''}]` to let you write HTML.
+If your endpoint supports a more convenient markup language such as Markdown, you can specify it:
+
+```html
+	<micro-panel-editor hidden defaultctype="markdown" ...></micro-panel-editor>
+```
+
 ### Posts
 
 In the post template, add a button or link wrapped in a `micro-panel-action`.
