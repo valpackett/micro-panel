@@ -11,9 +11,11 @@ function matchingKey (action) {
 
 export default class IndieAction extends HTMLElement {
 	connectedCallback () {
+		const editor = mpe()
 		for (const el of this.querySelectorAll('a, button')) {
-			el.addEventListener('click', e => mpe().newEntry({
-				[matchingKey(this.getAttribute('do'))]: [this.getAttribute('with')]
+			el.addEventListener('click', e => editor.newEntry({
+				[matchingKey(this.getAttribute('do'))]: [this.getAttribute('with')],
+				content: [{ [editor.defaultctype]: '' }],
 			}))
 		}
 	}
