@@ -9,6 +9,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 	static get properties () {
 		return {
 			entry: Object, setEntry: Function,
+			hiddenProps: Object,
 			openUploaders: Object, uploadQueues: Object,
 			openJsonEditors: Object, jsonParseError: Object,
 			media: /* endpoint */ String, mediatoken: String,
@@ -17,13 +18,14 @@ export default class MicroPanelEditorEntry extends LitElement {
 
 	constructor () {
 		super()
+		this.hiddenProps = {}
 		this.openUploaders = {}
 		this.uploadQueues = {}
 		this.openJsonEditors = {}
 		this.jsonParseError = {}
 	}
 
-	_render ({ entry, openUploaders, uploadQueues, openJsonEditors, jsonParseError, media, mediatoken }) {
+	_render ({ entry, hiddenProps, openUploaders, uploadQueues, openJsonEditors, jsonParseError, media, mediatoken }) {
 		return html`
 			${sharedStyles}
 			<style>
@@ -40,6 +42,9 @@ export default class MicroPanelEditorEntry extends LitElement {
 					background: var(--light-accent);
 					color: var(--neutral);
 					padding: 0.15rem 0.5rem;
+				}
+				.bar button + label {
+					margin-left: 0;
 				}
 				.input-row {
 					padding: 0.5rem;
@@ -105,6 +110,9 @@ export default class MicroPanelEditorEntry extends LitElement {
 			${entry && entry.properties && Object.keys(entry.properties).map(propname => html`
 				<fieldset>
 					<header class="bar">
+						<button on-click=${_ => {
+							this.hiddenProps = produce(hiddenProps, x => { x[propname] = !(x[propname] || false) })
+						}} title="Toggle display of this property" class="icon-button">${iconCode(hiddenProps[propname] ? icons.chevronDown : icons.chevronUp)}</button>
 						<label>${propname}</label>
 						<button on-click=${_ =>
 							this._modify(entry, draft => {
@@ -129,7 +137,8 @@ export default class MicroPanelEditorEntry extends LitElement {
 							this._modify(entry, draft => draft.properties[propname].push(''))
 						} title="Add new value to this property" class="icon-button">${iconCode(icons.plus)}</button>
 					</header>
-					${openJsonEditors[propname] ? this._jsonEditor(entry, propname, jsonParseError)
+					${hiddenProps[propname] ? ''
+						: openJsonEditors[propname] ? this._jsonEditor(entry, propname, jsonParseError)
 						: (entry.properties[propname] && entry.properties[propname].map((propval, idx) => html`
 						<div class="input-row">
 							${this._rowEditor(entry, propname, propval, idx)}
@@ -138,7 +147,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 							} title="Delete this value" class="icon-button">${iconCode(icons.minus)}</button>
 						</div>
 					`))}
-					${openUploaders[propname] ? this._mediaUploader(entry, propname, media, mediatoken, uploadQueues) : ''}
+					${(!hiddenProps[propname] && openUploaders[propname]) ? this._mediaUploader(entry, propname, media, mediatoken, uploadQueues) : ''}
 				</fieldset>
 			`)}
 
