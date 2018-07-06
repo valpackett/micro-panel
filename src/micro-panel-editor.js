@@ -27,6 +27,7 @@ export default class MicroPanelEditor extends LitElement {
 	static get properties () {
 		return {
 			micropub: String, media: String, mediatoken: String,
+			defaultctype: String,
 			entry: Object,
 			entryIsModified: Boolean, requestInFlight: Boolean,
 		}
@@ -103,7 +104,7 @@ export default class MicroPanelEditor extends LitElement {
 		this.show()
 	}
 
-	newEntry (properties = { name: ['New post'], content: [''] }) {
+	newEntry (properties = { name: ['New post'], content: [{[this.defaultctype || 'html']: ''}], category: [], photo: [] }) {
 		this.entry = {
 			type: ['h-entry'],
 			properties,
