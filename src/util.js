@@ -4,6 +4,45 @@ export function mpe () {
 	return document.querySelector('micro-panel-editor')
 }
 
+export function upload (endpoint, token, file, onProgress) {
+	return new Promise((resolve, reject) => {
+		const xhr = new XMLHttpRequest()
+		xhr.upload.addEventListener('progress', onProgress, false)
+		xhr.addEventListener('load', e => {
+			if (xhr.status >= 200 && xhr.status < 300) {
+				const ctype = xhr.getResponseHeader('Content-Type')
+				if (ctype && ctype.includes('application/json')) {
+					resolve(JSON.parse(xhr.responseText))
+				} else {
+					resolve(xhr.getResponseHeader('Location'))
+				}
+			} else {
+				reject(xhr.status)
+			}
+		})
+		xhr.addEventListener('error', reject)
+		xhr.addEventListener('abort', reject)
+		xhr.addEventListener('timeout', reject)
+		xhr.upload.addEventListener('error', reject)
+		xhr.upload.addEventListener('abort', reject)
+		xhr.upload.addEventListener('timeout', reject)
+		xhr.open('post', endpoint)
+		if (token) { // simple token for using a different domain
+			xhr.setRequestHeader('Authorization', 'MediaToken ' + token)
+		} else { // requires non-HttpOnly cookies
+			const bearerCookie = document.cookie.split('; ').find(c => c.split('=')[0] === 'Bearer')
+			if (bearerCookie) {
+				xhr.setRequestHeader('Authorization', 'Bearer ' + bearerCookie)
+			} else { // same origin
+				xhr.withCredentials = true
+			}
+		}
+		const form = new FormData()
+		form.append('file', file)
+		xhr.send(form)
+	})
+}
+
 export const sharedStyles = html`
 	<style>
 		:host {
@@ -75,7 +114,7 @@ export const sharedStyles = html`
 			display: flex;
 			align-items: baseline;
 		}
-		.bar label, .bar h1 {
+		.bar label, .bar h1, .bar .stretchy {
 			flex: 1;
 		}
 		.bar > * {
@@ -117,6 +156,9 @@ export const icons = {
 	`,
 	close: svg`
 		<path fill="currentColor" d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" />
+	`,
+	cloudUpload: svg`
+		<path fill="currentColor" d="M14,13V17H10V13H7L12,8L17,13M19.35,10.03C18.67,6.59 15.64,4 12,4C9.11,4 6.6,5.64 5.35,8.03C2.34,8.36 0,10.9 0,14A6,6 0 0,0 6,20H19A5,5 0 0,0 24,15C24,12.36 21.95,10.22 19.35,10.03Z" />
 	`,
 	/* by Austin Andrews @Templarian | OFL licensed: */
 	json: svg`

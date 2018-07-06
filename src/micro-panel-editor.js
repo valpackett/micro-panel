@@ -26,11 +26,13 @@ function micropubPost(endpoint, obj) {
 export default class MicroPanelEditor extends LitElement {
 	static get properties () {
 		return {
-			micropub: String, entry: Object, entryIsModified: Boolean, requestInFlight: Boolean,
+			micropub: String, media: String, mediatoken: String,
+			entry: Object,
+			entryIsModified: Boolean, requestInFlight: Boolean,
 		}
 	}
 
-	_render ({ micropub, entry, entryIsModified }) {
+	_render ({ micropub, media, mediatoken, entry, entryIsModified }) {
 		return html`
 			${sharedStyles}
 			<style>
@@ -63,7 +65,9 @@ export default class MicroPanelEditor extends LitElement {
 				`}
 			</header>
 
-			<micro-panel-editor-entry id="root-editor" entry=${entry}
+			<micro-panel-editor-entry id="root-editor"
+				media=${media} mediatoken=${mediatoken}
+				entry=${entry}
 				setEntry=${entry => {
 					this.entry = entry
 					this.entryIsModified = true
