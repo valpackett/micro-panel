@@ -113,7 +113,7 @@ export default class MicroPanelEditor extends LitElement {
 		this.show()
 	}
 
-	newEntry (properties = { name: ['New post'], content: [{[this.defaultctype || 'html']: ''}], category: [], photo: [] }) {
+	newEntry (properties = { name: [], content: [{[this.defaultctype || 'html']: ''}], category: [], photo: [] }) {
 		this.entry = {
 			type: ['h-entry'],
 			properties,
