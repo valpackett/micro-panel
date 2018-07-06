@@ -103,7 +103,7 @@ export default class MicroPanelEditor extends LitElement {
 		if (this.entryIsModified && !confirm('Abandon current modified entry?')) {
 			return
 		}
-		if ('animate' in this && 'finished' in Animation.prototype) {
+		if ('animate' in this && 'Animation' in window && 'finished' in Animation.prototype) {
 			await this.animate({transform: ['none', 'translateY(100vh)']}, {duration: 300, easing: 'ease-out'}).finished
 		}
 		this.hidden = true
