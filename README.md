@@ -140,6 +140,17 @@ And as already mentioned, `indie-action` is also handled.
 	</footer>
 ```
 
+### Category Suggestions
+
+To have the ability to conveniently add existing tags to the `category` property, mark up your tag list / tag cloud / whatever like so:
+
+```html
+<a href="/tag/demo" data-mf-category="demo">#demo</a>
+<a href="/tag/test" data-mf-category="test">#test</a>
+```
+
+Everything with the `data-mf-category` will be used for the category suggestions.
+
 ## Usage
 
 With the setup above, you should be ready to go!

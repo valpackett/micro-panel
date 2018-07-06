@@ -30,10 +30,19 @@ export default class MicroPanelEditor extends LitElement {
 			defaultctype: String,
 			entry: Object,
 			entryIsModified: Boolean, requestInFlight: Boolean,
+			cats: Array,
 		}
 	}
 
-	_render ({ micropub, media, mediatoken, entry, entryIsModified }) {
+	constructor () {
+		super()
+		this.cats = []
+		for (const el of document.querySelectorAll('[data-mf-category]')) {
+			this.cats.push(el.dataset.mfCategory)
+		}
+	}
+
+	_render ({ micropub, media, mediatoken, entry, entryIsModified, cats }) {
 		return html`
 			${sharedStyles}
 			<style>
@@ -67,7 +76,7 @@ export default class MicroPanelEditor extends LitElement {
 			</header>
 
 			<micro-panel-editor-entry id="root-editor" class="root-editor"
-				media=${media} mediatoken=${mediatoken}
+				media=${media} mediatoken=${mediatoken} cats=${cats}
 				entry=${entry}
 				setEntry=${entry => {
 					this.entry = entry
