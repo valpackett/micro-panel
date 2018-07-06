@@ -22,10 +22,25 @@ Look, the post source is **different**! This is a *demo*, so the micropub endpoi
 					}
 				],
 				url: [`https://${req.headers.host}/fake/post`],
+				['like-of']: [
+					{
+						type: ['h-entry'],
+						properties: {
+							name: ['Nested entry test!'],
+							url: [`https://${req.headers.host}/fake/other-post`],
+						},
+						content: [
+							{
+								html: `<strong>This works!</strong>`
+							}
+						],
+					},
+				],
 			},
 		}))
 	})
 	.post('/fake-micropub', (req, res) => {
+		req.pipe(process.stdout);
 		res.setHeader('Location', req.headers.referer || `http://${req.headers.host}`)
 		res.statusCode = 201
 		res.end()

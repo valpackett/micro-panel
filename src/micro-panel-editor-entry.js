@@ -54,7 +54,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 				.input-row + .input-row {
 					padding-top: 0;
 				}
-				.input-row input, .input-row textarea, .input-row code-flask, .input-row .error-value {
+				.input-row input, .input-row textarea, .input-row code-flask, .input-row micro-panel-editor-entry, .input-row .error-value {
 					flex: 1;
 				}
 				.input-row button {
@@ -103,7 +103,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 				}
 
 				@media screen and (min-width: 700px) {
-					fieldset { width: 70%; }
+					:host(.root-editor) fieldset { width: 70%; }
 				}
 			</style>
 
@@ -141,7 +141,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 						: openJsonEditors[propname] ? this._jsonEditor(entry, propname, jsonParseError)
 						: (entry.properties[propname] && entry.properties[propname].map((propval, idx) => html`
 						<div class="input-row">
-							${this._rowEditor(entry, propname, propval, idx)}
+							${this._rowEditor(entry, propname, propval, idx, media, mediatoken)}
 							<button on-click=${_ =>
 								this._modify(entry, draft => draft.properties[propname].splice(idx, 1))
 							} title="Delete this value" class="icon-button">${iconCode(icons.minus)}</button>
@@ -158,7 +158,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 		`
 	}
 
-	_rowEditor (entry, propname, propval, idx) {
+	_rowEditor (entry, propname, propval, idx, media, mediatoken) {
 		if (typeof propval === 'string') {
 			return html`
 				<input type="text" value=${propval} on-change=${e =>
@@ -172,21 +172,30 @@ export default class MicroPanelEditorEntry extends LitElement {
 		if (typeof propval !== 'object') {
 			return html`<div class="error-value">Item of unsupported type ${typeof propval}</div>`
 		}
+		if ('type' in propval) {
+			return html`
+				<micro-panel-editor-entry
+					media=${media} mediatoken=${mediatoken}
+					entry=${propval}
+					setEntry=${nentry => this._modify(entry, draft => draft.properties[propname][idx] = nentry)}>
+				</micro-panel-editor-entry>
+			`
+		}
 		if ('html' in propval) {
 			return html`
 				<code-flask word-wrap language="markup" value=${propval.html} on-value-changed=${e =>
 					this._modify(entry, draft => draft.properties[propname][idx].html = e.target.value)
 				}></code-flask>
 			`
-		} else if ('markdown' in propval) {
+		}
+		if ('markdown' in propval) {
 			return html`
 				<code-flask word-wrap language="markdown" value=${propval.markdown} on-value-changed=${e =>
 					this._modify(entry, draft => draft.properties[propname][idx].markdown = e.target.value)
 				}></code-flask>
 			`
-		} else {
-			return html`<div class="error-value">Unsupported object with keys: ${Object.keys(propval).join(', ')}</div>`
 		}
+		return html`<div class="error-value">Unsupported object with keys: ${Object.keys(propval).join(', ')}</div>`
 	}
 
 	_jsonEditor (entry, propname, jsonParseError) {
