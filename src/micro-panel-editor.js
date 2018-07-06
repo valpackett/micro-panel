@@ -42,6 +42,19 @@ export default class MicroPanelEditor extends LitElement {
 		}
 	}
 
+	connectedCallback () {
+		super.connectedCallback()
+		// Quick reply/like/etc URL for e.g. indie-action
+		const query = new URLSearchParams(document.location.search.substring(1))
+		if (query.has('mp-reaction')) {
+			if (query.has('with')) {
+				this.newReaction(query.get('mp-reaction'), query.get('with'), query.get('content'))
+			} else {
+				this.newEntry({ name: [], content: [{[this.defaultctype || 'html']: query.get('content')}], category: [], photo: [] })
+			}
+		}
+	}
+
 	_render ({ micropub, media, mediatoken, entry, entryIsModified, cats }) {
 		return html`
 			${sharedStyles}
@@ -121,6 +134,14 @@ export default class MicroPanelEditor extends LitElement {
 		this.entryIsNew = true
 		this.entryIsModified = false
 		this.show()
+	}
+
+	newReaction (kind, url, content) {
+		this.newEntry({
+			[kind]: [url],
+			content: [{ [this.defaultctype]: content || '' }],
+			photo: [],
+		})
 	}
 
 	createEntry () {

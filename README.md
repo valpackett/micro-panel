@@ -151,6 +151,40 @@ To have the ability to conveniently add existing tags to the `category` property
 
 Everything with the `data-mf-category` will be used for the category suggestions.
 
+### Quick Reaction URL
+
+micro-panel will automatically pop up a new reply/like/repost/etc. from a URL constructed like:
+
+```
+https://your.site/?mp-reaction=in-reply-to&with=https://example.com/entry&content=Hello+world
+```
+
+Where `in-reply-to` is the property name (can be anything).
+`content` is optional of course.
+
+And even `with` is optional, so you can have a plain "share" action:
+
+```
+https://your.site/?mp-reaction=post&content=Hello+world
+```
+
+This can be used to [set up indie-config](https://indieweb.org/indie-config#How_to_publish), for example:
+
+```html
+<script>
+(function() {
+  if (window.parent !== window) {
+    window.parent.postMessage(JSON.stringify({
+      reply: 'https://YOUR.DOMAIN/?mp-reaction=in-reply-to&with={url}',
+      like: 'https://YOUR.DOMAIN/?mp-reaction=like-of&with={url}',
+      repost: 'https://YOUR.DOMAIN/?mp-reaction=repost-of&with={url}',
+      bookmark: 'https://YOUR.DOMAIN/?mp-reaction=bookmark-of&with={url}',
+    }), '*');
+  }
+}());
+</script>
+```
+
 ## Usage
 
 With the setup above, you should be ready to go!
