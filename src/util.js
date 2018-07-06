@@ -51,7 +51,9 @@ export const sharedStyles = html`
 			--major-padding: var(--micro-panel-major-padding, 0.5rem);
 			--roundness: var(--micro-panel-roundness, 4px);
 			--neutral: var(--micro-panel-neutral, #fefefe);
+			--neutral-hover: var(--micro-panel-neutral, #ebebeb);
 			--accent: var(--micro-panel-accent, rgb(0, 137, 123));
+			--accent-hover: var(--micro-panel-accent-hover, rgb(0, 107, 103));
 			--light-accent: var(--micro-panel-light-accent, rgba(0, 137, 123, 0.55));
 			--text: var(--micro-panel-text, #333);
 			color: var(--text);
@@ -80,6 +82,16 @@ export const sharedStyles = html`
 			-webkit-appearance: button;
 			background: var(--accent);
 			color: var(--neutral);
+			transition: 0.15s ease-in transform;
+		}
+		button:focus {
+			transform: scale(1.1);
+		}
+		button:not([disabled]):active {
+			transform: scale(0.9);
+		}
+		button:hover {
+			background: var(--accent-hover);
 		}
 		button[disabled] {
 			opacity: 0.5;
@@ -95,6 +107,9 @@ export const sharedStyles = html`
 			color: inherit;
 			border: none;
 		}
+		.icon-button:hover {
+			background: rgba(10, 10, 10, 0.2);
+		}
 
 		.inverted {
 			background: var(--accent);
@@ -104,6 +119,9 @@ export const sharedStyles = html`
 			background: var(--neutral);
 			color: var(--accent);
 			border-color: var(--neutral);
+		}
+		.inverted button:hover {
+			background: var(--neutral-hover);
 		}
 
 		.header-bar {

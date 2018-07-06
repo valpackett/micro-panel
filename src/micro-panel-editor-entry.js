@@ -176,7 +176,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 				}></code-flask>
 			`
 		} else {
-			return html`<div class="error-value">Unsupported object with keys: ${Object.keys(propval)}</div>`
+			return html`<div class="error-value">Unsupported object with keys: ${Object.keys(propval).join(', ')}</div>`
 		}
 	}
 
