@@ -13,6 +13,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 			openUploaders: Object, uploadQueues: Object,
 			openJsonEditors: Object, jsonParseError: Object,
 			media: /* endpoint */ String, mediatoken: String,
+			cats: /* suggestions */ Array,
 		}
 	}
 
@@ -25,7 +26,10 @@ export default class MicroPanelEditorEntry extends LitElement {
 		this.jsonParseError = {}
 	}
 
-	_render ({ entry, hiddenProps, openUploaders, uploadQueues, openJsonEditors, jsonParseError, media, mediatoken }) {
+	_render ({
+		entry, hiddenProps, openUploaders, uploadQueues,
+		openJsonEditors, jsonParseError, media, mediatoken, cats
+	}) {
 		return html`
 			${sharedStyles}
 			<style>
@@ -78,6 +82,11 @@ export default class MicroPanelEditorEntry extends LitElement {
 					background: #bb1111;
 					color: #fff;
 					padding: 0.5rem;
+				}
+
+				.cat-suggest {
+					padding: 0.5rem;
+					font-size: 1.1em;
 				}
 
 				#upload-zone {
@@ -164,12 +173,19 @@ export default class MicroPanelEditorEntry extends LitElement {
 						: openJsonEditors[propname] ? this._jsonEditor(entry, propname, jsonParseError)
 						: (entry.properties[propname] && entry.properties[propname].map((propval, idx) => html`
 						<div class="input-row">
-							${this._rowEditor(entry, propname, propval, idx, media, mediatoken)}
+							${this._rowEditor(entry, propname, propval, idx, media, mediatoken, cats)}
 							<button on-click=${_ =>
 								this._modify(entry, draft => draft.properties[propname].splice(idx, 1))
 							} title="Delete this value" class="icon-button">${iconCode(icons.minus)}</button>
 						</div>
 					`))}
+					${(!hiddenProps[propname] && propname === 'category') ? html`
+						<div class="cat-suggest">
+							${cats.map(cat => entry.properties.category.includes(cat) ? '' : html`
+								<button on-click=${_ => this._modify(entry, draft => draft.properties.category.push(cat))}>${cat}</button>
+							`)}
+						</div>
+					` : ''}
 					${(!hiddenProps[propname] && openUploaders[propname]) ? this._mediaUploader(entry, propname, media, mediatoken, uploadQueues) : ''}
 				</fieldset>
 			`)}
@@ -181,7 +197,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 		`
 	}
 
-	_rowEditor (entry, propname, propval, idx, media, mediatoken) {
+	_rowEditor (entry, propname, propval, idx, media, mediatoken, cats) {
 		if (typeof propval === 'string') {
 			return html`
 				<input type="text" value=${propval} on-change=${e =>
@@ -198,7 +214,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 		if ('type' in propval) {
 			return html`
 				<micro-panel-editor-entry
-					media=${media} mediatoken=${mediatoken}
+					media=${media} mediatoken=${mediatoken} cats=${cats}
 					entry=${propval}
 					setEntry=${nentry => this._modify(entry, draft => draft.properties[propname][idx] = nentry)}>
 				</micro-panel-editor-entry>

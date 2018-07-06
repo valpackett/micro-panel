@@ -22,6 +22,7 @@ Look, the post source is **different**! This is a *demo*, so the micropub endpoi
 					}
 				],
 				url: [`https://${req.headers.host}/fake/post`],
+				category: ['test'],
 				['like-of']: [
 					{
 						type: ['h-entry'],
