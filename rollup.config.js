@@ -17,8 +17,10 @@ export default {
 		minify(),
 		license({
 			banner: `@license
-micro-panel is public domain or available under the Unlicense.
-lit-element/lit-html/etc. (c) The Polymer Authors under BSD 3-Clause.`
+micro-panel | Unlicense.
+lit-element/lit-html (c) The Polymer Authors | BSD 3-Clause.
+CodeFlask (c) Claudio Holanda | MIT.
+Prism (c) Lea Verou | MIT.`
 		}),
 	],
 }
