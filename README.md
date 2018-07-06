@@ -82,6 +82,32 @@ You can write custom styles to make it `position:sticky` or whatever.
 	...
 ```
 
+#### Media Endpoint
+
+You can provide a path to your [media endpoint](https://indieweb.org/micropub_media_endpoint) to enable file uploads:
+
+```html
+	<micro-panel-editor hidden micropub="/your/micropub/endpoint"
+	  media="/your/media/endpoint"></micro-panel-editor>
+```
+
+If it's a cross-domain endpoint, you have two options:
+
+- have a `Bearer` cookie accessible to JavaScript, it will be sent as `Authorization: Bearer COOKIE_CONTENT`
+- provide a `mediatoken="TOKEN"` attribute as well, it will be sent as `Authorization: MediaToken TOKEN`
+
+And of course, [CORS](https://enable-cors.org) should be configured in both cases:
+
+```
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Headers: Authorization
+```
+
+If the endpoint is on the same domain, you don't have to care about any of this :)
+
+Also: if the endpoint returns a JSON body, it will be inserted verbatim.
+Sweetroll uses this for rich photo upload.
+
 ### Posts
 
 In the post template, add a button or link wrapped in a `micro-panel-action`.
