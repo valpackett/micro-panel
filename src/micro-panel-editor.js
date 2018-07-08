@@ -130,6 +130,7 @@ export default class MicroPanelEditor extends LitElement {
 		if (this.entry.properties.url.length < 1) {
 			this.entry.properties.url.push(url)
 		}
+		this.originalUrl = this.entry.properties.url[0] // Store to allow changing the URL
 		this.entryIsNew = false
 		this.entryIsModified = false
 		this.show()
@@ -140,6 +141,7 @@ export default class MicroPanelEditor extends LitElement {
 			type: ['h-entry'],
 			properties,
 		}
+		this.originalUrl = undefined
 		this.entryIsNew = true
 		this.entryIsModified = false
 		this.show()
@@ -161,7 +163,7 @@ export default class MicroPanelEditor extends LitElement {
 	}
 
 	updateEntry () {
-		const url = ((this.entry.properties || {}).url || [null])[0]
+		const url = this.originalUrl || ((this.entry.properties || {}).url || [null])[0]
 		if (!url) {
 			return alert('Somehow, an entry with no URL! I have no idea how to save that.')
 		}
