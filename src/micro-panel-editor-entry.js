@@ -9,7 +9,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 	static get properties () {
 		return {
 			defaultctype: String,
-			entry: Object, setEntry: Function,
+			entry: Object, entryIsNew: Boolean, setEntry: Function,
 			hiddenProps: Object,
 			openUploaders: Object, uploadQueues: Object,
 			openJsonEditors: Object, jsonParseError: Object,
@@ -28,7 +28,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 	}
 
 	_render ({
-		defaultctype, entry, hiddenProps, openUploaders, uploadQueues,
+		defaultctype, entry, entryIsNew, hiddenProps, openUploaders, uploadQueues,
 		openJsonEditors, jsonParseError, media, mediatoken, cats
 	}) {
 		return html`
@@ -140,6 +140,28 @@ export default class MicroPanelEditorEntry extends LitElement {
 					:host(.root-editor) fieldset { width: 70%; }
 				}
 			</style>
+
+			${(entry && entry.type) ? html`
+				<fieldset>
+					${entry.type.map((tval, idx) => html`
+						<div class="input-row">
+							<input type="text" value=${tval} on-change=${e =>
+								this._modify(entry, draft => draft.type[idx] = e.target.value)
+							} disabled?=${!entryIsNew}>
+							${(idx === 0 || !entryIsNew) ? '' : html`
+								<button on-click=${_ =>
+									this._modify(entry, draft => draft.type.splice(idx, 1))
+								} title="Delete this type" class="icon-button">${iconCode(icons.minus)}</button>
+							`}
+							${!entryIsNew ? '' : html`
+								<button on-click=${_ =>
+									this._modify(entry, draft => draft.type.push(''))
+								} title="Add new type" class="icon-button">${iconCode(icons.plus)}</button>
+							`}
+						</div>
+					`)}
+				</fieldset>
+			` : ''}
 
 			${entry && entry.properties && Object.keys(entry.properties).map(propname => html`
 				<fieldset>
