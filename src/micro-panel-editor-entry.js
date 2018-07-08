@@ -212,7 +212,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 					`))}
 					${(!hiddenProps[propname] && propname === 'category') ? html`
 						<div class="cat-suggest">
-							${cats.map(cat => entry.properties.category.includes(cat) ? '' : html`
+							${[...cats].map(cat => entry.properties.category.includes(cat) ? '' : html`
 								<button on-click=${_ => this._modify(entry, draft => draft.properties.category.push(cat))}>${cat}</button>
 							`)}
 						</div>
