@@ -2,12 +2,13 @@ import 'codeflask-element'
 import 'prismjs/components/prism-markdown.min.js'
 import 'prismjs/components/prism-json.min.js'
 import { LitElement, html } from '@polymer/lit-element'
-import { upload, sharedStyles, icons, iconCode } from './util.js'
+import { upload, geolocate, reverseGeocode, sharedStyles, icons, iconCode } from './util.js'
 import produce from 'immer'
 
 export default class MicroPanelEditorEntry extends LitElement {
 	static get properties () {
 		return {
+			defaultctype: String,
 			entry: Object, setEntry: Function,
 			hiddenProps: Object,
 			openUploaders: Object, uploadQueues: Object,
@@ -27,7 +28,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 	}
 
 	_render ({
-		entry, hiddenProps, openUploaders, uploadQueues,
+		defaultctype, entry, hiddenProps, openUploaders, uploadQueues,
 		openJsonEditors, jsonParseError, media, mediatoken, cats
 	}) {
 		return html`
@@ -160,6 +161,13 @@ export default class MicroPanelEditorEntry extends LitElement {
 							this.openJsonEditors = produce(openJsonEditors, x => { x[propname] = !(x[propname] || false) })
 							this.jsonParseError = produce(jsonParseError, pes => { pes[propname] = null })
 						}} title="Edit this property as JSON" class="icon-button">${iconCode(icons.json)}</button>
+						${'geolocation' in navigator ? html`
+							<button on-click=${_ =>
+								geolocate()
+									.then(loc => this._modify(entry, draft => draft.properties[propname].push(loc)))
+									.catch(e => alert(e.toString()))
+							} title="Add geolocation" class="icon-button">${iconCode(icons.mapMarkerPlus)}</button>
+						` : ''}
 						${media && !openUploaders[propname] ? html`
 							<button on-click=${_ => {
 								this.uploadQueues = produce(uploadQueues, x => { x[propname] = [] })
@@ -174,7 +182,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 						: openJsonEditors[propname] ? this._jsonEditor(entry, propname, jsonParseError)
 						: (entry.properties[propname] && entry.properties[propname].map((propval, idx) => html`
 						<div class="input-row">
-							${this._rowEditor(entry, propname, propval, idx, media, mediatoken, cats)}
+							${this._rowEditor(entry, propname, propval, idx, media, mediatoken, cats, defaultctype)}
 							<button on-click=${_ =>
 								this._modify(entry, draft => draft.properties[propname].splice(idx, 1))
 							} title="Delete this value" class="icon-button">${iconCode(icons.minus)}</button>
@@ -191,6 +199,17 @@ export default class MicroPanelEditorEntry extends LitElement {
 				</fieldset>
 			`)}
 
+		${(entry && entry.type && entry.type.length > 0 && entry.type[0] === 'h-geo') ? html`
+			<fieldset class="input-row">
+				<button on-click=${_ => reverseGeocode(entry.properties).then(props =>
+					this._modify(entry, draft => {
+						draft.type[0] = 'h-adr'
+						draft.properties = props
+					})).catch(e => alert(e.toString()))
+				}>Find street address via Nominatim</button>
+			</fieldset>
+		` : ''}
+
 		<fieldset class="input-row">
 			<input type="text" placeholder="Add property..." id="new-prop-inp" on-keydown=${e => this.addNewProp(e, entry)}/>
 			<button on-click=${e => this.addNewProp(e, entry)} class="icon-button">${iconCode(icons.plus)}</button>
@@ -198,7 +217,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 		`
 	}
 
-	_rowEditor (entry, propname, propval, idx, media, mediatoken, cats) {
+	_rowEditor (entry, propname, propval, idx, media, mediatoken, cats, defaultctype) {
 		if (typeof propval === 'string') {
 			return html`
 				<input type="text" value=${propval} on-change=${e =>
@@ -215,7 +234,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 		if ('type' in propval) {
 			return html`
 				<micro-panel-editor-entry
-					media=${media} mediatoken=${mediatoken} cats=${cats}
+					media=${media} mediatoken=${mediatoken} cats=${cats} defaultctype=${defaultctype}
 					entry=${propval}
 					setEntry=${nentry => this._modify(entry, draft => draft.properties[propname][idx] = nentry)}>
 				</micro-panel-editor-entry>
@@ -418,7 +437,13 @@ export default class MicroPanelEditorEntry extends LitElement {
 		const propName = inp.value
 		this._modify(entry, draft => {
 			if (propName.length > 0 && !(propName in draft.properties)) {
-				draft.properties[propName] = ['']
+				if (propName === 'photo' || propName === 'video' || propName === 'audio' || propName === 'location') {
+					draft.properties[propName] = []
+				} else if (propName === 'content') {
+					draft.properties[propName] = [{ [this.defaultctype]: '' }]
+				} else {
+					draft.properties[propName] = ['']
+				}
 				if ('x-micro-panel-deleted-properties' in draft) {
 					draft['x-micro-panel-deleted-properties'] = draft['x-micro-panel-deleted-properties'].filter(x => x !== propName)
 				}

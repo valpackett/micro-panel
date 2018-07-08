@@ -43,6 +43,38 @@ export function upload (endpoint, token, file, onProgress) {
 	})
 }
 
+export async function geolocate () {
+	const pos = await new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject))
+	return {
+		'type': ['h-geo'],
+		properties: {
+			latitude: [pos.coords.latitude.toString()],
+			longitude: [pos.coords.longitude.toString()],
+		}
+	}
+}
+
+export async function reverseGeocode ({ latitude, longitude }) {
+	const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(latitude[0])}&lon=${encodeURIComponent(longitude[0])}`)
+	const { address } = await resp.json()
+	const result = {
+		latitude, longitude,
+		'street-address': [address.road],
+		'extended-address': [address.suburb],
+		locality: [address.hamlet || address.village || address.town || address.city],
+		region: [(address.county && address.state) ? (address.county + ', ' + address.state) : (address.state || address.county)],
+		'postal-code': [address.postcode],
+		'country-name': [address.country],
+		'country-code': [address.country_code && address.country_code.toUpperCase()],
+	}
+	for (const k of Object.keys(result)) {
+		if (!result[k][0]) {
+			delete result[k]
+		}
+	}
+	return result
+}
+
 export const sharedStyles = html`
 	<style>
 		:host {
@@ -188,6 +220,10 @@ export const icons = {
 	/* by Austin Andrews @Templarian | OFL licensed: */
 	json: svg`
 		<path fill="currentColor" d="M5,3H7V5H5V10A2,2 0 0,1 3,12A2,2 0 0,1 5,14V19H7V21H5C3.93,20.73 3,20.1 3,19V15A2,2 0 0,0 1,13H0V11H1A2,2 0 0,0 3,9V5A2,2 0 0,1 5,3M19,3A2,2 0 0,1 21,5V9A2,2 0 0,0 23,11H24V13H23A2,2 0 0,0 21,15V19A2,2 0 0,1 19,21H17V19H19V14A2,2 0 0,1 21,12A2,2 0 0,1 19,10V5H17V3H19M12,15A1,1 0 0,1 13,16A1,1 0 0,1 12,17A1,1 0 0,1 11,16A1,1 0 0,1 12,15M8,15A1,1 0 0,1 9,16A1,1 0 0,1 8,17A1,1 0 0,1 7,16A1,1 0 0,1 8,15M16,15A1,1 0 0,1 17,16A1,1 0 0,1 16,17A1,1 0 0,1 15,16A1,1 0 0,1 16,15Z" />
+	`,
+	/* by Cody @XT3000 | OFL licensed: */
+	mapMarkerPlus: svg`
+		<path fill="currentColor" d="M9,11.5A2.5,2.5 0 0,0 11.5,9A2.5,2.5 0 0,0 9,6.5A2.5,2.5 0 0,0 6.5,9A2.5,2.5 0 0,0 9,11.5M9,2C12.86,2 16,5.13 16,9C16,14.25 9,22 9,22C9,22 2,14.25 2,9A7,7 0 0,1 9,2M15,17H18V14H20V17H23V19H20V22H18V19H15V17Z" />
 	`,
 }
 
