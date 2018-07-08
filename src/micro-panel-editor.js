@@ -95,7 +95,7 @@ export default class MicroPanelEditor extends LitElement {
 
 			<micro-panel-editor-entry id="root-editor" class="root-editor"
 				media=${media} mediatoken=${mediatoken} cats=${cats} defaultctype=${defaultctype}
-				entry=${entry}
+				entry=${entry} entryIsNew=${entryIsNew}
 				setEntry=${entry => {
 					this.entry = entry
 					this.entryIsModified = true
