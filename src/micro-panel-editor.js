@@ -190,7 +190,7 @@ export default class MicroPanelEditor extends LitElement {
 		}
 		this.entryIsModified = false
 		this.close()
-		location.href = resp.headers.get('Location')
+		location.href = resp.headers.has('Location') ? resp.headers.get('Location') : this.entry.properties.url[0]
 	}
 
 }
