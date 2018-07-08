@@ -4,6 +4,11 @@ export function mpe () {
 	return document.querySelector('micro-panel-editor')
 }
 
+export function reportError (e) {
+	console.error(e)
+	alert(e.toString())
+}
+
 export function upload (endpoint, token, file, onProgress) {
 	return new Promise((resolve, reject) => {
 		const xhr = new XMLHttpRequest()
