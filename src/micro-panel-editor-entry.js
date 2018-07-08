@@ -2,7 +2,7 @@ import 'codeflask-element'
 import 'prismjs/components/prism-markdown.min.js'
 import 'prismjs/components/prism-json.min.js'
 import { LitElement, html } from '@polymer/lit-element'
-import { upload, geolocate, reverseGeocode, sharedStyles, icons, iconCode } from './util.js'
+import { reportError, upload, geolocate, reverseGeocode, sharedStyles, icons, iconCode } from './util.js'
 import produce from 'immer'
 
 export default class MicroPanelEditorEntry extends LitElement {
@@ -165,7 +165,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 							<button on-click=${_ =>
 								geolocate()
 									.then(loc => this._modify(entry, draft => draft.properties[propname].push(loc)))
-									.catch(e => alert(e.toString()))
+									.catch(reportError)
 							} title="Add geolocation" class="icon-button">${iconCode(icons.mapMarkerPlus)}</button>
 						` : ''}
 						${media && !openUploaders[propname] ? html`
@@ -205,7 +205,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 					this._modify(entry, draft => {
 						draft.type[0] = 'h-adr'
 						draft.properties = props
-					})).catch(e => alert(e.toString()))
+					})).catch(reportError)
 				}>Find street address via Nominatim</button>
 			</fieldset>
 		` : ''}
@@ -417,7 +417,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 									x[propname].splice(x[propname].findIndex(y => y.file === wrapper.file), 1)
 								})
 							} catch (e) {
-								alert(e)
+								reportError(e)
 							}
 						}
 					}}>Upload!</button>
