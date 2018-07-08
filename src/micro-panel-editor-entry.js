@@ -240,6 +240,13 @@ export default class MicroPanelEditorEntry extends LitElement {
 	}
 
 	_rowEditor (entry, propname, propval, idx, media, mediatoken, cats, defaultctype) {
+		if (propname === 'site-css' && typeof propval === 'string') {
+			return html`
+				<code-flask word-wrap language="css" value=${propval} on-value-changed=${e =>
+					this._modify(entry, draft => draft.properties[propname][idx] = e.target.value)
+				}></code-flask>
+			`
+		}
 		if (typeof propval === 'string') {
 			return html`
 				<input type="text" value=${propval} on-change=${e =>
