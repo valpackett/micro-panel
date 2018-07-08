@@ -38,9 +38,13 @@ export default class MicroPanelEditor extends LitElement {
 
 	constructor () {
 		super()
-		this.cats = []
+		// Use Set to prevent duplicates. Set does keep insertion order!
+		this.cats = new Set()
 		for (const el of document.querySelectorAll('[data-mf-category]')) {
-			this.cats.push(el.dataset.mfCategory)
+			const catname = el.dataset.mfCategory.trim()
+			if (catname.length > 0) {
+				this.cats.add(catname)
+			}
 		}
 	}
 
