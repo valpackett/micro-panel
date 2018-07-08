@@ -5,6 +5,8 @@ function matchingKey (action) {
 		case 'like': return 'like-of'
 		case 'repost': return 'repost-of'
 		case 'bookmark': return 'bookmark-of'
+		case 'quotation': return 'quotation-of'
+		case 'tag': return 'tag-of'
 		default: return 'in-reply-to'
 	}
 }

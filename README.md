@@ -179,6 +179,8 @@ This can be used to [set up indie-config](https://indieweb.org/indie-config#How_
       like: 'https://YOUR.DOMAIN/?mp-reaction=like-of&with={url}',
       repost: 'https://YOUR.DOMAIN/?mp-reaction=repost-of&with={url}',
       bookmark: 'https://YOUR.DOMAIN/?mp-reaction=bookmark-of&with={url}',
+      tag: 'https://YOUR.DOMAIN/?mp-reaction=tag-of&with={url}',
+      quotation: 'https://YOUR.DOMAIN/?mp-reaction=quotation-of&with={url}',
     }), '*');
   }
 }());
