@@ -28,8 +28,10 @@ export default class MicroPanelEditor extends LitElement {
 		return {
 			micropub: String, media: String, mediatoken: String,
 			defaultctype: String,
+			originalUrl: String,
 			entry: Object,
-			entryIsModified: Boolean, requestInFlight: Boolean,
+			entryIsNew: Boolean, entryIsModified: Boolean,
+			requestInFlight: Boolean,
 			cats: Array,
 		}
 	}
@@ -55,7 +57,7 @@ export default class MicroPanelEditor extends LitElement {
 		}
 	}
 
-	_render ({ micropub, media, mediatoken, entry, entryIsModified, cats }) {
+	_render ({ micropub, media, mediatoken, originalUrl, entry, entryIsNew, entryIsModified, cats }) {
 		return html`
 			${sharedStyles}
 			<style>
@@ -81,7 +83,10 @@ export default class MicroPanelEditor extends LitElement {
 			<header class="bar header-bar inverted">
 				<button on-click=${_ => this.close()} class="icon-button">${iconCode(icons.close)}</button>
 				<slot name="title"><h1>micro-panel editor</h1></slot>
-				${this.entryIsNew ? html`
+				${originalUrl ? html`
+					<button on-click=${_ => this.deleteEntry()}>Delete</button>
+				` : ''}
+				${entryIsNew ? html`
 					<button on-click=${_ => this.createEntry()} disabled?=${!entryIsModified}>Create</button>
 				` : html`
 					<button on-click=${_ => this.updateEntry()} disabled?=${!entryIsModified}>Save</button>
@@ -168,10 +173,23 @@ export default class MicroPanelEditor extends LitElement {
 			return alert('Somehow, an entry with no URL! I have no idea how to save that.')
 		}
 		this._post({
-			'action': 'update',
+			action: 'update',
 			url,
 			replace: this.entry.properties,
 			'delete': this.entry['x-micro-panel-deleted-properties'] || [],
+		})
+	}
+
+	deleteEntry () {
+		if (!this.originalUrl) {
+			return alert('Somehow, an entry with no URL! I have no idea how to delete that.')
+		}
+		if (!confirm('Delete this entry?')) {
+			return
+		}
+		this._post({
+			action: 'delete',
+			url: this.originalUrl
 		})
 	}
 
