@@ -57,7 +57,7 @@ export default class MicroPanelEditor extends LitElement {
 		}
 	}
 
-	_render ({ micropub, media, mediatoken, originalUrl, entry, entryIsNew, entryIsModified, cats }) {
+	_render ({ micropub, media, mediatoken, defaultctype, originalUrl, entry, entryIsNew, entryIsModified, cats }) {
 		return html`
 			${sharedStyles}
 			<style>
@@ -94,7 +94,7 @@ export default class MicroPanelEditor extends LitElement {
 			</header>
 
 			<micro-panel-editor-entry id="root-editor" class="root-editor"
-				media=${media} mediatoken=${mediatoken} cats=${cats}
+				media=${media} mediatoken=${mediatoken} cats=${cats} defaultctype=${defaultctype}
 				entry=${entry}
 				setEntry=${entry => {
 					this.entry = entry
@@ -141,7 +141,12 @@ export default class MicroPanelEditor extends LitElement {
 		this.show()
 	}
 
-	newEntry (properties = { name: [], content: [{[this.defaultctype || 'html']: ''}], category: [], photo: [] }) {
+	newEntry (properties = { name: [],
+		content: [{ [this.defaultctype || 'html']: '' }],
+		category: [],
+		photo: [],
+		location: [],
+	}) {
 		this.entry = {
 			type: ['h-entry'],
 			properties,
