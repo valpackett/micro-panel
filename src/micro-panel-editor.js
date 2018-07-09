@@ -133,6 +133,11 @@ export default class MicroPanelEditor extends LitElement {
 		if (!this.entry.properties) {
 			this.entry.properties = {}
 		}
+		for (const k of Object.keys(this.entry.properties)) {
+			if (!this.entry.properties[k]) {
+				this.entry.properties[k] = []
+			}
+		}
 		if (!this.entry.properties.url) {
 			this.entry.properties.url = []
 		}
