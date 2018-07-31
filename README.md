@@ -71,7 +71,7 @@ Beginning, end, doesn't matter -- it's a full screen overlay.
 Don't forget to provide your Micropub endpoint's URL!
 There's no smart detection, it doesn't look up in various links for simplicity reasons.
 
-The `micro-panel-toolbar` is what provides the New post button.
+The `micro-panel-toolbar` is what provides the Edit/New post buttons.
 It's a normal block element.
 You can write custom styles to make it `position:sticky` or whatever.
 
@@ -118,6 +118,8 @@ If your endpoint supports a more convenient markup language such as Markdown, yo
 ```
 
 ### Posts
+
+The toolbar has an Edit button for the current page, but you can also add a button for quickly editing a particular post in a list (feed) of posts.
 
 In the post template, add a button or link wrapped in a `micro-panel-action`.
 The `with` attribute of the element will be used, without modification, for the `?q=source` Micropub request.
