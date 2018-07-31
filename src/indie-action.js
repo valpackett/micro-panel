@@ -14,8 +14,11 @@ function matchingKey (action) {
 export default class IndieAction extends HTMLElement {
 	connectedCallback () {
 		for (const el of this.querySelectorAll('a, button')) {
-			el.addEventListener('click', e => mpe().newReaction(
-				matchingKey(this.getAttribute('do')), this.getAttribute('with')))
+			el.addEventListener('click', e => {
+				e.preventDefault()
+				e.stopPropagation()
+				mpe().newReaction(matchingKey(this.getAttribute('do')), this.getAttribute('with'))
+			})
 		}
 	}
 }
