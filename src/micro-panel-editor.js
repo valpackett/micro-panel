@@ -172,6 +172,7 @@ export default class MicroPanelEditor extends LitElement {
 			content: [{ [this.defaultctype]: content || '' }],
 			photo: [],
 		})
+		this.entryIsModified = true
 	}
 
 	createEntry () {
