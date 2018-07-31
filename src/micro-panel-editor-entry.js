@@ -203,7 +203,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 					${hiddenProps[propname] ? ''
 						: openJsonEditors[propname] ? this._jsonEditor(entry, propname, jsonParseError)
 						: (entry.properties[propname] && entry.properties[propname].map((propval, idx) => html`
-						<div class="input-row">
+						<div class="input-row input-row-labeled">
 							${this._rowEditor(entry, propname, propval, idx, media, mediatoken, cats, defaultctype)}
 							<button on-click=${_ =>
 								this._modify(entry, draft => draft.properties[propname].splice(idx, 1))
@@ -284,6 +284,13 @@ export default class MicroPanelEditorEntry extends LitElement {
 		}
 		if (typeof propval !== 'object') {
 			return html`<div class="error-value">Item of unsupported type ${typeof propval}</div>`
+		}
+		if (propname === 'subscriptions') {
+			return html`
+				Feed&nbsp;<input type="url" value=${propval.feed} on-value-changed=${e =>
+					this._modify(entry, draft => draft.properties[propname][idx].feed = e.target.value)
+				}>&nbsp;entries: ${(propval.entries || []).length}
+			`
 		}
 		if ('type' in propval) {
 			return html`
