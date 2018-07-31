@@ -15,7 +15,8 @@ export default class MicroPanelToolbar extends LitElement {
 
 			<header class="bar header-bar inverted">
 				<slot name="title"><h1>micro-panel</h1></slot>
-				<button on-click=${_ => mpe().newEntry()}>${iconCode(icons.leadPencil)} New post</button>
+				<button on-click=${_ => mpe().editEntry(location.href)}>${iconCode(icons.leadPencil)} Edit</button>
+				<button on-click=${_ => mpe().newEntry()}>${iconCode(icons.plus)} New</button>
 			</header>
 		`
 	}
