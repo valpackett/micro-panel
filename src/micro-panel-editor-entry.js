@@ -23,7 +23,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 		this.hiddenProps = {}
 		this.openUploaders = { photo: true, video: true, audio: true }
 		this.uploadQueues = { photo: [], video: [], audio: [] }
-		this.openJsonEditors = {}
+		this.openJsonEditors = { filter: true, unfilter: true, 'feed-settings': true, 'site-settings': true, 'site-web-push-subscriptions': true, }
 		this.jsonParseError = {}
 	}
 
