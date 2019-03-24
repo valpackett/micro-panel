@@ -1,18 +1,22 @@
-import { LitElement, html } from 'lit-element'
+import { LitElement, html, css } from 'lit-element'
 import { mpe, sharedStyles, icons, iconCode } from './util.js'
 
 export default class MicroPanelToolbar extends LitElement {
 	static get properties () { return { } }
 
-	render () {
-		return html`
-			${sharedStyles}
-			<style>
+	static get styles() {
+		return [
+			sharedStyles,
+			css`
 				:host {
 					display: block;
 				}
-			</style>
+			`
+		]
+	}
 
+	render () {
+		return html`
 			<header class="bar header-bar inverted">
 				<slot name="title"><h1>micro-panel</h1></slot>
 				<button @click=${_ => mpe().editEntry(location.href)}>${iconCode(icons.leadPencil)} Edit</button>
