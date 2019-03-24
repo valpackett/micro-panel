@@ -1,4 +1,4 @@
-import { html, svg } from '@polymer/lit-element'
+import { html, svg } from 'lit-element'
 
 export function mpe () {
 	return document.querySelector('micro-panel-editor')
@@ -233,7 +233,7 @@ export const icons = {
 }
 
 export function iconCode (icon, title = null) {
-	return html`<svg class="icon" width="24" height="24" viewBox="0 0 24 24" role="img" aria-hidden?=${title} title$=${title || ''}>
+	return html`<svg class="icon" width="24" height="24" viewBox="0 0 24 24" role="img" ?aria-hidden=${title} title=${title || ''}>
 		${icon}
 		${title ? html`<title>${title}</title>` : ''}
 	</svg>`

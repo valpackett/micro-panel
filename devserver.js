@@ -113,4 +113,3 @@ Look, the post source is **different**! This is a *demo*, so the micropub endpoi
 		setTimeout(() => req.pipe(bb), 500) // simulate processing time
 	})
 	.listen(3003)
-	.then(_ => console.log('Running on localhost:3003'))
