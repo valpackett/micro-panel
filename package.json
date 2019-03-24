@@ -26,18 +26,18 @@
   },
   "homepage": "https://github.com/myfreeweb/micro-panel#readme",
   "devDependencies": {
-    "@webcomponents/webcomponentsjs": "^2.0.3",
-    "busboy": "^0.2.14",
+    "@webcomponents/webcomponentsjs": "^2.2.7",
+    "busboy": "^0.3.0",
     "es-module-devserver": "^0.1.2",
-    "polka": "^0.4.0",
-    "rollup": "^0.63.4",
-    "rollup-plugin-license": "^0.7.0",
+    "polka": "^0.5.2",
+    "rollup": "^1.7.0",
+    "rollup-plugin-license": "^0.8.1",
     "rollup-plugin-minify-es": "^1.1.1",
-    "rollup-plugin-node-resolve": "^3.3.0"
+    "rollup-plugin-node-resolve": "^4.0.1"
   },
   "dependencies": {
-    "@polymer/lit-element": "^0.5.2",
     "codeflask-element": "^1.0.2",
-    "immer": "^1.5.0"
+    "immer": "^2.1.4",
+    "lit-element": "^2.1.0"
   }
 }

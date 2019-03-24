@@ -1,5 +1,5 @@
 import './micro-panel-editor-entry.js'
-import { LitElement, html } from '@polymer/lit-element'
+import { LitElement, html } from 'lit-element'
 import { sharedStyles, icons, iconCode } from './util.js'
 
 function micropubGet(endpoint, qs) {
@@ -26,13 +26,13 @@ function micropubPost(endpoint, obj) {
 export default class MicroPanelEditor extends LitElement {
 	static get properties () {
 		return {
-			micropub: String, media: String, mediatoken: String,
-			defaultctype: String,
-			originalUrl: String,
-			entry: Object,
-			entryIsNew: Boolean, entryIsModified: Boolean,
-			requestInFlight: Boolean,
-			cats: Array,
+			micropub: { type: String }, media: { type: String }, mediatoken: { type: String },
+			defaultctype: { type: String },
+			originalUrl: { type: String },
+			entry: { type: Object },
+			entryIsNew: { type: Boolean }, entryIsModified: { type: Boolean },
+			requestInFlight: { type: Boolean },
+			cats: { type: Array },
 		}
 	}
 
@@ -61,7 +61,8 @@ export default class MicroPanelEditor extends LitElement {
 		}
 	}
 
-	_render ({ micropub, media, mediatoken, defaultctype, originalUrl, entry, entryIsNew, entryIsModified, cats }) {
+	render () {
+		const { micropub, media, mediatoken, defaultctype, originalUrl, entry, entryIsNew, entryIsModified, cats } = this
 		return html`
 			${sharedStyles}
 			<style>
@@ -85,22 +86,22 @@ export default class MicroPanelEditor extends LitElement {
 			</style>
 
 			<header class="bar header-bar inverted">
-				<button on-click=${_ => this.close()} class="icon-button">${iconCode(icons.close)}</button>
+				<button @click=${_ => this.close()} class="icon-button">${iconCode(icons.close)}</button>
 				<slot name="title"><h1>micro-panel editor</h1></slot>
 				${originalUrl ? html`
-					<button on-click=${_ => this.deleteEntry()}>Delete</button>
+					<button @click=${_ => this.deleteEntry()}>Delete</button>
 				` : ''}
 				${entryIsNew ? html`
-					<button on-click=${_ => this.createEntry()} disabled?=${!entryIsModified}>Create</button>
+					<button @click=${_ => this.createEntry()} ?disabled=${!entryIsModified}>Create</button>
 				` : html`
-					<button on-click=${_ => this.updateEntry()} disabled?=${!entryIsModified}>Save</button>
+					<button @click=${_ => this.updateEntry()} ?disabled=${!entryIsModified}>Save</button>
 				`}
 			</header>
 
 			<micro-panel-editor-entry id="root-editor" class="root-editor"
-				media=${media} mediatoken=${mediatoken} cats=${cats} defaultctype=${defaultctype}
-				entry=${entry} entryIsNew=${entryIsNew}
-				setEntry=${entry => {
+				.media=${media} .mediatoken=${mediatoken} .cats=${cats} .defaultctype=${defaultctype}
+				.entry=${entry} .entryIsNew=${entryIsNew}
+				.setEntry=${entry => {
 					this.entry = entry
 					this.entryIsModified = true
 				}}></micro-panel-editor-entry>

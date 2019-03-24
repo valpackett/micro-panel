@@ -1,10 +1,10 @@
-import { LitElement, html } from '@polymer/lit-element'
+import { LitElement, html } from 'lit-element'
 import { mpe, sharedStyles, icons, iconCode } from './util.js'
 
 export default class MicroPanelToolbar extends LitElement {
 	static get properties () { return { } }
 
-	_render ({micropub}) {
+	render () {
 		return html`
 			${sharedStyles}
 			<style>
@@ -15,8 +15,8 @@ export default class MicroPanelToolbar extends LitElement {
 
 			<header class="bar header-bar inverted">
 				<slot name="title"><h1>micro-panel</h1></slot>
-				<button on-click=${_ => mpe().editEntry(location.href)}>${iconCode(icons.leadPencil)} Edit</button>
-				<button on-click=${_ => mpe().newEntry()}>${iconCode(icons.plus)} New</button>
+				<button @click=${_ => mpe().editEntry(location.href)}>${iconCode(icons.leadPencil)} Edit</button>
+				<button @click=${_ => mpe().newEntry()}>${iconCode(icons.plus)} New</button>
 			</header>
 		`
 	}
