@@ -1,4 +1,4 @@
-import { html, svg } from 'lit-element'
+import { html, css, svg } from 'lit-element'
 
 export function mpe () {
 	return document.querySelector('micro-panel-editor')
@@ -80,8 +80,7 @@ export async function reverseGeocode ({ latitude, longitude }) {
 	return result
 }
 
-export const sharedStyles = html`
-	<style>
+export const sharedStyles = css`
 		:host {
 			line-height: 1.15;
 			-webkit-text-size-adjust: 100%;
@@ -195,7 +194,6 @@ export const sharedStyles = html`
 		.bar button {
 			font-size: 1rem;
 		}
-	</style>
 `
 
 /* https://materialdesignicons.com */

@@ -1,5 +1,5 @@
 import './micro-panel-editor-entry.js'
-import { LitElement, html } from 'lit-element'
+import { LitElement, html, css } from 'lit-element'
 import { sharedStyles, icons, iconCode } from './util.js'
 
 function micropubGet(endpoint, qs) {
@@ -61,11 +61,10 @@ export default class MicroPanelEditor extends LitElement {
 		}
 	}
 
-	render () {
-		const { micropub, media, mediatoken, defaultctype, originalUrl, entry, entryIsNew, entryIsModified, cats } = this
-		return html`
-			${sharedStyles}
-			<style>
+	static get styles() {
+		return [
+			sharedStyles,
+			css`
 				:host {
 					display: flex;
 					flex-direction: column;
@@ -83,8 +82,13 @@ export default class MicroPanelEditor extends LitElement {
 					-webkit-overflow-scrolling: touch;
 					padding: var(--major-padding);
 				}
-			</style>
+			`
+		]
+	}
 
+	render () {
+		const { micropub, media, mediatoken, defaultctype, originalUrl, entry, entryIsNew, entryIsModified, cats } = this
+		return html`
 			<header class="bar header-bar inverted">
 				<button @click=${_ => this.close()} class="icon-button">${iconCode(icons.close)}</button>
 				<slot name="title"><h1>micro-panel editor</h1></slot>

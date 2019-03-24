@@ -1,7 +1,7 @@
 import 'codeflask-element'
 import 'prismjs/components/prism-markdown.min.js'
 import 'prismjs/components/prism-json.min.js'
-import { LitElement, html } from 'lit-element'
+import { LitElement, html, css } from 'lit-element'
 import { reportError, upload, geolocate, reverseGeocode, sharedStyles, icons, iconCode } from './util.js'
 import produce from 'immer'
 
@@ -27,14 +27,10 @@ export default class MicroPanelEditorEntry extends LitElement {
 		this.jsonParseError = {}
 	}
 
-	render () {
-		const {
-			defaultctype, entry, entryIsNew, hiddenProps, openUploaders, uploadQueues,
-			openJsonEditors, jsonParseError, media, mediatoken, cats
-		} = this
-		return html`
-			${sharedStyles}
-			<style>
+	static get styles() {
+		return [
+			sharedStyles,
+			css`
 				:host { display: block; }
 				fieldset {
 					border: 0;
@@ -140,8 +136,16 @@ export default class MicroPanelEditorEntry extends LitElement {
 				@media screen and (min-width: 700px) {
 					:host(.root-editor) fieldset { width: 70%; }
 				}
-			</style>
+			`
+		];
+	}
 
+	render () {
+		const {
+			defaultctype, entry, entryIsNew, hiddenProps, openUploaders, uploadQueues,
+			openJsonEditors, jsonParseError, media, mediatoken, cats
+		} = this
+		return html`
 			${(entry && entry.type) ? html`
 				<fieldset>
 					${entry.type.map((tval, idx) => html`
