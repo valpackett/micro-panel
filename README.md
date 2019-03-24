@@ -61,8 +61,7 @@ If you want to try to support browsers without native [Custom Elements](https://
 ```
 
 But hey, it's an admin application, not a public application, so you only have to care about browsers *you* use.
-If all your Firefoxes are Nightly, you're fine without polyfills.
-(Actually, you might try enabling `about:config` flags on stable Firefox, that might work.)
+And Firefox stable supports everything already.
 
 ### Editor and toolbar
 
