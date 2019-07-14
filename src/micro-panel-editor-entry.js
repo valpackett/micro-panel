@@ -237,31 +237,6 @@ export default class MicroPanelEditorEntry extends LitElement {
 			</fieldset>
 		` : ''}
 
-		${(entry && entry.acl) ? html`
-			<fieldset>
-				<header class="bar">
-					<label>Access Control List</label>
-					<button @click=${_ =>
-						this._modify(entry, draft => draft.acl.push(''))
-					} title="Add new ACL entry" class="icon-button">${iconCode(icons.plus)}</button>
-				</header>
-				${entry.acl.map((tval, idx) => html`
-					<div class="input-row">
-						<input type="text" .value=${tval} @change=${e =>
-							this._modify(entry, draft => draft.acl[idx] = e.target.value)
-						}>
-						<button @click=${_ =>
-							this._modify(entry, draft => draft.acl.splice(idx, 1))
-						} title="Delete this ACL entry" class="icon-button">${iconCode(icons.minus)}</button>
-					</div>
-				`)}
-			</fieldset>
-		` : html`
-			<fieldset class="input-row">
-				<button @click=${_ => this._modify(entry, draft => draft.acl = ['*'])}>Add Access Control List</button>
-			</fieldset>
-		`}
-
 		<fieldset class="input-row">
 			<input type="text" placeholder="Add property..." id="new-prop-inp" @keydown=${e => this.addNewProp(e, entry)}/>
 			<button @click=${e => this.addNewProp(e, entry)} class="icon-button">${iconCode(icons.plus)}</button>
