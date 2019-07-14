@@ -11,14 +11,17 @@ function micropubGet(endpoint, qs) {
 	})
 }
 
-function micropubPost(endpoint, obj) {
+function micropubPost(endpoint, obj, csrf_key, csrf_val) {
+	const headers = {
+		'Accept': 'application/json',
+		'Content-Type': 'application/json',
+	}
+	if (csrf_key && csrf_val)
+		headers[csrf_key] = csrf_val
 	return fetch(endpoint, {
 		method: 'post',
 		credentials: 'include',
-		headers: {
-			'Accept': 'application/json',
-			'Content-Type': 'application/json',
-		},
+		headers,
 		body: JSON.stringify(obj),
 	})
 }
@@ -219,7 +222,7 @@ export default class MicroPanelEditor extends LitElement {
 		this.requestInFlight = true
 		let resp
 		try {
-			resp = await micropubPost(this.micropub, data)
+			resp = await micropubPost(this.micropub, data, this.getAttribute('csrfheader'), this.getAttribute('csrftoken'))
 		} catch (e) {
 			alert(`Couldn't save the entry! Got error: ${e}`)
 			return

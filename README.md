@@ -76,7 +76,7 @@ You can write custom styles to make it `position:sticky` or whatever.
 
 ```html
 <body>
-	<micro-panel-editor hidden micropub="/your/micropub/endpoint"></micro-panel-editor>
+	<micro-panel-editor hidden micropub="/your/micropub/endpoint" csrfheader="x-csrf-token" csrftoken="1A2B..random"></micro-panel-editor>
 	<micro-panel-toolbar></micro-panel-toolbar>
 	...
 ```
