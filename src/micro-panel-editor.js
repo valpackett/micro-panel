@@ -187,7 +187,6 @@ export default class MicroPanelEditor extends LitElement {
 		this._post({
 			type: this.entry.type,
 			properties: this.entry.properties,
-			acl: this.entry.acl,
 		})
 	}
 
@@ -201,7 +200,6 @@ export default class MicroPanelEditor extends LitElement {
 			url,
 			replace: this.entry.properties,
 			'delete': this.entry['x-micro-panel-deleted-properties'] || [],
-			acl: this.entry.acl,
 		})
 	}
 
