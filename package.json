@@ -36,6 +36,7 @@
     "rollup-plugin-node-resolve": "^5.2.0"
   },
   "dependencies": {
+    "@wessberg/color": "^1.0.5",
     "codeflask-element": "^1.0.3",
     "immer": "^5.0.1",
     "lit-element": "^2.2.1"
