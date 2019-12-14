@@ -1,6 +1,7 @@
 import 'codeflask-element'
 import 'prismjs/components/prism-markdown.min.js'
 import 'prismjs/components/prism-json.min.js'
+import { rgbToHex, rgbTupleToRgb, hexToRgbTuple } from '@wessberg/color'
 import { LitElement, html, css } from 'lit-element'
 import { reportError, upload, geolocate, reverseGeocode, sharedStyles, icons, iconCode } from './util.js'
 import produce from 'immer'
@@ -299,40 +300,34 @@ export default class MicroPanelEditorEntry extends LitElement {
 			return html`
 				<div class="media-editor">
 					${(propval.width || propval.height) ? html`
-						<div class="input-row">[${propval.width}x${propval.height}]</div>` : ''}
-					<div class="input-row">
+						<div class="input-row">
+							<img src=${propval.tiny_preview} alt="" />
+							[${propval.width}x${propval.height}]
+						</div>` : ''}
 					${propval.source.map(src => html`
-						<figure>
-							${src.type && src.type.startsWith('image') ? html`
-								<img src=${src.src} alt=""/>
-							` : ''}
-							${src.type && src.type.startsWith('audio') ? html`
-								<audio src=${src.src} controls></audio>
-							` : ''}
-							${src.type && src.type.startsWith('video') ? html`
-								<video src=${src.src} controls></video>
-							` : ''}
-							<figcaption>
-								<a href=${src.src}>${src.type}</a>
-							</figcaption>
-						</figure>
+						<div class="input-row">
+							Source&nbsp;<code>${src.type}</code>&nbsp;${src.original ? 'original' : ''}
+							${src.src ? html`&nbsp;<a href=${src.src}>&lt;src&gt</a>` : ''}
+							${src.srcset ? src.srcset.map(setitem => html`&nbsp;<a href=${setitem.src}>&lt;width ${setitem.width}&gt</a>`) : ''}
+						</div>
 					`)}
-					</div>
 					${propval.palette ? html`
 						<div class="input-row input-row-labeled palette-row">
 							Palette
-							${Object.keys(propval.palette).map(clr => html`
+							${propval.palette.map((clr, i) => html`
 								<label class="palette-color">
-									<input type="color" value=${propval.palette[clr].color} @change=${e =>
-										this._modify(entry, draft => draft.properties[propname][idx].palette[clr].color = e.target.value)
+									<input type="color" value=${rgbToHex(rgbTupleToRgb([clr.r || 0, clr.g || 0, clr.b || 0]))} @change=${e =>
+										this._modify(entry, draft => {
+											const [r, g, b] = hexToRgbTuple(e.target.value)
+											draft.properties[propname][idx].palette[i] = {r, g, b}
+										})
 									}/>
-									${clr} (${propval.palette[clr].population})
 								</label>
 							`)}
 						</div>` : ''}
 					<label class="input-row input-row-labeled">
 						Alt text&nbsp;
-						<input type="text" value=${propval.alt} @change=${e =>
+						<input type="text" value=${propval.alt || ''} @change=${e =>
 							this._modify(entry, draft => draft.properties[propname][idx].alt = e.target.value)
 						}/>
 					</label>
@@ -340,11 +335,11 @@ export default class MicroPanelEditorEntry extends LitElement {
 						<label for=${`id-${propval}`}>
 							ID&nbsp;
 						</label>
-						<input type="text" id=${`id-${propval}`} value=${propval.id} @change=${e =>
+						<input type="text" id=${`id-${propval}`} value=${propval.id || ''} @change=${e =>
 							this._modify(entry, draft => draft.properties[propname][idx].id = e.target.value)
 						}/>&nbsp;
 						<code @click=${e => window.getSelection().selectAllChildren(e.target)}>
-							&lt;${propname}-here id="${propval.id}"&gt;&lt;/${propname}-here&gt;
+							&lt;${propname}-here id="${propval.id || ''}"&gt;&lt;/${propname}-here&gt;
 						</code>
 					</label>
 				</div>
