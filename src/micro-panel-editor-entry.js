@@ -87,6 +87,9 @@ export default class MicroPanelEditorEntry extends LitElement {
 				.input-row-labeled {
 					align-items: baseline;
 				}
+				.input-row-photo-stuff input {
+					width: 5em;
+				}
 				textarea, code-flask {
 					resize: vertical;
 					min-height: 200px;
@@ -139,7 +142,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 					flex-wrap: wrap;
 					line-height: 1.9;
 				}
-				.palette-color {
+				.palette-color, .input-row-photo-stuff label {
 					border-right: 1px solid #999;
 					padding-right: 0.5rem;
 					margin-right: 0.5rem;
@@ -147,7 +150,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 				.palette-color:first-of-type {
 					margin-left: 0.5rem;
 				}
-				.palette-color:last-of-type {
+				.palette-color:last-of-type, .input-row-photo-stuff label:last-of-type {
 					border-right: 0;
 				}
 
@@ -342,6 +345,30 @@ export default class MicroPanelEditorEntry extends LitElement {
 								</label>
 							`)}
 						</div>` : ''}
+					<div class="input-row input-row-labeled input-row-photo-stuff">
+						<label>
+							ƒ/<input type="number" min="0.0" step="0.01" value=${propval.aperture || null} @change=${e =>
+								this._modify(entry, draft => draft.properties[propname][idx].aperture = parseFloat(e.target.value))
+							}/>
+						</label>
+						<label>
+							Shutter <input type="number" min="0" step="1" value=${(propval.shutter_speed || [])[0] || null} @change=${e =>
+								this._modify(entry, draft => draft.properties[propname][idx].shutter_speed = [parseFloat(e.target.value), (draft.properties[propname][idx].shutter_speed || [])[1] || 1] )
+							}/>/<input type="number" min="0" step="1" value=${(propval.shutter_speed || [])[1] || null} @change=${e =>
+								this._modify(entry, draft => draft.properties[propname][idx].shutter_speed = [(draft.properties[propname][idx].shutter_speed || [])[0] || 1, parseFloat(e.target.value)] )
+							}/> s
+						</label>
+						<label>
+							ISO <input type="number" min="0" step="1" value=${propval.iso || null} @change=${e =>
+								this._modify(entry, draft => draft.properties[propname][idx].iso = parseInt(e.target.value))
+							}/>
+						</label>
+						<label>
+							Focal <input type="number" min="0" step="0.01" value=${propval.focal_length || null} @change=${e =>
+								this._modify(entry, draft => draft.properties[propname][idx].focal_length = parseFloat(e.target.value))
+							}/> mm
+						</label>
+					</div>
 					<label class="input-row input-row-labeled">
 						Alt text&nbsp;
 						<input type="text" value=${propval.alt || ''} @change=${e =>
