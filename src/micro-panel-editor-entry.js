@@ -74,6 +74,9 @@ export default class MicroPanelEditorEntry extends LitElement {
 				.input-row + .input-row {
 					padding-top: 0;
 				}
+				fieldset > .input-row:nth-of-type(even) {
+					background: #fafafa;
+				}
 				.input-row input, .input-row textarea, .input-row code-flask,
 				.input-row micro-panel-editor-entry, .input-row .media-editor, .input-row .error-value {
 					flex: 1;
