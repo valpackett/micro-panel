@@ -29,7 +29,7 @@ function micropubPost(endpoint, obj, csrf_key, csrf_val) {
 export default class MicroPanelEditor extends LitElement {
 	static get properties () {
 		return {
-			micropub: { type: String }, media: { type: String }, mediatoken: { type: String },
+			micropub: { type: String }, media: { type: String }, mediatoken: { type: String }, mediafirehose: { type: String },
 			defaultctype: { type: String },
 			originalUrl: { type: String },
 			entry: { type: Object },
@@ -90,7 +90,7 @@ export default class MicroPanelEditor extends LitElement {
 	}
 
 	render () {
-		const { micropub, media, mediatoken, defaultctype, originalUrl, entry, entryIsNew, entryIsModified, cats } = this
+		const { micropub, media, mediatoken, mediafirehose, defaultctype, originalUrl, entry, entryIsNew, entryIsModified, cats } = this
 		return html`
 			<header class="bar header-bar inverted">
 				<button @click=${_ => this.close()} class="icon-button">${iconCode(icons.close)}</button>
@@ -106,7 +106,7 @@ export default class MicroPanelEditor extends LitElement {
 			</header>
 
 			<micro-panel-editor-entry id="root-editor" class="root-editor"
-				.media=${media} .mediatoken=${mediatoken} .cats=${cats} .defaultctype=${defaultctype}
+				.media=${media} .mediatoken=${mediatoken} .mediafirehose=${mediafirehose} .cats=${cats} .defaultctype=${defaultctype}
 				.entry=${entry} .entryIsNew=${entryIsNew}
 				.setEntry=${entry => {
 					this.entry = entry

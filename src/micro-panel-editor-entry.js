@@ -14,7 +14,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 			hiddenProps: { type: Object },
 			openUploaders: { type: Object }, uploadQueues: { type: Object },
 			openJsonEditors: { type: Object }, jsonParseError: { type: Object },
-			media: /* endpoint */ { type: String }, mediatoken: { type: String },
+			media: /* endpoint */ { type: String }, mediatoken: { type: String }, mediafirehose: { type: String },
 			cats: /* suggestions */ { type: Array },
 		}
 	}
@@ -26,6 +26,23 @@ export default class MicroPanelEditorEntry extends LitElement {
 		this.uploadQueues = { photo: [], video: [], audio: [] }
 		this.openJsonEditors = { filter: true, unfilter: true, 'feed-settings': true, 'site-settings': true, 'site-web-push-subscriptions': true, }
 		this.jsonParseError = {}
+	}
+
+	connectedCallback () {
+		super.connectedCallback()
+		if (this.mediafirehose) {
+			this.mediaEventSrc = new EventSource(this.mediafirehose)
+			this.mediaEventSrc.addEventListener('message', e => {
+				if (e.data.length < 2) { return }
+				const { object, url } = JSON.parse(e.data)
+				this._modify(this.entry, draft => {
+					for (const propname of Object.keys(draft.properties)) {
+						draft.properties[propname] = draft.properties[propname].map(o =>
+							o == url ? object : o)
+					}
+				})
+			})
+		}
 	}
 
 	static get styles() {

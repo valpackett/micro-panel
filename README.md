@@ -104,8 +104,25 @@ Access-Control-Allow-Headers: Authorization
 
 If the endpoint is on the same domain, you don't have to care about any of this :)
 
-Also: if the endpoint returns a JSON body, it will be inserted verbatim.
-Sweetroll uses this for rich photo upload.
+##### Media Objects (metadata)
+
+If the endpoint returns a JSON body, it will be inserted verbatim.
+But that implies synchronous processing, which is too slow, especially for video.
+
+micro-panel also supports Server-Sent Events for asynchronously replacing plain URLs
+with objects that contain multiple sources, metadata, etc.:
+
+```html
+	<micro-panel-editor hidden micropub="/your/micropub/endpoint"
+	  media="/your/media/endpoint"
+	  mediafirehose="/your/media/firehose"></micro-panel-editor>
+```
+
+The SSE stream must stream JSON-encoded payloads that contain `url` and `object` keys
+(every property value equal to `url` will be replaced with the `object`.
+
+A nice editor will be displayed for object values of `photo`/`video`/`audio` properties,
+designed around the [imgroll](https://github.com/myfreeweb/imgroll) schema.
 
 #### Default Content Type
 
