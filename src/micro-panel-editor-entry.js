@@ -112,7 +112,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 					line-height: 2;
 				}
 
-				#upload-zone {
+				.upload-zone {
 					position: relative;
 					padding: 0.5rem;
 				}
@@ -416,7 +416,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 
 	_mediaUploader (entry, propname, media, mediatoken, uploadQueues) {
 		return html`
-			<div id="upload-zone"
+			<div class="upload-zone"
 				@dragenter=${e => {
 					e.stopPropagation()
 					e.preventDefault()
@@ -426,7 +426,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 					} else {
 						this.dragFirst = true
 						e.dataTransfer.dropEffect = 'copy'
-						this.shadowRoot.getElementById('upload-zone').classList.add('dragging')
+						e.target.classList.add('dragging')
 					}
 				}}
 				@dragover=${e => {
@@ -442,7 +442,8 @@ export default class MicroPanelEditorEntry extends LitElement {
 						this.dragFirst = false
 					}
 					if (!this.dragFirst && !this.dragSecond) {
-						this.shadowRoot.getElementById('upload-zone').classList.remove('dragging')
+						for (const zone of this.shadowRoot.querySelectorAll('.upload-zone'))
+							zone.classList.remove('dragging')
 					}
 				}}
 				@drop=${e => {
@@ -450,7 +451,8 @@ export default class MicroPanelEditorEntry extends LitElement {
 					e.preventDefault()
 					this.dragFirst = false
 					this.dragSecond = false
-					this.shadowRoot.getElementById('upload-zone').classList.remove('dragging')
+					for (const zone of this.shadowRoot.querySelectorAll('.upload-zone'))
+						zone.classList.remove('dragging')
 					this.uploadQueues = produce(uploadQueues, x => {
 						for (const file of e.dataTransfer.files) {
 							x[propname].push({ file })
