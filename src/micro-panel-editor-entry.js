@@ -1,6 +1,4 @@
-import 'codeflask-element'
-import 'prismjs/components/prism-markdown.min.js'
-import 'prismjs/components/prism-json.min.js'
+import './mp-code-mirror.js'
 import { rgbToHex, rgbTupleToRgb, hexToRgbTuple } from '@wessberg/color'
 import { LitElement, html, css } from 'lit'
 import { reportError, upload, geolocate, reverseGeocode, sharedStyles, icons, iconCode } from './util.js'
@@ -77,7 +75,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 				fieldset > .input-row:nth-of-type(even) {
 					background: #fafafa;
 				}
-				.input-row input, .input-row textarea, .input-row code-flask,
+				.input-row input, .input-row textarea, .input-row mp-code-mirror,
 				.input-row micro-panel-editor-entry, .input-row .media-editor, .input-row .error-value {
 					flex: 1;
 				}
@@ -93,7 +91,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 				.input-row-photo-stuff input {
 					width: 5em;
 				}
-				textarea, code-flask {
+				textarea {
 					resize: vertical;
 					min-height: 200px;
 				}
@@ -271,9 +269,9 @@ export default class MicroPanelEditorEntry extends LitElement {
 	_rowEditor (entry, propname, propval, idx, media, mediatoken, cats, defaultctype) {
 		if (propname === 'site-css' && typeof propval === 'string') {
 			return html`
-				<code-flask word-wrap language="css" .value=${propval} @value-changed=${e =>
-					this._modify(entry, draft => draft.properties[propname][idx] = e.target.value)
-				}></code-flask>
+				<mp-code-mirror lang="css" .value=${propval} .setValue=${v =>
+					this._modify(entry, draft => draft.properties[propname][idx] = v)
+				}></mp-code-mirror>
 			`
 		}
 		if (typeof propval === 'string') {
@@ -307,16 +305,16 @@ export default class MicroPanelEditorEntry extends LitElement {
 		}
 		if ('html' in propval) {
 			return html`
-				<code-flask word-wrap language="markup" .value=${propval.html} @value-changed=${e =>
-					this._modify(entry, draft => draft.properties[propname][idx].html = e.target.value)
-				}></code-flask>
+				<mp-code-mirror lang="html" .value=${propval.html} .setValue=${v =>
+					this._modify(entry, draft => draft.properties[propname][idx].html = v)
+				}></mp-code-mirror>
 			`
 		}
 		if ('markdown' in propval) {
 			return html`
-				<code-flask word-wrap language="markdown" .value=${propval.markdown} @value-changed=${e =>
-					this._modify(entry, draft => draft.properties[propname][idx].markdown = e.target.value)
-				}></code-flask>
+				<mp-code-mirror lang="markdown" .value=${propval.markdown} .setValue=${v =>
+					this._modify(entry, draft => draft.properties[propname][idx].markdown = v)
+				}></mp-code-mirror>
 			`
 		}
 		if ('source' in propval) {
@@ -394,16 +392,16 @@ export default class MicroPanelEditorEntry extends LitElement {
 
 	_jsonEditor (entry, propname, jsonParseError) {
 		return html`
-			<code-flask word-wrap language="json" .value=${JSON.stringify(entry.properties[propname], null, 2)} @value-changed=${e =>
+			<mp-code-mirror lang="json" .value=${JSON.stringify(entry.properties[propname], null, 2)} .setValue=${v =>
 				this._modify(entry, draft => {
 					try {
-						draft.properties[propname] = JSON.parse(e.target.value)
+						draft.properties[propname] = JSON.parse(v)
 						this.jsonParseError = produce(jsonParseError, pes => { pes[propname] = null })
 					} catch (e) {
 						this.jsonParseError = produce(jsonParseError, pes => { pes[propname] = e.toString() })
 					}
 				})
-			}></code-flask>
+			}></mp-code-mirror>
 			${jsonParseError[propname] ? html`<div class="json-error">
 				<p><strong>JSON parsing error!</strong> The changes are not saved when this error is present. Please fix the syntax in the editor above. The error is:</p>
 				<p><code>${jsonParseError[propname]}</code></p>
