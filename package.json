@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/myfreeweb/micro-panel.git"
+    "url": "git+https://github.com/unrelentingtech/micro-panel.git"
   },
   "keywords": [
     "micropub",
@@ -22,9 +22,9 @@
   "author": "Greg V <greg@unrelenting.technology>",
   "license": "Unlicense",
   "bugs": {
-    "url": "https://github.com/myfreeweb/micro-panel/issues"
+    "url": "https://github.com/unrelentingtech/micro-panel/issues"
   },
-  "homepage": "https://github.com/myfreeweb/micro-panel#readme",
+  "homepage": "https://github.com/unrelentingtech/micro-panel#readme",
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^13.0.4",
     "busboy": "^0.3.1",

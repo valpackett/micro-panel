@@ -1,16 +1,14 @@
-<img src="https://unrelentingtech.s3.dualstack.eu-west-1.amazonaws.com/micro-panel-splash.png" alt="" width="512"/>
+<img src="https://dl.unrelenting.technology/micro-panel-splash.png" alt="" width="512"/>
 
 # micro-panel
 
-micro-panel is a set of [Web Components] that provide an interface for editing [posts] on your website using the [Micropub] protocol from the [IndieWeb].
-
-(Actually, it doesn't have to be just posts! The [Sweetroll] engine gets away with using micro-panel as its one and only admin interface, because everything -- site configuration, categories, etc. -- is shoehorned into micropub-editable objects.)
+micro-panel is a set of [Web Components] made with [Lit] that provide an interface for editing [posts] on your website using the [Micropub] protocol from the [IndieWeb].
 
 [Web Components]: https://developers.google.com/web/fundamentals/web-components/
+[Lit]: https://lit.dev/
 [posts]: https://indieweb.org/posts
 [Micropub]: https://micropub.net/
 [IndieWeb]: https://indieweb.org/
-[Sweetroll]: https://github.com/myfreeweb/sweetroll
 
 ## Requirements
 
@@ -50,18 +48,7 @@ So if you use a "guest" implementation to allow others to easily react to your p
 [webactions]: https://indieweb.org/webactions
 [reader]: https://indieweb.org/reader
 [indie-config]: https://indieweb.org/indie-config
-[indieweb-components]: https://github.com/myfreeweb/indieweb-components
-
-If you want to try to support browsers without native [Custom Elements](https://caniuse.com/#feat=custom-elementsv1) & [Shadow DOM](https://caniuse.com/#feat=shadowdomv1), also load the [Web Components Polyfill](https://www.npmjs.com/package/@webcomponents/webcomponentsjs) loader (make sure you use `-loader.js`, DO NOT load the `-bundle.js` you don't want the whole 100kb of polyfills on browser that don't need them):
-
-```html
-<head>
-	...
-	<script src="/whatever/webcomponentsjs/webcomponents-loader.js"></script>
-```
-
-But hey, it's an admin application, not a public application, so you only have to care about browsers *you* use.
-And Firefox stable supports everything already.
+[indieweb-components]: https://github.com/unrelentingtech/indieweb-components
 
 ### Editor and toolbar
 
@@ -104,10 +91,88 @@ Access-Control-Allow-Headers: Authorization
 
 If the endpoint is on the same domain, you don't have to care about any of this :)
 
-##### Media Objects (metadata)
+#### Media Objects
 
-If the endpoint returns a JSON body, it will be inserted verbatim.
-But that implies synchronous processing, which is too slow, especially for video.
+micro-panel supports JSON objects for photos like this one:
+
+```json
+{
+  "aperture": 10,
+  "focal_length": 27,
+  "geo": null,
+  "height": 2916,
+  "iso": 100,
+  "palette": [
+    { "b": 106, "g": 89, "r": 58 },
+    { "b": 198, "g": 201, "r": 201 },
+    { "b": 140, "g": 143, "r": 146 },
+    { "b": 25, "g": 23, "r": 2 },
+    { "b": 41, "g": 47, "r": 52 },
+    { "b": 181, "g": 149, "r": 101 },
+    { "b": 191, "g": 183, "r": 159 },
+    { "b": 153, "g": 141, "r": 113 },
+    { "b": 128, "g": 140, "r": 172 }
+  ],
+  "shutter_speed": [ 1, 320 ],
+  "source": [
+    {
+      "original": false,
+      "srcset": [
+        {
+          "src": "https://dl.unrelenting.technology/4a0c45a0ed40_img-7081.3000.jpg",
+          "width": 3000
+        },
+        {
+          "src": "https://dl.unrelenting.technology/4a0c45a0ed40_img-7081.2000.jpg",
+          "width": 2000
+        },
+        {
+          "src": "https://dl.unrelenting.technology/4a0c45a0ed40_img-7081.1000.jpg",
+          "width": 1000
+        }
+      ],
+      "type": "image/jpeg"
+    },
+    {
+      "original": false,
+      "srcset": [
+        {
+          "src": "https://dl.unrelenting.technology/4a0c45a0ed40_img-7081.3000.webp",
+          "width": 3000
+        },
+        {
+          "src": "https://dl.unrelenting.technology/4a0c45a0ed40_img-7081.2000.webp",
+          "width": 2000
+        },
+        {
+          "src": "https://dl.unrelenting.technology/4a0c45a0ed40_img-7081.1000.webp",
+          "width": 1000
+        }
+      ],
+      "type": "image/webp"
+    },
+    {
+      "original": true,
+      "srcset": [
+        {
+          "src": "https://dl.unrelenting.technology/IMG-7081.jpg",
+          "width": 5184
+        }
+      ],
+      "type": "image/jpeg"
+    }
+  ],
+  "tiny_preview": "data:image/webp;base64,UklGRnAAAABXRUJQVlA4IGQAAAAwBACdASowABoAP93k6Gy/urEptVv8A/A7iWpn5FtTI0FdNumdDYJBregA/QjOCu+Vax2w/NNsn1WlEoWM/p71MMMgguqBQEtfbHi8eOBhwhKVvNAzA0Rvwyv7z3kaGgxQoYAA",
+  "width": 5184
+}
+```
+
+##### Server-Side Media Processing
+
+The above JSON can be generated on the server side, e.g. by [imgroll](https://github.com/unrelentingtech/imgroll).
+
+So, if the media endpoint returns a JSON body, it will be inserted verbatim.
+But that implies synchronous processing, which is slow.
 
 micro-panel also supports Server-Sent Events for asynchronously replacing plain URLs
 with objects that contain multiple sources, metadata, etc.:
@@ -120,9 +185,6 @@ with objects that contain multiple sources, metadata, etc.:
 
 The SSE stream must stream JSON-encoded payloads that contain `url` and `object` keys
 (every property value equal to `url` will be replaced with the `object`.
-
-A nice editor will be displayed for object values of `photo`/`video`/`audio` properties,
-designed around the [imgroll](https://github.com/myfreeweb/imgroll) schema.
 
 #### Default Content Type
 
@@ -217,7 +279,7 @@ Please feel free to submit pull requests!
 
 By participating in this project you agree to follow the [Contributor Code of Conduct](https://contributor-covenant.org/version/1/4/) and to release your contributions under the Unlicense.
 
-[The list of contributors is available on GitHub](https://github.com/myfreeweb/micro-panel/graphs/contributors).
+[The list of contributors is available on GitHub](https://github.com/unrelentingtech/micro-panel/graphs/contributors).
 
 ## License
 
