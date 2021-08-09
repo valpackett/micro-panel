@@ -1,4 +1,4 @@
-import { LitElement, html, css } from 'lit-element'
+import { LitElement, html, css } from 'lit'
 import { mpe, sharedStyles, icons, iconCode } from './util.js'
 
 export default class MicroPanelToolbar extends LitElement {

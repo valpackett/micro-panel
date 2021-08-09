@@ -1,4 +1,4 @@
-import { html, css, svg } from 'lit-element'
+import { html, css, svg } from 'lit'
 
 export function mpe () {
 	return document.querySelector('micro-panel-editor')
