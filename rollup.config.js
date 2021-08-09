@@ -8,7 +8,6 @@ export default {
 	output: [
 		{
 			format: 'iife',
-			name: 'codeflask_element',
 			file: 'dist/micro-panel-all.bundle.min.js',
 			sourcemap: true,
 		}
@@ -23,10 +22,7 @@ export default {
 		}),
 		license({
 			banner: `@license
-micro-panel | Unlicense.
-lit-element/lit-html (c) The Polymer Authors | BSD 3-Clause.
-CodeFlask (c) Claudio Holanda | MIT.
-Prism (c) Lea Verou | MIT.`
+micro-panel | Unlicense.`
 		}),
 	],
 	preserveEntrySignatures: 'strict',

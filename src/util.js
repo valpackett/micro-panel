@@ -91,13 +91,14 @@ export const sharedStyles = css`
 			--accent: var(--micro-panel-accent, rgb(0, 137, 123));
 			--accent-hover: var(--micro-panel-accent-hover, rgb(0, 107, 103));
 			--light-accent: var(--micro-panel-light-accent, rgba(0, 137, 123, 0.55));
+			--very-light-accent: var(--micro-panel-very-light-accent, rgba(0, 137, 123, 0.1));
 			--text: var(--micro-panel-text, #333);
 			color: var(--text);
 		}
 		:host([hidden]) { display: none !important; }
 		* { box-sizing: border-box; }
 
-		input, textarea, button {
+		input, textarea, button, .input-row mp-code-mirror {
 			text-transform: none;
 			border-radius: var(--roundness);
 			padding: 0.4rem;
@@ -105,6 +106,7 @@ export const sharedStyles = css`
 			border: 1px solid var(--accent);
 			vertical-align: baseline;
 		}
+		mp-code-mirror { display: block; padding: 0 !important; overflow: hidden; }
 		::-moz-focus-inner {
 			border-style: none;
 			padding: 0;
