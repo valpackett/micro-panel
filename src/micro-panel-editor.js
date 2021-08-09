@@ -1,5 +1,5 @@
 import './micro-panel-editor-entry.js'
-import { LitElement, html, css } from 'lit-element'
+import { LitElement, html, css } from 'lit'
 import { sharedStyles, icons, iconCode } from './util.js'
 
 function micropubGet(endpoint, qs) {

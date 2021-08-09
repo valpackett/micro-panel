@@ -8,11 +8,9 @@
 			body { margin: 0; padding: 0; font: 1em sans-serif; }
 			main { margin: 1rem auto; max-width: 96%; }
 		</style>
-		<!-- Polyfill loader -- you should include it -->
-		<script src="node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
 		<!-- The actual micro-panel code -- DO NOT include like this, this is for development.
 		Include the bundled minified script dist/micro-panel-all.bundle.min.js
-		Or bundle yourself if you also use lit-html/lit-element/etc. elsewhere in your site.
+		Or bundle yourself if you also use Lit elsewhere in your site.
 		You can't just use these modules directly because they refer to package paths in their imports :( -->
 		<script type="module" src="src/micro-panel-all.js"></script>
 		<!-- Icons and manifest -- you should include them, unless you have your own -->

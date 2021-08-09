@@ -1,5 +1,6 @@
-import resolve from 'rollup-plugin-node-resolve'
-import minify from 'rollup-plugin-minify-es'
+import resolve from '@rollup/plugin-node-resolve'
+import {terser} from 'rollup-plugin-terser'
+import minifyHTML from 'rollup-plugin-minify-html-literals'
 import license from 'rollup-plugin-license'
 
 export default {
@@ -14,7 +15,12 @@ export default {
 	],
 	plugins: [
 		resolve(),
-		minify(),
+		minifyHTML(),
+    terser({
+			ecma: 2020,
+			module: true,
+			warnings: true,
+		}),
 		license({
 			banner: `@license
 micro-panel | Unlicense.
@@ -23,4 +29,5 @@ CodeFlask (c) Claudio Holanda | MIT.
 Prism (c) Lea Verou | MIT.`
 		}),
 	],
+	preserveEntrySignatures: 'strict',
 }

@@ -2,7 +2,7 @@ import 'codeflask-element'
 import 'prismjs/components/prism-markdown.min.js'
 import 'prismjs/components/prism-json.min.js'
 import { rgbToHex, rgbTupleToRgb, hexToRgbTuple } from '@wessberg/color'
-import { LitElement, html, css } from 'lit-element'
+import { LitElement, html, css } from 'lit'
 import { reportError, upload, geolocate, reverseGeocode, sharedStyles, icons, iconCode } from './util.js'
 import produce from 'immer'
 
