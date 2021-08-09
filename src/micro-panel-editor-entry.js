@@ -385,9 +385,6 @@ export default class MicroPanelEditorEntry extends LitElement {
 						<input type="text" id=${`id-${propval}`} value=${propval.id || ''} @change=${e =>
 							this._modify(entry, draft => draft.properties[propname][idx].id = e.target.value)
 						}/>&nbsp;
-						<code @click=${e => window.getSelection().selectAllChildren(e.target)}>
-							&lt;${propname}-here id="${propval.id || ''}"&gt;&lt;/${propname}-here&gt;
-						</code>
 					</label>
 				</div>
 			`
