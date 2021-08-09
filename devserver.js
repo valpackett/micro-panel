@@ -43,15 +43,15 @@ Look, the post source is **different**! This is a *demo*, so the micropub endpoi
 						"width": 800,
 						"source": [
 							{
-								"src": "https://unrelentingtech.s3.dualstack.eu-west-1.amazonaws.com/786ac297_x.mp4",
+								"src": "https://dl.unrelenting.technology/786ac297_x.mp4",
 								"type": "video/mp4"
 							},
 							{
-								"src": "https://unrelentingtech.s3.dualstack.eu-west-1.amazonaws.com/786ac297_x.webm",
+								"src": "https://dl.unrelenting.technology/786ac297_x.webm",
 								"type": "video/webm"
 							},
 							{
-								"src": "https://unrelentingtech.s3.dualstack.eu-west-1.amazonaws.com/786ac297_x.poster.jpg",
+								"src": "https://dl.unrelenting.technology/786ac297_x.poster.jpg",
 								"type": "image/jpeg"
 							}
 						],
@@ -66,21 +66,31 @@ Look, the post source is **different**! This is a *demo*, so the micropub endpoi
 				photo: [
 					{
 						"height": 380,
-						"palette": {
-							"Vibrant": { "color": "#e47060", "population": 4 },
-							"LightVibrant": { "color": "#f4ac9c", "population": 4 },
-							"Muted": { "color": "#9fcc97", "population": 7 },
-							"DarkVibrant": { "color": "#711e13", "population": 0 },
-							"LightMuted": { "color": "#b0c6ad", "population": 21 }
-						},
+						"aperture": 10,
+						"focal_length": 27,
+						"geo": null,
+						"height": 2916,
+						"iso": 100,
+						"palette": [
+							{ "b": 106, "g": 89, "r": 58 },
+							{ "b": 198, "g": 201, "r": 201 },
+							{ "b": 140, "g": 143, "r": 146 },
+							{ "b": 25, "g": 23, "r": 2 },
+							{ "b": 41, "g": 47, "r": 52 },
+							{ "b": 181, "g": 149, "r": 101 },
+							{ "b": 191, "g": 183, "r": 159 },
+							{ "b": 153, "g": 141, "r": 113 },
+							{ "b": 128, "g": 140, "r": 172 }
+						],
+						"shutter_speed": [ 1, 320 ],
 						"width": 1276,
 						"source": [
 							{
-								"src": "https://unrelentingtech.s3.dualstack.eu-west-1.amazonaws.com/b18de0b9_wayland-screenshot-2018-07-05_16-33-27-fs8.png",
+								"src": "https://dl.unrelenting.technology/b18de0b9_wayland-screenshot-2018-07-05_16-33-27-fs8.png",
 								"type": "image/png"
 							},
 							{
-								"src": "https://unrelentingtech.s3.dualstack.eu-west-1.amazonaws.com/b18de0b9_wayland-screenshot-2018-07-05_16-33-27-fs8.webp",
+								"src": "https://dl.unrelenting.technology/b18de0b9_wayland-screenshot-2018-07-05_16-33-27-fs8.webp",
 								"type": "image/webp"
 							}
 						],
