@@ -376,11 +376,9 @@ export default class MicroPanelEditorEntry extends LitElement {
 							this._modify(entry, draft => draft.properties[propname][idx].alt = e.target.value)
 						}/>
 					</label>
-					<div class="input-row input-row-labeled">
-						<label for=${`id-${propval}`}>
-							ID&nbsp;
-						</label>
-						<input type="text" id=${`id-${propval}`} value=${propval.id || ''} @change=${e =>
+					<label class="input-row input-row-labeled">
+						ID&nbsp;
+						<input type="text" value=${propval.id || ''} @change=${e =>
 							this._modify(entry, draft => draft.properties[propname][idx].id = e.target.value)
 						}/>&nbsp;
 					</label>
