@@ -437,7 +437,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 						this.dragFirst = false
 					}
 					if (!this.dragFirst && !this.dragSecond) {
-						for (const zone of this.shadowRoot.querySelectorAll('.upload-zone'))
+						for (const zone of this.renderRoot.querySelectorAll('.upload-zone'))
 							zone.classList.remove('dragging')
 					}
 				}}
@@ -446,7 +446,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 					e.preventDefault()
 					this.dragFirst = false
 					this.dragSecond = false
-					for (const zone of this.shadowRoot.querySelectorAll('.upload-zone'))
+					for (const zone of this.renderRoot.querySelectorAll('.upload-zone'))
 						zone.classList.remove('dragging')
 					this.uploadQueues = produce(uploadQueues, x => {
 						for (const file of e.dataTransfer.files) {
@@ -513,7 +513,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 		if ('key' in e && e.key !== 'Enter') {
 			return
 		}
-		const inp = this.shadowRoot.getElementById('new-prop-inp')
+		const inp = this.renderRoot.getElementById('new-prop-inp')
 		const propName = inp.value
 		this._modify(entry, draft => {
 			if (propName.length > 0 && !(propName in draft.properties)) {
