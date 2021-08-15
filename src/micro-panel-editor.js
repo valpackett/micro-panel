@@ -97,19 +97,21 @@ export default class MicroPanelEditor extends LitElement {
 		const { micropub, media, mediatoken, mediafirehose, defaultctype, originalUrl, entry, entryIsNew, entryIsModified, cats } = this
 		return html`
 			<header class="bar header-bar inverted">
-				<button @click=${_ => this.close()} class="icon-button">${iconCode(icons.close)}</button>
+				<button @click=${_ => this.close()} class="icon-button" title="Close the editor">${iconCode(icons.close)}</button>
 				<slot name="title"><h1>micro-panel editor</h1></slot>
 				<button ?disabled=${this.rootEditor && !this.rootEditor.canUndo}
-					@click=${_ => this.rootEditor.undo()} class="icon-button">${iconCode(icons.undo)}</button>
+					@click=${_ => this.rootEditor.undo()} class="icon-button" title="Undo">${iconCode(icons.undo)}</button>
 				<button ?disabled=${this.rootEditor && !this.rootEditor.canRedo}
-					@click=${_ => this.rootEditor.redo()} class="icon-button">${iconCode(icons.redo)}</button>
+					@click=${_ => this.rootEditor.redo()} class="icon-button" title="Redo">${iconCode(icons.redo)}</button>
 				${originalUrl ? html`
-					<button @click=${_ => this.deleteEntry()}>Delete</button>
+					<button @click=${_ => this.deleteEntry()} class="icon-button" title="Delete">${iconCode(icons.trash)}</button>
 				` : ''}
 				${entryIsNew ? html`
-					<button @click=${_ => this.createEntry()} ?disabled=${!entryIsModified}>Create</button>
+					<button @click=${_ => this.createEntry()} ?disabled=${!entryIsModified}
+						class="icon-button" title="Create">${iconCode(icons.save)}</button>
 				` : html`
-					<button @click=${_ => this.updateEntry()} ?disabled=${!entryIsModified}>Save</button>
+					<button @click=${_ => this.updateEntry()} ?disabled=${!entryIsModified}
+						class="icon-button" title="Save">${iconCode(icons.save)}</button>
 				`}
 			</header>
 
