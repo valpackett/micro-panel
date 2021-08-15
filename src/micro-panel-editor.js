@@ -89,12 +89,20 @@ export default class MicroPanelEditor extends LitElement {
 		]
 	}
 
+	get rootEditor() {
+		return this.renderRoot.getElementById('root-editor')
+	}
+
 	render () {
 		const { micropub, media, mediatoken, mediafirehose, defaultctype, originalUrl, entry, entryIsNew, entryIsModified, cats } = this
 		return html`
 			<header class="bar header-bar inverted">
 				<button @click=${_ => this.close()} class="icon-button">${iconCode(icons.close)}</button>
 				<slot name="title"><h1>micro-panel editor</h1></slot>
+				<button ?disabled=${this.rootEditor && !this.rootEditor.canUndo}
+					@click=${_ => this.rootEditor.undo()} class="icon-button">${iconCode(icons.undo)}</button>
+				<button ?disabled=${this.rootEditor && !this.rootEditor.canRedo}
+					@click=${_ => this.rootEditor.redo()} class="icon-button">${iconCode(icons.redo)}</button>
 				${originalUrl ? html`
 					<button @click=${_ => this.deleteEntry()}>Delete</button>
 				` : ''}
