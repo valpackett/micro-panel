@@ -319,6 +319,13 @@ export default class MicroPanelEditorEntry extends LitElement {
 				}></mp-code-mirror>
 			`
 		}
+		if ('text' in propval) {
+			return html`
+				<mp-code-mirror lang="markdown" .value=${propval.text} .setValue=${v =>
+					this._modify(entry, draft => draft.properties[propname][idx].text = v)
+				}></mp-code-mirror>
+			`
+		}
 		if ('source' in propval) {
 			return html`
 				<div class="media-editor">
