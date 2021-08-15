@@ -110,10 +110,15 @@ export const sharedStyles = css`
 			padding: 0;
 			vertical-align: middle;
 			height: 1.6rem;
-			width: 3rem;
+			width: 1.6rem;
+			border-radius: 10rem;
+			overflow: hidden;
+		}
+		::-webkit-color-swatch-wrapper {
+			padding: 0;
 		}
 		mp-code-mirror { display: block; padding: 0 !important; overflow: hidden; }
-		::-moz-focus-inner {
+		::-moz-focus-inner, ::-moz-color-swatch {
 			border-style: none;
 			padding: 0;
 		}

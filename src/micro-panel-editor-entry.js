@@ -339,7 +339,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 							Palette
 							${Array.isArray(propval.palette) && propval.palette.map((clr, i) => html`
 								<label class="palette-color">
-									<input type="color" value=${rgbToHex(rgbTupleToRgb([clr.r || 0, clr.g || 0, clr.b || 0]))} @change=${e =>
+									<input type="color" .value=${rgbToHex(rgbTupleToRgb([clr.r || 0, clr.g || 0, clr.b || 0]))} @change=${e =>
 										this._modify(entry, draft => {
 											const [r, g, b] = hexToRgbTuple(e.target.value)
 											draft.properties[propname][idx].palette[i] = {r, g, b}
