@@ -1,6 +1,9 @@
 // https://github.com/immerjs/immer/issues/557
 window.process = {env: {NODE_ENV: 'production'}}
 
+import { enablePatches } from 'immer'
+enablePatches()
+
 import './micro-panel-editor.js'
 import './micro-panel-toolbar.js'
 import './micro-panel-action.js'

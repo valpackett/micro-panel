@@ -2,7 +2,7 @@ import './mp-code-mirror.js'
 import { rgbToHex, rgbTupleToRgb, hexToRgbTuple } from '@wessberg/color'
 import { LitElement, html, css } from 'lit'
 import { reportError, upload, geolocate, reverseGeocode, sharedStyles, icons, iconCode } from './util.js'
-import produce from 'immer'
+import produce, { produceWithPatches, applyPatches } from 'immer'
 
 export default class MicroPanelEditorEntry extends LitElement {
 	static get properties () {
@@ -24,6 +24,8 @@ export default class MicroPanelEditorEntry extends LitElement {
 		this.uploadQueues = { photo: [], video: [], audio: [] }
 		this.openJsonEditors = { filter: true, unfilter: true, 'feed-settings': true, 'site-settings': true, 'site-web-push-subscriptions': true, }
 		this.jsonParseError = {}
+		this.undos = []
+		this.redos = []
 	}
 
 	connectedCallback () {
@@ -533,7 +535,34 @@ export default class MicroPanelEditorEntry extends LitElement {
 	_modify (entry, fn) {
 		// NOTE: propagating the entry property assignment up to the top component
 		// NOTE: eat return value here to avoid returning assignment results
-		this.setEntry(produce(entry, draft => { fn(draft) }))
+		const [newEntry, patches, inversePatches] = produceWithPatches(entry, draft => { fn(draft) })
+		this.setEntry(newEntry)
+		this.undos.push([patches, inversePatches])
+		this.redos = []
+	}
+
+	undo () {
+		if (this.undos.length < 1)
+			return
+		const [patches, inversePatches] = this.undos.pop()
+		this.setEntry(produce(this.entry, draft => { applyPatches(draft, inversePatches) }))
+		this.redos.unshift(patches)
+	}
+
+	redo () {
+		if (this.redos.length < 1)
+			return
+		const [newEntry, patches, inversePatches] = produceWithPatches(this.entry, draft => { applyPatches(draft, this.redos.shift()) })
+		this.setEntry(newEntry)
+		this.undos.push([patches, inversePatches])
+	}
+
+	get canUndo() {
+		return this.undos.length > 0
+	}
+
+	get canRedo() {
+		return this.redos.length > 0
 	}
 }
 
