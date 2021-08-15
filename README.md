@@ -35,7 +35,7 @@ Just do it!
 ```html
 	...
 	{{if logged-in-as-admin}}
-	<script defer src="/some/where/micro-panel-all.bundle.min.js"></script>
+	<script type="module" src="/some/where/micro-panel-all.js"></script>
 	{{else}}
 	<script defer src="/some/where/indie-action.min.js"></script>
 	{{endif}}
