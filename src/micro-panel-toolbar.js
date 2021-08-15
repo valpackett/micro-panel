@@ -10,6 +10,15 @@ export default class MicroPanelToolbar extends LitElement {
 			css`
 				:host {
 					display: block;
+					position: fixed;
+					top: 0;
+					right: 0;
+					border-bottom-left-radius: var(--roundness);
+					overflow: hidden;
+					opacity: 0.9;
+				}
+				:host(:hover) {
+					opacity: 1;
 				}
 			`
 		]
