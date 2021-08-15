@@ -106,6 +106,12 @@ export const sharedStyles = css`
 			border: 1px solid var(--accent);
 			vertical-align: baseline;
 		}
+		input[type=color] {
+			padding: 0;
+			vertical-align: middle;
+			height: 1.6rem;
+			width: 3rem;
+		}
 		mp-code-mirror { display: block; padding: 0 !important; overflow: hidden; }
 		::-moz-focus-inner {
 			border-style: none;
@@ -145,6 +151,11 @@ export const sharedStyles = css`
 		.icon, .icon-button {
 			vertical-align: middle;
 		}
+		button:not(.icon-button) .icon {
+			width: 1.4rem;
+			height: 1.4rem;
+			margin-top: -0.2rem;
+		}
 		.icon-button {
 			padding: 0.2rem;
 			border-radius: 100rem;
@@ -171,6 +182,7 @@ export const sharedStyles = css`
 
 		.header-bar {
 			padding: var(--major-padding);
+			line-height: 25px;
 		}
 		.bar {
 			margin: 0;
