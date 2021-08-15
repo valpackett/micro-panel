@@ -194,6 +194,9 @@ export default class MicroPanelEditor extends LitElement {
 	}
 
 	createEntry () {
+		if (!confirm('Create this entry?')) {
+			return
+		}
 		this._post({
 			type: this.entry.type,
 			properties: this.entry.properties,
@@ -204,6 +207,9 @@ export default class MicroPanelEditor extends LitElement {
 		const url = this.originalUrl || ((this.entry.properties || {}).url || [null])[0]
 		if (!url) {
 			return alert('Somehow, an entry with no URL! I have no idea how to save that.')
+		}
+		if (!confirm('Update this entry?')) {
+			return
 		}
 		this._post({
 			action: 'update',
