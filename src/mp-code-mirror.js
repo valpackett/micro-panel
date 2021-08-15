@@ -1,9 +1,4 @@
 import { ReactiveElement } from '@lit/reactive-element'
-import { EditorState, EditorView, basicSetup } from '@codemirror/basic-setup'
-import { markdown } from '@codemirror/lang-markdown'
-import { html } from '@codemirror/lang-html'
-import { css } from '@codemirror/lang-css'
-import { json } from '@codemirror/lang-json'
 
 export default class CodeMirrorElement extends ReactiveElement {
 	static get properties () {
@@ -18,8 +13,13 @@ export default class CodeMirrorElement extends ReactiveElement {
 		this.value = ''
 	}
 
-	createRenderRoot() {
-		const shadowRoot = super.createRenderRoot()
+	async connectedCallback() {
+		super.connectedCallback()
+		const { EditorState, EditorView, basicSetup } = await import('@codemirror/basic-setup')
+		const { markdown } = await import('@codemirror/lang-markdown')
+		const { html } = await import('@codemirror/lang-html')
+		const { css } = await import('@codemirror/lang-css')
+		const { json } = await import('@codemirror/lang-json')
 		const exts = [
 			basicSetup,
 			EditorView.lineWrapping,
@@ -44,14 +44,13 @@ export default class CodeMirrorElement extends ReactiveElement {
 				doc: this.value,
 				extensions: exts,
 			}),
-			root: shadowRoot,
-			parent: shadowRoot,
+			root: this.renderRoot,
+			parent: this.renderRoot,
 		})
-		return shadowRoot
 	}
 
 	update(changed) {
-		if (changed.has('value'))
+		if (changed.has('value') && this.cmview)
 			this.cmview.dispatch({
 				changes: {
 					from: 0, 
