@@ -1,9 +1,9 @@
 import { ReactiveElement } from '@lit/reactive-element'
-import { EditorState, EditorView, basicSetup } from "@codemirror/basic-setup"
-import { markdown } from "@codemirror/lang-markdown"
-import { html } from "@codemirror/lang-html"
-import { css } from "@codemirror/lang-css"
-import { json } from "@codemirror/lang-json"
+import { EditorState, EditorView, basicSetup } from '@codemirror/basic-setup'
+import { markdown } from '@codemirror/lang-markdown'
+import { html } from '@codemirror/lang-html'
+import { css } from '@codemirror/lang-css'
+import { json } from '@codemirror/lang-json'
 
 export default class CodeMirrorElement extends ReactiveElement {
 	static get properties () {
