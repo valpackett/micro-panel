@@ -15,7 +15,7 @@ export default {
 	plugins: [
 		resolve(),
 		minifyHTML(),
-    terser({
+		terser({
 			ecma: 2020,
 			module: true,
 			warnings: true,

@@ -549,16 +549,18 @@ export default class MicroPanelEditorEntry extends LitElement {
 	}
 
 	undo () {
-		if (this.undos.length < 1)
+		if (this.undos.length < 1) {
 			return
+		}
 		const [patches, inversePatches] = this.undos.pop()
 		this.setEntry(produce(this.entry, draft => { applyPatches(draft, inversePatches) }))
 		this.redos.unshift(patches)
 	}
 
 	redo () {
-		if (this.redos.length < 1)
+		if (this.redos.length < 1) {
 			return
+		}
 		const [newEntry, patches, inversePatches] = produceWithPatches(this.entry, draft => { applyPatches(draft, this.redos.shift()) })
 		this.setEntry(newEntry)
 		this.undos.push([patches, inversePatches])
