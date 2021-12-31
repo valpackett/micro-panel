@@ -87,7 +87,7 @@ export const sharedStyles = css`
 			--major-padding: var(--micro-panel-major-padding, 0.5rem);
 			--roundness: var(--micro-panel-roundness, 4px);
 			--neutral: var(--micro-panel-neutral, #fefefe);
-			--neutral-hover: var(--micro-panel-neutral, #ebebeb);
+			--neutral-hover: var(--micro-panel-neutral-hover, #ebebeb);
 			--accent: var(--micro-panel-accent, rgb(0, 137, 123));
 			--accent-hover: var(--micro-panel-accent-hover, rgb(0, 107, 103));
 			--light-accent: var(--micro-panel-light-accent, rgba(0, 137, 123, 0.55));
@@ -96,13 +96,28 @@ export const sharedStyles = css`
 			color: var(--text);
 		}
 		:host([hidden]) { display: none !important; }
+		::selection { background: var(--light-accent); color: var(--neutral); }
 		* { box-sizing: border-box; }
+
+		@media (prefers-color-scheme: dark) {
+			:host {
+				--micro-panel-neutral: #292929;
+				--micro-panel-neutral-hover: #323232;
+				--micro-panel-text: #efefef;
+				--micro-panel-accent: rgb(195, 230, 119);
+				--micro-panel-accent-hover: rgb(215, 250, 139);
+				--micro-panel-light-accent: rgba(195, 230, 119, 0.69);
+				--micro-panel-very-light-accent: rgba(195, 230, 119, 0.15);
+			}
+		}
 
 		input, textarea, button, .input-row mp-code-mirror {
 			text-transform: none;
 			border-radius: var(--roundness);
 			padding: 0.4rem;
 			outline: none;
+			background: var(--neutral);
+			color: var(--text);
 			border: 1px solid var(--accent);
 			vertical-align: baseline;
 		}
@@ -170,6 +185,11 @@ export const sharedStyles = css`
 		}
 		.icon-button:hover {
 			background: rgba(10, 10, 10, 0.2);
+		}
+		@media (prefers-color-scheme: dark) {
+			.icon-button:hover {
+				background: rgba(230, 230, 230, 0.2);
+			}
 		}
 
 		.inverted {

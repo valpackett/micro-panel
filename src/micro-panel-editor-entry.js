@@ -53,29 +53,39 @@ export default class MicroPanelEditorEntry extends LitElement {
 				fieldset {
 					border: 0;
 					margin: 1rem auto;
-					padding: 0;
-					box-shadow: rgba(20,20,20,0.24) 0 0 6px;
+					padding: 0 0 0.25rem 0;
+					box-shadow: rgba(20, 20, 20, 0.24) 0 0 6px;
 					border-radius: var(--roundness);
 					overflow: hidden;
+				}
+				@media (prefers-color-scheme: dark) {
+					fieldset {
+						box-shadow: var(--very-light-accent) 0 0 6px;
+					}
 				}
 				header {
 					background: var(--light-accent);
 					color: var(--neutral);
 					padding: 0.15rem 0.5rem;
 				}
+				.bar {
+					margin-bottom: 0.25rem;
+				}
 				.bar button + label {
 					margin-left: 0;
 				}
 				.input-row {
-					padding: 0.5rem;
+					padding: 0.3rem 0.5rem;
 					display: flex;
 					align-items: start;
 				}
-				.input-row + .input-row {
-					padding-top: 0;
-				}
 				fieldset > .input-row:nth-of-type(even) {
-					background: #fafafa;
+					background: rgba(25, 25, 25, 0.06);
+				}
+				@media (prefers-color-scheme: dark) {
+					fieldset > .input-row:nth-of-type(even) {
+						background: rgba(255, 255, 255, 0.08);
+					}
 				}
 				.input-row input, .input-row textarea, .input-row mp-code-mirror,
 				.input-row micro-panel-editor-entry, .input-row .media-editor, .input-row .error-value {
@@ -107,7 +117,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 				}
 
 				.cat-suggest {
-					padding: 0.5rem;
+					padding: 0.3rem;
 					font-size: 1.1em;
 					line-height: 2;
 				}
