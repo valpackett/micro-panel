@@ -1,6 +1,6 @@
 const fs = require('fs')
 const polka = require('polka')
-const Busboy = require('busboy')
+const busboy = require('busboy')
 const esModuleDevserver = require('es-module-devserver')
 
 polka()
@@ -108,7 +108,7 @@ Look, the post source is **different**! This is a *demo*, so the micropub endpoi
 	})
 	.post('/fake-media', (req, res) => {
 		let filename = null
-		const bb = new Busboy({ headers: req.headers })
+		const bb = busboy({ headers: req.headers })
 		bb.on('file', (_fld, file, fname, _enc, _mt) => {
 			file.on('data', _ => {}) // needs these
 			file.on('end', () => {})
