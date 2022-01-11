@@ -121,6 +121,7 @@ export default class MicroPanelEditor extends LitElement {
 				.setEntry=${entry => {
 					this.entry = entry
 					this.entryIsModified = true
+					this.update()
 				}}></micro-panel-editor-entry>
 
 		`

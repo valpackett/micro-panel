@@ -185,16 +185,16 @@ export default class MicroPanelEditorEntry extends LitElement {
 					${entry.type.map((tval, idx) => html`
 						<div class="input-row">
 							<input type="text" .value=${tval} @change=${e =>
-								this._modify(entry, draft => draft.type[idx] = e.target.value)
+								this._modify(draft => draft.type[idx] = e.target.value)
 							} ?disabled=${!entryIsNew}>
 							${(idx === 0 || !entryIsNew) ? '' : html`
 								<button @click=${_ =>
-									this._modify(entry, draft => draft.type.splice(idx, 1))
+									this._modify(draft => draft.type.splice(idx, 1))
 								} title="Delete this type" class="icon-button">${iconCode(icons.minus)}</button>
 							`}
 							${!entryIsNew ? '' : html`
 								<button @click=${_ =>
-									this._modify(entry, draft => draft.type.push(''))
+									this._modify(draft => draft.type.push(''))
 								} title="Add new type" class="icon-button">${iconCode(icons.plus)}</button>
 							`}
 						</div>
@@ -210,7 +210,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 						}} title="Toggle display of this property" class="icon-button">${iconCode(hiddenProps[propname] ? icons.chevronDown : icons.chevronUp)}</button>
 						<label>${propname}</label>
 						<button @click=${_ =>
-							this._modify(entry, draft => {
+							this._modify(draft => {
 								delete draft.properties[propname]
 								if (!('x-micro-panel-deleted-properties' in draft)) {
 									draft['x-micro-panel-deleted-properties'] = []
@@ -225,7 +225,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 						${'geolocation' in navigator ? html`
 							<button @click=${_ =>
 								geolocate()
-									.then(loc => this._modify(entry, draft => draft.properties[propname].push(loc)))
+									.then(loc => this._modify(draft => draft.properties[propname].push(loc)))
 									.catch(reportError)
 							} title="Add geolocation" class="icon-button">${iconCode(icons.mapMarkerPlus)}</button>
 						` : ''}
@@ -236,7 +236,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 							}} title="Upload media files" class="icon-button">${iconCode(icons.cloudUpload)}</button>
 						` : ''}
 						<button @click=${_ =>
-							this._modify(entry, draft => draft.properties[propname].push(''))
+							this._modify(draft => draft.properties[propname].push(''))
 						} title="Add new value to this property" class="icon-button">${iconCode(icons.plus)}</button>
 					</header>
 					${hiddenProps[propname] ? ''
@@ -245,14 +245,14 @@ export default class MicroPanelEditorEntry extends LitElement {
 						<div class="input-row input-row-labeled">
 							${this._rowEditor(entry, propname, propval, idx, media, mediatoken, cats, defaultctype)}
 							<button @click=${_ =>
-								this._modify(entry, draft => draft.properties[propname].splice(idx, 1))
+								this._modify(draft => draft.properties[propname].splice(idx, 1))
 							} title="Delete this value" class="icon-button">${iconCode(icons.minus)}</button>
 						</div>
 					`))}
 					${(!hiddenProps[propname] && propname === 'category') ? html`
 						<div class="cat-suggest">
 							${[...cats].map(cat => entry.properties.category.includes(cat) ? '' : html`
-								<button @click=${_ => this._modify(entry, draft => draft.properties.category.push(cat))}>${cat}</button>
+								<button @click=${_ => this._modify(draft => draft.properties.category.push(cat))}>${cat}</button>
 							`)}
 						</div>
 					` : ''}
@@ -263,7 +263,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 		${(entry && entry.type && entry.type.length > 0 && entry.type[0] === 'h-geo') ? html`
 			<fieldset class="input-row">
 				<button @click=${_ => reverseGeocode(entry.properties).then(props =>
-					this._modify(entry, draft => {
+					this._modify(draft => {
 						draft.type[0] = 'h-adr'
 						draft.properties = props
 					})).catch(reportError)
@@ -282,14 +282,14 @@ export default class MicroPanelEditorEntry extends LitElement {
 		if (propname === 'site-css' && typeof propval === 'string') {
 			return html`
 				<mp-code-mirror lang="css" .value=${propval} .setValue=${v =>
-					this._modify(entry, draft => draft.properties[propname][idx] = v)
+					this._modify(draft => draft.properties[propname][idx] = v)
 				}></mp-code-mirror>
 			`
 		}
 		if (typeof propval === 'string') {
 			return html`
 				<input type="text" .value=${propval} @change=${e =>
-					this._modify(entry, draft => draft.properties[propname][idx] = e.target.value)
+					this._modify(draft => draft.properties[propname][idx] = e.target.value)
 				}/>
 			`
 		}
@@ -302,7 +302,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 		if (propname === 'subscriptions') {
 			return html`
 				Feed&nbsp;<input type="url" .value=${propval.feed} @value-changed=${e =>
-					this._modify(entry, draft => draft.properties[propname][idx].feed = e.target.value)
+					this._modify(draft => draft.properties[propname][idx].feed = e.target.value)
 				}>&nbsp;entries: ${(propval.entries || []).length}
 			`
 		}
@@ -311,28 +311,28 @@ export default class MicroPanelEditorEntry extends LitElement {
 				<micro-panel-editor-entry
 					.media=${media} .mediatoken=${mediatoken} .cats=${cats} .defaultctype=${defaultctype}
 					.entry=${propval}
-					.setEntry=${nentry => this._modify(entry, draft => draft.properties[propname][idx] = nentry)}>
+					.setEntry=${nentry => this._modify(draft => draft.properties[propname][idx] = nentry)}>
 				</micro-panel-editor-entry>
 			`
 		}
 		if ('html' in propval) {
 			return html`
 				<mp-code-mirror lang="html" .value=${propval.html} .setValue=${v =>
-					this._modify(entry, draft => draft.properties[propname][idx].html = v)
+					this._modify(draft => draft.properties[propname][idx].html = v)
 				}></mp-code-mirror>
 			`
 		}
 		if ('markdown' in propval) {
 			return html`
 				<mp-code-mirror lang="markdown" .value=${propval.markdown} .setValue=${v =>
-					this._modify(entry, draft => draft.properties[propname][idx].markdown = v)
+					this._modify(draft => draft.properties[propname][idx].markdown = v)
 				}></mp-code-mirror>
 			`
 		}
 		if ('text' in propval) {
 			return html`
 				<mp-code-mirror lang="markdown" .value=${propval.text} .setValue=${v =>
-					this._modify(entry, draft => draft.properties[propname][idx].text = v)
+					this._modify(draft => draft.properties[propname][idx].text = v)
 				}></mp-code-mirror>
 			`
 		}
@@ -357,7 +357,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 							${Array.isArray(propval.palette) && propval.palette.map((clr, i) => html`
 								<label class="palette-color">
 									<input type="color" .value=${rgbToHex(rgbTupleToRgb([clr.r || 0, clr.g || 0, clr.b || 0]))} @change=${e =>
-										this._modify(entry, draft => {
+										this._modify(draft => {
 											const [r, g, b] = hexToRgbTuple(e.target.value)
 											draft.properties[propname][idx].palette[i] = {r, g, b}
 										})
@@ -368,37 +368,37 @@ export default class MicroPanelEditorEntry extends LitElement {
 					<div class="input-row input-row-labeled input-row-photo-stuff">
 						<label>
 							ƒ/<input type="number" min="0.0" step="0.01" value=${propval.aperture || null} @change=${e =>
-								this._modify(entry, draft => draft.properties[propname][idx].aperture = parseFloat(e.target.value))
+								this._modify(draft => draft.properties[propname][idx].aperture = parseFloat(e.target.value))
 							}/>
 						</label>
 						<label>
 							Shutter <input type="number" min="0" step="1" value=${(propval.shutter_speed || [])[0] || null} @change=${e =>
-								this._modify(entry, draft => draft.properties[propname][idx].shutter_speed = [parseFloat(e.target.value), (draft.properties[propname][idx].shutter_speed || [])[1] || 1] )
+								this._modify(draft => draft.properties[propname][idx].shutter_speed = [parseFloat(e.target.value), (draft.properties[propname][idx].shutter_speed || [])[1] || 1] )
 							}/>/<input type="number" min="0" step="1" value=${(propval.shutter_speed || [])[1] || null} @change=${e =>
-								this._modify(entry, draft => draft.properties[propname][idx].shutter_speed = [(draft.properties[propname][idx].shutter_speed || [])[0] || 1, parseFloat(e.target.value)] )
+								this._modify(draft => draft.properties[propname][idx].shutter_speed = [(draft.properties[propname][idx].shutter_speed || [])[0] || 1, parseFloat(e.target.value)] )
 							}/> s
 						</label>
 						<label>
 							ISO <input type="number" min="0" step="1" value=${propval.iso || null} @change=${e =>
-								this._modify(entry, draft => draft.properties[propname][idx].iso = parseInt(e.target.value))
+								this._modify(draft => draft.properties[propname][idx].iso = parseInt(e.target.value))
 							}/>
 						</label>
 						<label>
 							Focal <input type="number" min="0" step="0.01" value=${propval.focal_length || null} @change=${e =>
-								this._modify(entry, draft => draft.properties[propname][idx].focal_length = parseFloat(e.target.value))
+								this._modify(draft => draft.properties[propname][idx].focal_length = parseFloat(e.target.value))
 							}/> mm
 						</label>
 					</div>
 					<label class="input-row input-row-labeled">
 						Alt text&nbsp;
 						<input type="text" value=${propval.alt || ''} @change=${e =>
-							this._modify(entry, draft => draft.properties[propname][idx].alt = e.target.value)
+							this._modify(draft => draft.properties[propname][idx].alt = e.target.value)
 						}/>
 					</label>
 					<label class="input-row input-row-labeled">
 						ID&nbsp;
 						<input type="text" value=${propval.id || ''} @change=${e =>
-							this._modify(entry, draft => draft.properties[propname][idx].id = e.target.value)
+							this._modify(draft => draft.properties[propname][idx].id = e.target.value)
 						}/>&nbsp;
 					</label>
 				</div>
@@ -410,7 +410,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 	_jsonEditor (entry, propname, jsonParseError) {
 		return html`
 			<mp-code-mirror lang="json" .value=${JSON.stringify(entry.properties[propname], null, 2)} .setValue=${v =>
-				this._modify(entry, draft => {
+				this._modify(draft => {
 					try {
 						draft.properties[propname] = JSON.parse(v)
 						this.jsonParseError = produce(jsonParseError, pes => { pes[propname] = null })
@@ -532,7 +532,7 @@ export default class MicroPanelEditorEntry extends LitElement {
 		}
 		const inp = this.renderRoot.getElementById('new-prop-inp')
 		const propName = inp.value
-		this._modify(entry, draft => {
+		this._modify(draft => {
 			if (propName.length > 0 && !(propName in draft.properties)) {
 				if (propName === 'photo' || propName === 'video' || propName === 'audio' || propName === 'location') {
 					draft.properties[propName] = []
@@ -549,10 +549,10 @@ export default class MicroPanelEditorEntry extends LitElement {
 		inp.value = ''
 	}
 
-	_modify (entry, fn) {
+	_modify (fn) {
 		// NOTE: propagating the entry property assignment up to the top component
 		// NOTE: eat return value here to avoid returning assignment results
-		const [newEntry, patches, inversePatches] = produceWithPatches(entry, draft => { fn(draft) })
+		const [newEntry, patches, inversePatches] = produceWithPatches(this.entry, draft => { fn(draft) })
 		this.setEntry(newEntry)
 		this.undos.push([patches, inversePatches])
 		this.redos = []
