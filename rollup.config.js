@@ -1,6 +1,6 @@
 import resolve from '@rollup/plugin-node-resolve'
 import {terser} from 'rollup-plugin-terser'
-import minifyHTML from 'rollup-plugin-minify-html-literals'
+// import minifyHTML from 'rollup-plugin-minify-html-literals' // https://github.com/asyncLiz/minify-html-literals/issues/42
 
 export default {
 	input: 'src/micro-panel-all.js',
@@ -18,7 +18,7 @@ export default {
 	],
 	plugins: [
 		resolve(),
-		minifyHTML(),
+		// minifyHTML(),
 		terser({
 			ecma: 2020,
 			module: true,
